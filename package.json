@@ -1,0 +1,66 @@
+{
+  "name": "srvx",
+  "version": "0.0.0",
+  "description": "",
+  "repository": "unjs/srvx",
+  "license": "MIT",
+  "sideEffects": false,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/types.d.mts",
+      "bun": "./dist/bun.mjs",
+      "node": "./dist/node.mjs"
+    },
+    "./node-utils": {
+      "types": "./dist/node-utils/index.d.mts",
+      "import": "./dist/node-utils/index.mjs"
+    },
+    "./types": {
+      "types": "./dist/types.d.mts",
+      "import": "./dist/types.mjs"
+    }
+  },
+  "types": "./dist/types.d.mts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "unbuild",
+    "dev": "vitest dev",
+    "lint": "eslint . && prettier -c .",
+    "lint:fix": "automd && eslint . --fix && prettier -w .",
+    "prepack": "pnpm build",
+    "play:bun": "bun run ./playground/index.ts",
+    "bench:node": "node test/bench-node/_run.mjs",
+    "play:deno": "deno run --unstable-byonm -A ./playground/index.ts",
+    "play:node": "node --import jiti/register ./playground/index.ts",
+    "release": "pnpm test && changelogen --release && npm publish && git push --follow-tags",
+    "test": "pnpm lint && pnpm test:types && vitest run --coverage",
+    "test:types": "tsc --noEmit --skipLibCheck"
+  },
+  "dependencies": {
+    "cookie-es": "^1.2.2"
+  },
+  "devDependencies": {
+    "@deno/types": "^0.0.1",
+    "@hono/node-server": "^1.12.2",
+    "@mjackson/node-fetch-server": "^0.1.0",
+    "@types/bun": "^1.1.8",
+    "@types/node": "^22.5.4",
+    "@vitest/coverage-v8": "^2.0.5",
+    "automd": "^0.3.8",
+    "changelogen": "^0.5.5",
+    "eslint": "^9.8.0",
+    "eslint-config-unjs": "^0.3.2",
+    "execa": "^9.3.1",
+    "get-port-please": "^3.1.2",
+    "jiti": "^2.0.0-beta.3",
+    "prettier": "^3.3.3",
+    "typescript": "^5.5.4",
+    "unbuild": "^3.0.0-rc.7",
+    "srvx": "link:.",
+    "vitest": "^2.0.5"
+  },
+  "packageManager": "pnpm@9.7.0"
+}

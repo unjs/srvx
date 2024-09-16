@@ -1,0 +1,5 @@
+{
+  "imports": {
+    "srvx": "./src/deno.ts"
+  }
+}

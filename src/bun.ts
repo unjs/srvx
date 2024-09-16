@@ -1,5 +1,6 @@
 import type { ServerOptions } from "./types";
 import { Server } from "./server.ts";
+import { resolvePort } from "./_common.ts";
 
 export function serve(options: ServerOptions): Server {
   return new BunServer(options);
@@ -28,7 +29,7 @@ class BunServer extends Server {
     }
 
     this.bunServer = Bun.serve({
-      port: resolvePort(options.port),
+      port: resolvePort(options.port, globalThis.process?.env.PORT),
       hostname: this.options.hostname,
       reusePort: this.options.reusePort,
       ...this.options.bun,
@@ -47,11 +48,4 @@ class BunServer extends Server {
   close(closeAll?: boolean) {
     this.bunServer.stop(closeAll);
   }
-}
-
-function resolvePort(port: string | number | undefined): number {
-  return (
-    Number.parseInt((port as string) ?? globalThis.process?.env?.PORT, 10) ??
-    3000
-  );
 }

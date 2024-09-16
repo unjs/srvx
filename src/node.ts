@@ -2,6 +2,7 @@ import type { ServerOptions, xRequest } from "./types";
 import NodeHttp from "node:http";
 import { Server } from "./server";
 import { sendNodeResponse, NodeRequestProxy } from "./node-utils/index.ts";
+import { resolvePort } from "./_common.ts";
 
 export function serve(options: ServerOptions): Server {
   return new NodeServer(options);
@@ -34,7 +35,7 @@ class NodeServer extends Server {
     this._listening = new Promise<void>((resolve) => {
       nodeServer.listen(
         {
-          port: resolvePort(options.port),
+          port: resolvePort(options.port, globalThis.process?.env.PORT),
           host: options.hostname,
           exclusive: !options.reusePort,
           ...options.node,
@@ -77,11 +78,4 @@ class NodeServer extends Server {
       );
     });
   }
-}
-
-function resolvePort(port: string | number | undefined): number {
-  return (
-    Number.parseInt((port as string) ?? globalThis.process?.env?.PORT, 10) ??
-    3000
-  );
 }

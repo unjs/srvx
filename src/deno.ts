@@ -1,6 +1,7 @@
 import type { ServerOptions } from "./types";
 import type DenoTypes from "@deno/types";
 import { Server } from "./server.ts";
+import { resolvePort } from "./_common.ts";
 
 export function serve(options: ServerOptions): Server {
   return new DenoServer(options);
@@ -37,7 +38,10 @@ class DenoServer extends Server {
 
     this.denoServer = Deno.serve(
       {
-        port: resolvePort(options.port),
+        port: resolvePort(
+          options.port,
+          (globalThis as any).Deno?.env.get("PORT"),
+        ),
         hostname: this.options.hostname,
         reusePort: this.options.reusePort,
         ...this.options.deno,
@@ -64,17 +68,4 @@ class DenoServer extends Server {
   close(_closeAll?: boolean /* TODO */) {
     this.denoServer.shutdown();
   }
-}
-
-function resolvePort(port: string | number | undefined): number {
-  return (
-    Number.parseInt(
-      (port as string) ??
-        ((globalThis as any).Deno as typeof DenoTypes.Deno)?.env?.get?.(
-          "PORT",
-        ) ??
-        globalThis.process?.env?.PORT,
-      10,
-    ) ?? 3000
-  );
 }

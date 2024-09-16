@@ -10,6 +10,7 @@
     ".": {
       "types": "./dist/types.d.mts",
       "bun": "./dist/bun.mjs",
+      "deno": "./dist/deno.mjs",
       "node": "./dist/node.mjs"
     },
     "./node-utils": {
@@ -26,13 +27,13 @@
     "dist"
   ],
   "scripts": {
+    "bench:node": "node test/bench-node/_run.mjs",
     "build": "unbuild",
     "dev": "vitest dev",
     "lint": "eslint . && prettier -c .",
     "lint:fix": "automd && eslint . --fix && prettier -w .",
     "prepack": "pnpm build",
     "play:bun": "bun run ./playground/index.ts",
-    "bench:node": "node test/bench-node/_run.mjs",
     "play:deno": "deno run --unstable-byonm -A ./playground/index.ts",
     "play:node": "node --import jiti/register ./playground/index.ts",
     "release": "pnpm test && changelogen --release && npm publish && git push --follow-tags",
@@ -57,9 +58,9 @@
     "get-port-please": "^3.1.2",
     "jiti": "^2.0.0-beta.3",
     "prettier": "^3.3.3",
+    "srvx": "link:.",
     "typescript": "^5.5.4",
     "unbuild": "^3.0.0-rc.7",
-    "srvx": "link:.",
     "vitest": "^2.0.5"
   },
   "packageManager": "pnpm@9.7.0"

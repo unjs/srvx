@@ -27,7 +27,7 @@ class NodeServer extends Server {
         request.xNode = { req: nodeReq, res: nodeRes };
         const res = options.fetch(request);
         return res instanceof Promise
-          ? res.then((reolvedRes) => sendNodeResponse(nodeRes, reolvedRes))
+          ? res.then((resolvedRes) => sendNodeResponse(nodeRes, resolvedRes))
           : sendNodeResponse(nodeRes, res);
       },
     ));

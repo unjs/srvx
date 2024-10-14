@@ -14,7 +14,7 @@ describe("node", () => {
     await server?.close();
   });
 
-  addTests(() => server!.url!, {
+  addTests((path) => server!.url! + path.slice(1), {
     runtime: "node",
   });
 });

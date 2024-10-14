@@ -1,8 +1,8 @@
 export function resolvePort(
-  portConfig: string | number | undefined,
+  portOptions: string | number | undefined,
   portEnv: string | undefined,
 ): number {
-  const portInput = portConfig ?? portEnv;
+  const portInput = portOptions ?? portEnv;
   if (portInput === undefined) {
     return 3000;
   }

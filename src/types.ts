@@ -7,6 +7,8 @@ import type { Server } from "./server.ts";
 
 export type { Server } from "./server.ts";
 
+type MaybePromise<T> = T | Promise<T>;
+
 // ----------------------------------------------------------------------------
 // srvx API
 // ----------------------------------------------------------------------------
@@ -19,9 +21,7 @@ export declare function serve(options: ServerOptions): Server;
 /**
  * Web fetch compatible request handler
  */
-export type ServerHandler = (
-  request: xRequest,
-) => xResponse | Promise<xResponse>;
+export type ServerHandler = (request: xRequest) => MaybePromise<Response>;
 
 /**
  * Server options
@@ -31,6 +31,11 @@ export interface ServerOptions {
    * The fetch handler handles incoming requests.
    */
   fetch: ServerHandler;
+
+  /**
+   * Server plugins
+   */
+  plugins?: (ServerPlugin | ServerPluginInstance)[];
 
   /**
    * The port server should be listening to.
@@ -94,6 +99,36 @@ export interface ServerOptions {
 }
 
 // ----------------------------------------------------------------------------
+// Plugins
+// ----------------------------------------------------------------------------
+
+export type ServerPlugin = (
+  server: Server,
+) => MaybePromise<ServerPluginInstance>;
+
+export interface ServerPluginInstance {
+  /**
+   * Plugin display name
+   */
+  name?: string;
+
+  /**
+   * Hook to allow running logic before user fetch handler
+   * If an response value is returned, user fetch handler and the next plugins will be skipped.
+   */
+  request?: (request: xRequest) => MaybePromise<Response | void>;
+
+  /**
+   * Hook to allow running logic after user fetch handler
+   * If a response value is returned, user response and the next plugins will be skipped.
+   */
+  response?: (
+    request: xRequest,
+    response: Response,
+  ) => MaybePromise<void | Response>;
+}
+
+// ----------------------------------------------------------------------------
 // Web-platform compatible types
 // - Possible runtime specific augmentations are removed.
 // - Runtime specific types are namespaces as optional keys.
@@ -123,9 +158,7 @@ export interface xRequest extends Omit<Request, "headers" | "clone"> {
    * Remote address of the client.
    */
   xRemoteAddress?: string | null;
-}
 
-/**
- * https://developer.mozilla.org/en-US/docs/Web/API/Response
- */
-export interface xResponse extends Response {}
+  /** Optional user context */
+  xContext?: Record<string, unknown>;
+}

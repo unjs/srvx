@@ -1,7 +1,8 @@
 import type * as NodeHttp from "node:http";
 import type BunTypes from "bun";
 import type { Deno } from "@deno/types";
-import type { ServerOptions } from "./types.ts";
+import type { ServerHandler, ServerOptions } from "./types.ts";
+import { applyPlugins } from "./_plugin.ts";
 
 export abstract class Server {
   /**
@@ -12,28 +13,37 @@ export abstract class Server {
   /**
    * Node.js listening server instance.
    */
-  readonly nodeServer?: NodeHttp.Server;
+  nodeServer?: NodeHttp.Server;
 
   /**
    * Bun listening server instance.
    */
-  readonly bunServer?: BunTypes.Server;
+  bunServer?: BunTypes.Server;
 
   /**
    * Deno listening server instance.
    */
-  readonly denoServer?: Deno.HttpServer;
+  denoServer?: Deno.HttpServer;
 
-  protected _listening: undefined | Promise<void>;
+  #listening: undefined | Promise<void>;
 
   /**
-   * Server options.
+   * Server options
    */
-  readonly options: ServerOptions;
+  options: Omit<ServerOptions, "fetch">;
+
+  /**
+   * Server fetch handler
+   */
+  fetch: ServerHandler;
 
   constructor(options: ServerOptions) {
     this.options = options;
+    this.fetch = options.fetch;
+    this.#listening = applyPlugins(this).then(() => this._listen());
   }
+
+  protected abstract _listen(): void | Promise<void>;
 
   /**
    * Listening address (hostname or IP).
@@ -64,7 +74,7 @@ export abstract class Server {
    * Returns a promise that resolves when the server is ready.
    */
   ready(): Promise<Server> {
-    return Promise.resolve(this._listening).then(() => this);
+    return Promise.resolve(this.#listening).then(() => this);
   }
 
   /**

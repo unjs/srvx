@@ -14,19 +14,14 @@ declare const Deno: typeof DenoTypes.Deno;
 class DenoServer extends Server {
   readonly runtime = "deno";
 
-  readonly denoServer: NonNullable<Server["denoServer"]>;
-
   #listeningInfo?: { hostname: string; port: number };
 
-  constructor(options: ServerOptions) {
-    super(options);
+  protected _listen() {
+    const onListenPromise = Promise.withResolvers<void>();
 
-    const onListenPromise = Promise.withResolvers<void>(); // Supported since Deno 1.38
-    this._listening = onListenPromise.promise;
-
-    let serverFetch = options.fetch as DenoTypes.Deno.ServeHandler;
-    if (options.xRemoteAddress) {
-      const userFetch = serverFetch as typeof options.fetch;
+    let serverFetch = this.fetch as DenoTypes.Deno.ServeHandler;
+    if (this.options.xRemoteAddress) {
+      const userFetch = serverFetch as typeof this.fetch;
       serverFetch = (request, info) => {
         Object.defineProperty(request, "xRemoteAddress", {
           get: () => info?.remoteAddr?.hostname,
@@ -39,7 +34,7 @@ class DenoServer extends Server {
     this.denoServer = Deno.serve(
       {
         port: resolvePort(
-          options.port,
+          this.options.port,
           (globalThis as any).Deno?.env.get("PORT"),
         ),
         hostname: this.options.hostname,
@@ -66,6 +61,6 @@ class DenoServer extends Server {
   }
 
   close(_closeAll?: boolean /* TODO */) {
-    this.denoServer.shutdown();
+    this.denoServer?.shutdown();
   }
 }

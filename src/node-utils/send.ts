@@ -6,6 +6,11 @@ export async function sendNodeResponse(
   nodeRes: NodeHttp.ServerResponse,
   webRes: Response | NodeFastResponse,
 ): Promise<void> {
+  if (!webRes) {
+    nodeRes.statusCode = 500;
+    return endNodeResponse(nodeRes);
+  }
+
   // Fast path for NodeFastResponse
   if ((webRes as NodeFastResponse).xNodeResponse) {
     const res = (webRes as NodeFastResponse).xNodeResponse();

@@ -11,14 +11,10 @@ export function serve(options: ServerOptions): Server {
 class BunServer extends Server {
   readonly runtime = "bun";
 
-  readonly bunServer: NonNullable<Server["bunServer"]>;
-
-  constructor(options: ServerOptions) {
-    super(options);
-
-    let serverFetch = options.fetch;
-    if (options.xRemoteAddress) {
-      const userFetch = options.fetch;
+  protected _listen() {
+    let serverFetch = this.fetch;
+    if (this.options.xRemoteAddress) {
+      const userFetch = this.fetch;
       serverFetch = (request) => {
         Object.defineProperty(request, "xRemoteAddress", {
           get: () => this.bunServer?.requestIP(request as Request)?.address,
@@ -29,7 +25,7 @@ class BunServer extends Server {
     }
 
     this.bunServer = Bun.serve({
-      port: resolvePort(options.port, globalThis.process?.env.PORT),
+      port: resolvePort(this.options.port, globalThis.process?.env.PORT),
       hostname: this.options.hostname,
       reusePort: this.options.reusePort,
       ...this.options.bun,
@@ -38,14 +34,14 @@ class BunServer extends Server {
   }
 
   get port() {
-    return this.bunServer.port;
+    return this.bunServer?.port ?? null;
   }
 
   get addr() {
-    return this.bunServer.hostname;
+    return this.bunServer?.hostname ?? null;
   }
 
   close(closeAll?: boolean) {
-    this.bunServer.stop(closeAll);
+    this.bunServer?.stop(closeAll);
   }
 }

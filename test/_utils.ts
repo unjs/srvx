@@ -11,11 +11,11 @@ export function testsExec(
   opts: { runtime?: string; silent?: boolean },
 ) {
   let childProc: ExecaRes;
-  let url: string;
+  let baseURL: string;
 
   beforeAll(async () => {
     const port = await getRandomPort("localhost");
-    url = `http://localhost:${port}/`;
+    baseURL = `http://localhost:${port}/`;
     const [bin, ...args] = cmd.replace("./", testDir).split(" ");
     if (process.env.TEST_DEBUG) {
       console.log(`$ ${bin} ${args.join(" ")}`);
@@ -43,5 +43,5 @@ export function testsExec(
     await childProc.kill();
   });
 
-  addTests(() => url);
+  addTests((path) => baseURL + path.slice(1));
 }

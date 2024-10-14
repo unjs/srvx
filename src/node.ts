@@ -13,11 +13,7 @@ export function serve(options: ServerOptions): Server {
 class NodeServer extends Server {
   readonly runtime = "node";
 
-  readonly nodeServer: NodeHttp.Server;
-
-  constructor(options: ServerOptions) {
-    super(options);
-
+  protected _listen() {
     const nodeServer = (this.nodeServer = NodeHttp.createServer(
       {
         ...this.options.node,
@@ -25,20 +21,20 @@ class NodeServer extends Server {
       (nodeReq, nodeRes) => {
         const request = new NodeRequestProxy(nodeReq) as xRequest;
         request.xNode = { req: nodeReq, res: nodeRes };
-        const res = options.fetch(request);
+        const res = this.fetch(request);
         return res instanceof Promise
           ? res.then((resolvedRes) => sendNodeResponse(nodeRes, resolvedRes))
           : sendNodeResponse(nodeRes, res);
       },
     ));
 
-    this._listening = new Promise<void>((resolve) => {
+    return new Promise<void>((resolve) => {
       nodeServer.listen(
         {
-          port: resolvePort(options.port, globalThis.process?.env.PORT),
-          host: options.hostname,
-          exclusive: !options.reusePort,
-          ...options.node,
+          port: resolvePort(this.options.port, globalThis.process?.env.PORT),
+          host: this.options.hostname,
+          exclusive: !this.options.reusePort,
+          ...this.options.node,
         },
         () => resolve(),
       );
@@ -62,7 +58,7 @@ class NodeServer extends Server {
   }
 
   get #addr() {
-    const addr = this.nodeServer.address();
+    const addr = this.nodeServer?.address();
     if (addr && typeof addr !== "string") {
       return addr;
     }
@@ -71,9 +67,9 @@ class NodeServer extends Server {
   close(closeAll?: boolean): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       if (closeAll) {
-        this.nodeServer.closeAllConnections?.();
+        this.nodeServer?.closeAllConnections?.();
       }
-      this.nodeServer.close((error?: Error) =>
+      this.nodeServer?.close((error?: Error) =>
         error ? reject(error) : resolve(),
       );
     });

@@ -54,7 +54,7 @@ Published under the [MIT](https://github.com/unjs/srvx/blob/main/LICENSE) licens
 Made by [@pi0](https://github.com/pi0) and [community](https://github.com/unjs/srvx/graphs/contributors) 💛
 <br><br>
 <a href="https://github.com/unjs/srvx/graphs/contributors">
-<img src="https://contrib.rocks/image?repo=unjs/srvx" />
+  <img src="https://contrib.rocks/image?repo=unjs/srvx&" />
 </a>
 
 <!-- /automd -->

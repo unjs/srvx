@@ -3,7 +3,7 @@
 <!-- automd:badges color=yellow -->
 
 [![npm version](https://img.shields.io/npm/v/srvx?color=yellow)](https://npmjs.com/package/srvx)
-[![npm downloads](https://img.shields.io/npm/dm/srvx?color=yellow)](https://npmjs.com/package/srvx)
+[![npm downloads](https://img.shields.io/npm/dm/srvx?color=yellow)](https://npm.chart.dev/srvx)
 
 <!-- /automd -->
 

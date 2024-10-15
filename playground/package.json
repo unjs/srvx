@@ -2,7 +2,7 @@
   "name": "srvx-playground",
   "version": "0.0.0",
   "scripts": {
-    "start": "node --watch ./index.mjs"
+    "start": "node --watch ./app.mjs"
   },
   "devDependencies": {
     "srvx": "^0.1.0"

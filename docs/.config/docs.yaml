@@ -10,7 +10,7 @@ landing:
     playOnline:
       label: Play Online
       icon: i-heroicons-play
-      to: https://stackblitz.com/github/unjs/crossws/tree/main/examples/h3?file=app.ts
+      to: https://stackblitz.com/github/unjs/srvx/tree/main/playground?file=app.mjs
   heroCode:
     lang: js
     title: "server.mjs"

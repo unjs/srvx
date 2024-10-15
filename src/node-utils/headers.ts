@@ -77,28 +77,28 @@ export const NodeReqHeadersProxy = /* @__PURE__ */ (() =>
       }
     }
 
-    *entries(): IterableIterator<[string, string]> {
+    *entries(): HeadersIterator<[string, string]> {
       const _headers = this[kNodeReq].headers;
       for (const key in _headers) {
         yield [key, _normalizeValue(_headers[key])];
       }
     }
 
-    *keys(): IterableIterator<string> {
+    *keys(): HeadersIterator<string> {
       const keys = Object.keys(this[kNodeReq].headers);
       for (const key of keys) {
         yield key;
       }
     }
 
-    *values(): IterableIterator<string> {
+    *values(): HeadersIterator<string> {
       const values = Object.values(this[kNodeReq].headers);
       for (const value of values) {
         yield _normalizeValue(value);
       }
     }
 
-    [Symbol.iterator](): IterableIterator<[string, string]> {
+    [Symbol.iterator](): HeadersIterator<[string, string]> {
       return this.entries()[Symbol.iterator]();
     }
 
@@ -164,28 +164,28 @@ export const NodeResHeadersProxy = /* @__PURE__ */ (() =>
       }
     }
 
-    *entries(): IterableIterator<[string, string]> {
+    *entries(): HeadersIterator<[string, string]> {
       const _headers = this[kNodeRes].getHeaders();
       for (const key in _headers) {
         yield [key, _normalizeValue(_headers[key])];
       }
     }
 
-    *keys(): IterableIterator<string> {
+    *keys(): HeadersIterator<string> {
       const keys = this[kNodeRes].getHeaderNames();
       for (const key of keys) {
         yield key;
       }
     }
 
-    *values(): IterableIterator<string> {
+    *values(): HeadersIterator<string> {
       const values = Object.values(this[kNodeRes].getHeaders());
       for (const value of values) {
         yield _normalizeValue(value);
       }
     }
 
-    [Symbol.iterator](): IterableIterator<[string, string]> {
+    [Symbol.iterator](): HeadersIterator<[string, string]> {
       return this.entries()[Symbol.iterator]();
     }
 

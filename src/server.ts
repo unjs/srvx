@@ -1,6 +1,5 @@
 import type * as NodeHttp from "node:http";
 import type BunTypes from "bun";
-import type { Deno } from "@deno/types";
 import type { ServerHandler, ServerOptions } from "./types.ts";
 import { applyPlugins } from "./_plugin.ts";
 

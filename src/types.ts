@@ -1,7 +1,6 @@
 import type * as NodeHttp from "node:http";
 import type * as NodeNet from "node:net";
 import type * as Bun from "bun";
-import Deno from "@deno/types";
 
 import type { Server } from "./server.ts";
 
@@ -95,7 +94,7 @@ export interface ServerOptions {
    *
    * @docs https://docs.deno.com/api/deno/~/Deno.serve
    */
-  deno?: Deno.Deno.ServeOptions;
+  deno?: Deno.ServeOptions;
 }
 
 // ----------------------------------------------------------------------------

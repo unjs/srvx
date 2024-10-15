@@ -1,5 +1,4 @@
 import type { ServerOptions } from "./types";
-import type DenoTypes from "@deno/types";
 import { Server } from "./server.ts";
 import { resolvePort } from "./_common.ts";
 
@@ -9,8 +8,6 @@ export function serve(options: ServerOptions): Server {
 
 // https://docs.deno.com/api/deno/~/Deno.serve
 
-declare const Deno: typeof DenoTypes.Deno;
-
 class DenoServer extends Server {
   readonly runtime = "deno";
 
@@ -19,12 +16,12 @@ class DenoServer extends Server {
   protected _listen() {
     const onListenPromise = Promise.withResolvers<void>();
 
-    let serverFetch = this.fetch as DenoTypes.Deno.ServeHandler;
+    let serverFetch = this.fetch as Deno.ServeHandler;
     if (this.options.xRemoteAddress) {
       const userFetch = serverFetch as typeof this.fetch;
       serverFetch = (request, info) => {
         Object.defineProperty(request, "xRemoteAddress", {
-          get: () => info?.remoteAddr?.hostname,
+          get: () => (info?.remoteAddr as Deno.NetAddr)?.hostname,
           enumerable: true,
         });
         return userFetch(request);

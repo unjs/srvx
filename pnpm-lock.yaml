@@ -12,9 +12,6 @@ importers:
         specifier: ^1.2.2
         version: 1.2.2
     devDependencies:
-      '@deno/types':
-        specifier: ^0.0.1
-        version: 0.0.1
       '@hono/node-server':
         specifier: ^1.13.2
         version: 1.13.2(hono@4.6.1)
@@ -24,6 +21,9 @@ importers:
       '@types/bun':
         specifier: ^1.1.11
         version: 1.1.11
+      '@types/deno':
+        specifier: ^2.0.0
+        version: 2.0.0
       '@types/node':
         specifier: ^22.7.5
         version: 22.7.5
@@ -154,9 +154,6 @@ packages:
 
   '@bcoe/v8-coverage@0.2.3':
     resolution: {integrity: sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==}
-
-  '@deno/types@0.0.1':
-    resolution: {integrity: sha512-KTB6Blr05Iw7k7aMzPWlJX0kv08xXZ5Mu7fxSp0M1HnaOHDRnFC956I4PxYdOtN27+b2723Id2G2oofxLvA35A==}
 
   '@esbuild/aix-ppc64@0.19.12':
     resolution: {integrity: sha512-bmoCYyWdEL3wDQIVbcyzRyeKLgk2WtWLTWz1ZIAZF/EGbNOwSA6ew3PftJ1PqMiOOGu0OyFMzG53L0zqIpPeNA==}
@@ -906,6 +903,9 @@ packages:
 
   '@types/bun@1.1.11':
     resolution: {integrity: sha512-0N7D/H/8sbf9JMkaG5F3+I/cB4TlhKTkO9EskEWP8XDr8aVcDe4EywSnU4cnyZy6tar1dq70NeFNkqMEUigthw==}
+
+  '@types/deno@2.0.0':
+    resolution: {integrity: sha512-O9/jRVlq93kqfkl4sYR5N7+Pz4ukzXVIbMnE/VgvpauNHsvjQ9iBVnJ3X0gAvMa2khcoFD8DSO7mQVCuiuDMPg==}
 
   '@types/estree@1.0.6':
     resolution: {integrity: sha512-AYnb1nQyY49te+VRAVgmzfcgjYS91mY5P0TKUDCLEM+gNnA+3T6rWITXRLYCpahpqSQbN5cE+gHpnPyXjHWxcw==}
@@ -2878,8 +2878,6 @@ snapshots:
 
   '@bcoe/v8-coverage@0.2.3': {}
 
-  '@deno/types@0.0.1': {}
-
   '@esbuild/aix-ppc64@0.19.12':
     optional: true
 
@@ -3350,6 +3348,8 @@ snapshots:
   '@types/bun@1.1.11':
     dependencies:
       bun-types: 1.1.30
+
+  '@types/deno@2.0.0': {}
 
   '@types/estree@1.0.6': {}
 

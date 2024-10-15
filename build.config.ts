@@ -12,5 +12,5 @@ export default defineBuildConfig({
       },
     },
   },
-  externals: ["@deno/types", "bun"],
+  externals: ["deno", "bun"],
 });

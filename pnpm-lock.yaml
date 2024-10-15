@@ -55,8 +55,8 @@ importers:
         specifier: ^3.3.3
         version: 3.3.3
       srvx:
-        specifier: ^0.0.0
-        version: 0.0.0
+        specifier: ^0.1.0
+        version: 0.1.0
       typescript:
         specifier: ^5.6.3
         version: 5.6.3
@@ -2466,9 +2466,6 @@ packages:
 
   spdx-license-ids@3.0.20:
     resolution: {integrity: sha512-jg25NiDV/1fLtSgEgyvVyDunvaNHbuwF9lfNV17gSmPFAlYzdfNBlLtLzXTevwkPj7DhGbmN9VnmJIgLnhvaBw==}
-
-  srvx@0.0.0:
-    resolution: {integrity: sha512-i6a5K3QW5Q1d9zyMi5zMbzPrOLbklaQLCPoLiammAvO3Av8pZ5Nbb0j/ZPWtt8hahG7o3J7tTRyt50RdP/YQeA==}
 
   srvx@0.1.0:
     resolution: {integrity: sha512-jTLHw1AEWvhlMgkZQDonZ21V7fzLZVu4y7v9tVb/u1rH6QkzrC43ypWOwrr2yNsb8pU+H/MrmuY1CX9SmzYRZA==}
@@ -5061,8 +5058,6 @@ snapshots:
       spdx-license-ids: 3.0.20
 
   spdx-license-ids@3.0.20: {}
-
-  srvx@0.0.0: {}
 
   srvx@0.1.0:
     dependencies:

@@ -55,7 +55,7 @@
     "get-port-please": "^3.1.2",
     "jiti": "^2.3.3",
     "prettier": "^3.3.3",
-    "srvx": "^0.0.0",
+    "srvx": "^0.1.0",
     "typescript": "^5.6.3",
     "unbuild": "^2.0.0",
     "vitest": "^2.1.3"

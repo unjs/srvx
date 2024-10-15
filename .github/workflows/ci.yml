@@ -21,9 +21,9 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
-      - uses: denoland/setup-deno@v1
+      - uses: denoland/setup-deno@v2
         with:
-            deno-version: v1.x
+            deno-version: v2.x
       - run: pnpm install
       - run: pnpm lint
       - run: pnpm test:types

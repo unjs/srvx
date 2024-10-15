@@ -1,0 +1,10 @@
+{
+  "name": "srvx-playground",
+  "version": "0.0.0",
+  "scripts": {
+    "start": "node --watch ./index.mjs"
+  },
+  "devDependencies": {
+    "srvx": "^0.1.0"
+  }
+}

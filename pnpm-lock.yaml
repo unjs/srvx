@@ -67,6 +67,12 @@ importers:
         specifier: ^2.1.3
         version: 2.1.3(@types/node@22.7.5)
 
+  playground:
+    devDependencies:
+      srvx:
+        specifier: ^0.1.0
+        version: 0.1.0
+
 packages:
 
   '@ampproject/remapping@2.3.0':
@@ -2463,6 +2469,9 @@ packages:
 
   srvx@0.0.0:
     resolution: {integrity: sha512-i6a5K3QW5Q1d9zyMi5zMbzPrOLbklaQLCPoLiammAvO3Av8pZ5Nbb0j/ZPWtt8hahG7o3J7tTRyt50RdP/YQeA==}
+
+  srvx@0.1.0:
+    resolution: {integrity: sha512-jTLHw1AEWvhlMgkZQDonZ21V7fzLZVu4y7v9tVb/u1rH6QkzrC43ypWOwrr2yNsb8pU+H/MrmuY1CX9SmzYRZA==}
 
   stackback@0.0.2:
     resolution: {integrity: sha512-1XMJE5fQo1jGH6Y/7ebnwPOBEkIEnT4QF32d5R1+VXdXveM0IBMJt8zfaxX1P3QhVwrYe+576+jkANtSS2mBbw==}
@@ -5054,6 +5063,10 @@ snapshots:
   spdx-license-ids@3.0.20: {}
 
   srvx@0.0.0: {}
+
+  srvx@0.1.0:
+    dependencies:
+      cookie-es: 1.2.2
 
   stackback@0.0.2: {}
 

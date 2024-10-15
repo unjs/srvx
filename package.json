@@ -33,9 +33,6 @@
     "lint": "eslint . && prettier -c .",
     "lint:fix": "automd && eslint . --fix && prettier -w .",
     "prepack": "pnpm build",
-    "play:bun": "bun run ./playground/index.ts",
-    "play:deno": "deno run --unstable-byonm -A ./playground/index.ts",
-    "play:node": "node --import jiti/register ./playground/index.ts",
     "release": "pnpm test && changelogen --release && npm publish && git push --follow-tags",
     "test": "pnpm lint && pnpm test:types && vitest run --coverage",
     "test:types": "tsc --noEmit --skipLibCheck"

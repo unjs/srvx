@@ -15,9 +15,13 @@ export async function sendNodeResponse(
   if ((webRes as NodeFastResponse).xNodeResponse) {
     const res = (webRes as NodeFastResponse).xNodeResponse();
     nodeRes.writeHead(res.status, res.statusText, res.headers);
-    return res.body instanceof ReadableStream
-      ? streamBody(res.body, nodeRes).finally(() => endNodeResponse(nodeRes))
-      : endNodeResponse(nodeRes);
+    if (res.body instanceof ReadableStream) {
+      return streamBody(res.body, nodeRes).finally(() =>
+        endNodeResponse(nodeRes),
+      );
+    }
+    nodeRes.write(res.body);
+    return endNodeResponse(nodeRes);
   }
 
   const headerEntries: NodeHttp.OutgoingHttpHeader[] = [];

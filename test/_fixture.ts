@@ -31,6 +31,9 @@ export const server = serve({
       })) satisfies ServerPlugin,
   ),
   fetch(req) {
+    const Response =
+      (globalThis as any).TEST_RESPONSE_CTOR || globalThis.Response;
+
     const url = new URL(req.url);
     switch (url.pathname) {
       case "/": {

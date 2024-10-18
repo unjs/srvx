@@ -1,8 +1,6 @@
 # Changelog
 
-
 ## v0.1.1
-
 
 ### 🚀 Enhancements
 
@@ -47,4 +45,3 @@
 - Andrei Luca ([@iamandrewluca](http://github.com/iamandrewluca))
 - Florens Verschelde ([@fvsch](http://github.com/fvsch))
 - Sébastien Chopin <seb@nuxtlabs.com>
-

@@ -5,6 +5,6 @@
     "start": "node --watch ./app.mjs"
   },
   "devDependencies": {
-    "srvx": "^0.1.0"
+    "srvx": "^0.1.1"
   }
 }

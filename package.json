@@ -41,7 +41,7 @@
     "cookie-es": "^1.2.2"
   },
   "devDependencies": {
-    "@hono/node-server": "^1.13.5",
+    "@hono/node-server": "^1.13.7",
     "@mjackson/node-fetch-server": "^0.1.0",
     "@types/bun": "^1.1.13",
     "@types/deno": "^2.0.0",

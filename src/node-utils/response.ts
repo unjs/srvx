@@ -217,6 +217,17 @@ export const NodeFastResponse = /* @__PURE__ */ (() =>
       return this.#response.blob(); // Slow path
     }
 
+    bytes(): Promise<Uint8Array> {
+      if (this.#responseObj) {
+        return this.#responseObj.bytes(); // Reuse instance
+      }
+      const fastBody = this.#fastBody(Uint8Array);
+      if (fastBody !== false) {
+        return Promise.resolve(fastBody || new Uint8Array()); // Fast path
+      }
+      return this.#response.bytes(); // Slow path
+    }
+
     formData(): Promise<FormData> {
       if (this.#responseObj) {
         return this.#responseObj.formData(); // Reuse instance

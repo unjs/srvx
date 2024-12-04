@@ -1,5 +1,29 @@
 # Changelog
 
+## v0.1.2
+
+[compare changes](https://github.com/unjs/srvx/compare/v0.1.1...v0.1.2)
+
+### 🚀 Enhancements
+
+- **node:** Add `NodeFastResponse.bytes()` ([#16](https://github.com/unjs/srvx/pull/16))
+- **node:** Add `NodeRequestProxy.bytes()` ([07863f6](https://github.com/unjs/srvx/commit/07863f6))
+
+### 📖 Documentation
+
+- Minor tweaks ([#9](https://github.com/unjs/srvx/pull/9))
+
+### 🏡 Chore
+
+- Apply automated updates ([7def381](https://github.com/unjs/srvx/commit/7def381))
+- Update dev dependencies ([5bc0dce](https://github.com/unjs/srvx/commit/5bc0dce))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](http://github.com/pi0))
+- Emil ([@bergold](http://github.com/bergold))
+- Johann Schopplich ([@johannschopplich](http://github.com/johannschopplich))
+
 ## v0.1.1
 
 ### 🚀 Enhancements

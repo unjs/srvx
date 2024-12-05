@@ -26,7 +26,7 @@ export const NodeRequestProxy = /* @__PURE__ */ (() =>
 
     #abortSignal?: AbortController;
     #hasBody: boolean | undefined;
-    #rawBody?: Promise<Uint8Array>;
+    #bodyBytes?: Promise<Uint8Array>;
     #blobBody?: Promise<Blob>;
     #formDataBody?: Promise<FormData>;
     #jsonBody?: Promise<any>;
@@ -124,30 +124,29 @@ export const NodeRequestProxy = /* @__PURE__ */ (() =>
       return this.#bodyStream;
     }
 
-    arrayBuffer(): Promise<ArrayBuffer> {
-      if (!this.#rawBody) {
-        const _bodyStream = this.body;
-        return _bodyStream
-          ? _readStream(_bodyStream).then((buff) => buff.buffer as ArrayBuffer)
-          : Promise.resolve(new ArrayBuffer(0));
-      }
-      return this.#rawBody.then((buff) => buff.buffer as ArrayBuffer);
-    }
-
     bytes(): Promise<Uint8Array> {
-      if (!this.#rawBody) {
+      if (!this.#bodyBytes) {
         const _bodyStream = this.body;
-        return _bodyStream
+        this.#bodyBytes = _bodyStream
           ? _readStream(_bodyStream)
           : Promise.resolve(new Uint8Array());
       }
-      return this.#rawBody;
+      return this.#bodyBytes;
+    }
+
+    arrayBuffer(): Promise<ArrayBuffer> {
+      return this.bytes().then((buff) => {
+        return buff.buffer.slice(
+          buff.byteOffset,
+          buff.byteOffset + buff.byteLength,
+        ) as ArrayBuffer;
+      });
     }
 
     blob(): Promise<Blob> {
       if (!this.#blobBody) {
-        this.#blobBody = this.arrayBuffer().then((buff) => {
-          return new Blob([buff], {
+        this.#blobBody = this.bytes().then((bytes) => {
+          return new Blob([bytes], {
             type: this[kNodeReq].headers["content-type"],
           });
         });
@@ -164,6 +163,15 @@ export const NodeRequestProxy = /* @__PURE__ */ (() =>
       return this.#formDataBody;
     }
 
+    text(): Promise<string> {
+      if (!this.#textBody) {
+        this.#textBody = this.bytes().then((bytes) => {
+          return new TextDecoder().decode(bytes);
+        });
+      }
+      return this.#textBody;
+    }
+
     json(): Promise<any> {
       if (!this.#jsonBody) {
         this.#jsonBody = this.text().then((txt) => {
@@ -171,15 +179,6 @@ export const NodeRequestProxy = /* @__PURE__ */ (() =>
         });
       }
       return this.#jsonBody;
-    }
-
-    text(): Promise<string> {
-      if (!this.#textBody) {
-        this.#textBody = this.arrayBuffer().then((buff) => {
-          return new TextDecoder().decode(buff);
-        });
-      }
-      return this.#textBody;
     }
 
     get [Symbol.toStringTag]() {

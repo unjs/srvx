@@ -22,7 +22,7 @@ export function addTests(
     );
   });
 
-  test.skipIf(opts?.runtime === "node")("POST works (text body)", async () => {
+  test("POST works (text body)", async () => {
     const response = await fetch(url("/body/text"), {
       method: "POST",
       body: "hello world",

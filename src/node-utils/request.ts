@@ -97,7 +97,7 @@ export const NodeRequestProxy = /* @__PURE__ */ (() =>
     }
 
     get body() {
-      if (!this.#hasBody) {
+      if (!this._hasBody) {
         return null;
       }
       if (!this.#bodyStream) {

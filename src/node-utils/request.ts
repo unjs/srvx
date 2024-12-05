@@ -22,11 +22,8 @@ export const NodeRequestProxy = /* @__PURE__ */ (() =>
 
     [kNodeReq]: NodeHttp.IncomingMessage;
 
-    xNode:
-      | { req: NodeHttp.IncomingMessage; res: NodeHttp.ServerResponse }
-      | undefined;
+    _url: URL;
 
-    #url: URL;
     #abortSignal?: AbortController;
     #hasBody: boolean | undefined;
     #rawBody?: Promise<Uint8Array>;
@@ -38,7 +35,7 @@ export const NodeRequestProxy = /* @__PURE__ */ (() =>
 
     constructor(nodeReq: NodeHttp.IncomingMessage) {
       this[kNodeReq] = nodeReq;
-      this.#url = new NodeReqURLProxy(nodeReq) as unknown as URL;
+      this._url = new NodeReqURLProxy(nodeReq) as unknown as URL;
       this.headers = new NodeReqHeadersProxy(nodeReq);
     }
 
@@ -51,7 +48,7 @@ export const NodeRequestProxy = /* @__PURE__ */ (() =>
     }
 
     get url() {
-      return this.#url.href;
+      return this._url.href;
     }
 
     get method() {

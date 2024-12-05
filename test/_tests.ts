@@ -14,7 +14,7 @@ export function addTests(
   test("xRemoteAddress", async () => {
     const response = await fetch(url("/ip"));
     expect(response.status).toBe(200);
-    expect(await response.text()).toMatch(/ip: ::1/);
+    expect(await response.text()).toMatch(/ip: ::1|ip: 127.0.0.1/);
   });
 
   describe("plugin", () => {

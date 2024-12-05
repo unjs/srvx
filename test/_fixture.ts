@@ -30,7 +30,7 @@ export const server = serve({
         },
       })) satisfies ServerPlugin,
   ),
-  fetch(req) {
+  async fetch(req) {
     const Response =
       (globalThis as any).TEST_RESPONSE_CTOR || globalThis.Response;
 
@@ -38,6 +38,12 @@ export const server = serve({
     switch (url.pathname) {
       case "/": {
         return new Response("ok");
+      }
+      case "/body/binary": {
+        return new Response(req.body);
+      }
+      case "/body/text": {
+        return new Response(await req.text());
       }
       case "/ip": {
         return new Response(`ip: ${req.xRemoteAddress}`);

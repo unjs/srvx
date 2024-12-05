@@ -3,12 +3,32 @@ import { expect, test } from "vitest";
 
 export function addTests(
   url: (path: string) => string,
-  _opts?: { runtime?: string },
+  opts?: { runtime?: string },
 ) {
-  test("works", async () => {
+  test("GET works", async () => {
     const response = await fetch(url("/"));
     expect(response.status).toBe(200);
     expect(await response.text()).toMatch("ok");
+  });
+
+  test("POST works (binary body)", async () => {
+    const response = await fetch(url("/body/binary"), {
+      method: "POST",
+      body: new Uint8Array([1, 2, 3]),
+    });
+    expect(response.status).toBe(200);
+    expect(new Uint8Array(await response.arrayBuffer())).toEqual(
+      new Uint8Array([1, 2, 3]),
+    );
+  });
+
+  test.skipIf(opts?.runtime === "node")("POST works (text body)", async () => {
+    const response = await fetch(url("/body/text"), {
+      method: "POST",
+      body: "hello world",
+    });
+    expect(response.status).toBe(200);
+    expect(await response.text()).toBe("hello world");
   });
 
   test("xRemoteAddress", async () => {

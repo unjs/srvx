@@ -1,5 +1,44 @@
 # Changelog
 
+## v0.1.3
+
+[compare changes](https://github.com/unjs/srvx/compare/v0.1.1...v0.1.3)
+
+### 🚀 Enhancements
+
+- **node:** Add `NodeFastResponse.bytes()` ([#16](https://github.com/unjs/srvx/pull/16))
+- **node:** Add `NodeRequestProxy.bytes()` ([07863f6](https://github.com/unjs/srvx/commit/07863f6))
+
+### 🩹 Fixes
+
+- **node:** Compute `hasBody` when accessing `req.body` ([a002185](https://github.com/unjs/srvx/commit/a002185))
+- **node:** Body utils should respect buffer view offset ([5e4ec69](https://github.com/unjs/srvx/commit/5e4ec69))
+
+### 💅 Refactors
+
+- **node:** Expose `request._url` ([8eb8f5d](https://github.com/unjs/srvx/commit/8eb8f5d))
+
+### 📖 Documentation
+
+- Minor tweaks ([#9](https://github.com/unjs/srvx/pull/9))
+
+### 🏡 Chore
+
+- Apply automated updates ([7def381](https://github.com/unjs/srvx/commit/7def381))
+- Update dev dependencies ([5bc0dce](https://github.com/unjs/srvx/commit/5bc0dce))
+- **release:** V0.1.2 ([4bf7261](https://github.com/unjs/srvx/commit/4bf7261))
+
+### ✅ Tests
+
+- Update ip regex ([6885842](https://github.com/unjs/srvx/commit/6885842))
+- Add additional tests for req body handling ([e00b4c9](https://github.com/unjs/srvx/commit/e00b4c9))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](http://github.com/pi0))
+- Emil ([@bergold](http://github.com/bergold))
+- Johann Schopplich ([@johannschopplich](http://github.com/johannschopplich))
+
 ## v0.1.2
 
 [compare changes](https://github.com/unjs/srvx/compare/v0.1.1...v0.1.2)

@@ -45,7 +45,7 @@
     "@mjackson/node-fetch-server": "^0.5.0",
     "@types/bun": "^1.1.14",
     "@types/deno": "^2.0.0",
-    "@types/node": "^22.10.2",
+    "@types/node": "^22.10.3",
     "@vitest/coverage-v8": "^2.1.8",
     "automd": "^0.3.12",
     "changelogen": "^0.5.7",
@@ -60,5 +60,5 @@
     "unbuild": "^2.0.0",
     "vitest": "^2.1.8"
   },
-  "packageManager": "pnpm@9.15.1"
+  "packageManager": "pnpm@9.15.2"
 }

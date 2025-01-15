@@ -3,7 +3,7 @@ import { expect, test } from "vitest";
 
 export function addTests(
   url: (path: string) => string,
-  opts?: { runtime?: string },
+  _opts?: { runtime?: string },
 ) {
   test("GET works", async () => {
     const response = await fetch(url("/"));

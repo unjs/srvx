@@ -2,7 +2,7 @@ import { serve } from "srvx";
 
 const server = serve({
   port: 3000,
-  fetch(request) {
+  fetch(_request) {
     return new Response(
       `
         <h1>👋 Hello there</h1>

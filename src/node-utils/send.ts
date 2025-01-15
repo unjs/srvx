@@ -16,9 +16,7 @@ export async function sendNodeResponse(
     const res = (webRes as NodeFastResponse).xNodeResponse();
     nodeRes.writeHead(res.status, res.statusText, res.headers);
     if (res.body instanceof ReadableStream) {
-      return streamBody(res.body, nodeRes).finally(() =>
-        endNodeResponse(nodeRes),
-      );
+      return streamBody(res.body, nodeRes);
     }
     nodeRes.write(res.body);
     return endNodeResponse(nodeRes);
@@ -38,7 +36,7 @@ export async function sendNodeResponse(
   nodeRes.writeHead(webRes.status || 200, webRes.statusText, headerEntries);
 
   return webRes.body
-    ? streamBody(webRes.body, nodeRes).finally(() => endNodeResponse(nodeRes))
+    ? streamBody(webRes.body, nodeRes)
     : endNodeResponse(nodeRes);
 }
 
@@ -46,21 +44,57 @@ function endNodeResponse(nodeRes: NodeHttp.ServerResponse) {
   return new Promise<void>((resolve) => nodeRes.end(resolve));
 }
 
-// Almost twice faster than `pipeline` from `node:stream/promises`
-async function streamBody(
+export function streamBody(
   stream: ReadableStream,
   nodeRes: NodeHttp.ServerResponse,
-) {
-  const reader = stream.getReader();
-  try {
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) {
-        break;
-      }
-      nodeRes.write(value);
-    }
-  } finally {
-    reader.releaseLock();
+): Promise<void> | void {
+  // stream is already destroyed
+  if (nodeRes.destroyed) {
+    stream.cancel();
+    return;
   }
+
+  const reader = stream.getReader();
+
+  // Cancel the stream and destroy the response
+  function streamCancel(error?: Error) {
+    reader.cancel(error).catch(() => {});
+    if (error) {
+      nodeRes.destroy(error);
+    }
+  }
+
+  function streamHandle({
+    done,
+    value,
+  }: ReadableStreamReadResult<Uint8Array>): void | Promise<void> {
+    try {
+      if (done) {
+        // End the response
+        nodeRes.end();
+      } else if (nodeRes.write(value)) {
+        // Continue reading recursively
+        reader.read().then(streamHandle, streamCancel);
+      } else {
+        // Wait for the drain event to continue reading
+        nodeRes.once("drain", () =>
+          reader.read().then(streamHandle, streamCancel),
+        );
+      }
+    } catch (error) {
+      streamCancel(error instanceof Error ? error : undefined);
+    }
+  }
+
+  // Listen for close and error events to cancel the stream
+  nodeRes.on("close", streamCancel);
+  nodeRes.on("error", streamCancel);
+  reader.read().then(streamHandle, streamCancel);
+
+  // Return a promise that resolves when the stream is closed
+  return reader.closed.finally(() => {
+    // cleanup listeners
+    nodeRes.off("close", streamCancel);
+    nodeRes.off("error", streamCancel);
+  });
 }

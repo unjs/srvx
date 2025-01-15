@@ -1,5 +1,27 @@
 # Changelog
 
+## v0.1.4
+
+[compare changes](https://github.com/unjs/srvx/compare/v0.1.3...v0.1.4)
+
+### 🩹 Fixes
+
+- **node:** Access req headers with lowerCase ([#21](https://github.com/unjs/srvx/pull/21))
+
+### 💅 Refactors
+
+- **node:** Improve body streaming ([#26](https://github.com/unjs/srvx/pull/26))
+
+### 🏡 Chore
+
+- Update deps ([b74f68a](https://github.com/unjs/srvx/commit/b74f68a))
+- Lint ([011d381](https://github.com/unjs/srvx/commit/011d381))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](http://github.com/pi0))
+- Alex ([@alexfriesen](http://github.com/alexfriesen))
+
 ## v0.1.3
 
 [compare changes](https://github.com/unjs/srvx/compare/v0.1.1...v0.1.3)

@@ -12,6 +12,7 @@ export const NodeReqHeadersProxy = /* @__PURE__ */ (() =>
     }
 
     append(name: string, value: string): void {
+      name = name.toLowerCase();
       const _headers = this[kNodeReq].headers;
       const _current = _headers[name];
       if (_current) {
@@ -26,10 +27,12 @@ export const NodeReqHeadersProxy = /* @__PURE__ */ (() =>
     }
 
     delete(name: string): void {
+      name = name.toLowerCase();
       this[kNodeReq].headers[name] = undefined;
     }
 
     get(name: string): string | null {
+      name = name.toLowerCase();
       return _normalizeValue(this[kNodeReq].headers[name]);
     }
 
@@ -42,10 +45,12 @@ export const NodeReqHeadersProxy = /* @__PURE__ */ (() =>
     }
 
     has(name: string): boolean {
+      name = name.toLowerCase();
       return !!this[kNodeReq].headers[name];
     }
 
     set(name: string, value: string): void {
+      name = name.toLowerCase();
       this[kNodeReq].headers[name] = value;
     }
 

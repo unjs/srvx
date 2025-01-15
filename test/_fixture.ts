@@ -13,7 +13,7 @@ export const server = serve({
     (withBody) =>
       (() => ({
         request: (req) => {
-          if (req.headers.has("x-plugin-req")) {
+          if (req.headers.has("X-plugin-req")) {
             const res = withBody ? new Response("plugin req") : undefined;
             return req.headers.has("x-plugin-async")
               ? Promise.resolve(res)
@@ -21,7 +21,7 @@ export const server = serve({
           }
         },
         response: (req) => {
-          if (req.headers.has("x-plugin-res")) {
+          if (req.headers.has("X-plugin-res")) {
             const res = withBody ? new Response("plugin res") : undefined;
             return req.headers.has("x-plugin-async")
               ? Promise.resolve(res)

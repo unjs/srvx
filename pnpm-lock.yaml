@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       cookie-es:
-        specifier: ^1.2.2
-        version: 1.2.2
+        specifier: ^2.0.0
+        version: 2.0.0
     devDependencies:
       '@hono/node-server':
         specifier: ^1.13.8
@@ -1134,6 +1134,9 @@ packages:
 
   cookie-es@1.2.2:
     resolution: {integrity: sha512-+W7VmiVINB+ywl1HGXJXmrqkOhpKrIiVZV6tQuV54ZyQC7MMuBt81Vc336GMLoHBq5hV/F9eXgt5Mnx0Rha5Fg==}
+
+  cookie-es@2.0.0:
+    resolution: {integrity: sha512-RAj4E421UYRgqokKUmotqAwuplYw15qtdXfY+hGzgCJ/MBjCVZcSoHK/kH9kocfjRjcDME7IiDWR/1WX1TM2Pg==}
 
   core-js-compat@3.40.0:
     resolution: {integrity: sha512-0XEDpr5y5mijvw8Lbc6E5AkjrHfp7eEoPlu36SWeAbcL8fn1G1ANe8DBlo2XoNN89oVpxWwOjYIPVzR4ZvsKCQ==}
@@ -3601,6 +3604,8 @@ snapshots:
   convert-source-map@2.0.0: {}
 
   cookie-es@1.2.2: {}
+
+  cookie-es@2.0.0: {}
 
   core-js-compat@3.40.0:
     dependencies:

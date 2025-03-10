@@ -14,7 +14,9 @@ export async function sendNodeResponse(
   // Fast path for NodeFastResponse
   if ((webRes as NodeFastResponse).nodeResponse) {
     const res = (webRes as NodeFastResponse).nodeResponse();
-    nodeRes.writeHead(res.status, res.statusText, res.headers);
+    if (!nodeRes.headersSent) {
+      nodeRes.writeHead(res.status, res.statusText, res.headers);
+    }
     if (res.body instanceof ReadableStream) {
       return streamBody(res.body, nodeRes);
     }
@@ -33,7 +35,9 @@ export async function sendNodeResponse(
     }
   }
 
-  nodeRes.writeHead(webRes.status || 200, webRes.statusText, headerEntries);
+  if (!nodeRes.headersSent) {
+    nodeRes.writeHead(webRes.status || 200, webRes.statusText, headerEntries);
+  }
 
   return webRes.body
     ? streamBody(webRes.body, nodeRes)

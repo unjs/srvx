@@ -4,12 +4,12 @@ import { splitSetCookieString } from "cookie-es";
 
 export type NodeFastResponse = InstanceType<typeof NodeFastResponse>;
 
-export const NodeFastResponse = /* @__PURE__ */ (() =>
-  /**
-   * Fast Response for Node.js runtime
-   *
-   * It is faster because in most cases it doesn't create a full Response instance.
-   */
+/**
+ * Fast Response for Node.js runtime
+ *
+ * It is faster because in most cases it doesn't create a full Response instance.
+ */
+export const NodeFastResponse = /* @__PURE__ */ (() => {
   class NodeFastResponse implements Response {
     #body?: BodyInit | null;
     #init?: ResponseInit;
@@ -263,4 +263,9 @@ export const NodeFastResponse = /* @__PURE__ */ (() =>
       }
       return this.text().then((text) => JSON.parse(text));
     }
-  })();
+  }
+
+  Object.setPrototypeOf(NodeFastResponse.prototype, Response.prototype);
+
+  return NodeFastResponse;
+})();

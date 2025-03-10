@@ -1,5 +1,22 @@
 # Changelog
 
+## v0.2.1
+
+[compare changes](https://github.com/unjs/srvx/compare/v0.2.0...v0.2.1)
+
+### 🚀 Enhancements
+
+- **node:** Export `toNodeHandler` ([5df69b6](https://github.com/unjs/srvx/commit/5df69b6))
+- Export handler types ([54a01e4](https://github.com/unjs/srvx/commit/54a01e4))
+
+### 🏡 Chore
+
+- Apply automated updates ([5a1caf0](https://github.com/unjs/srvx/commit/5a1caf0))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](https://github.com/pi0))
+
 ## v0.2.0
 
 [compare changes](https://github.com/unjs/srvx/compare/v0.1.4...v0.2.0)

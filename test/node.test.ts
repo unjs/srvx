@@ -1,6 +1,6 @@
 import { describe, beforeAll, afterAll } from "vitest";
 import { addTests } from "./_tests";
-import { serve } from "../src/node";
+import { serve } from "../src/adapters/node.ts";
 
 describe("node", () => {
   let server: ReturnType<typeof serve> | undefined;

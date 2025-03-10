@@ -7,22 +7,16 @@
   "sideEffects": false,
   "type": "module",
   "exports": {
+    "./types": "./dist/types.d.mts",
+    "./deno": "./dist/adapters/deno.mjs",
+    "./bun": "./dist/adapters/bun.mjs",
+    "./node": "./dist/adapters/node.mjs",
     ".": {
-      "types": "./dist/types.d.mts",
-      "bun": "./dist/bun.mjs",
-      "deno": "./dist/deno.mjs",
-      "node": "./dist/node.mjs"
-    },
-    "./node-utils": {
-      "types": "./dist/node-utils/index.d.mts",
-      "import": "./dist/node-utils/index.mjs"
-    },
-    "./types": {
-      "types": "./dist/types.d.mts",
-      "import": "./dist/types.mjs"
+      "deno": "./dist/adapters/deno.mjs",
+      "bun": "./dist/adapters/bun.mjs",
+      "node": "./dist/adapters/node.mjs"
     }
   },
-  "types": "./dist/types.d.mts",
   "files": [
     "dist"
   ],
@@ -36,6 +30,9 @@
     "release": "pnpm test && changelogen --release && npm publish && git push --follow-tags",
     "test": "pnpm lint && pnpm test:types && vitest run --coverage",
     "test:types": "tsc --noEmit --skipLibCheck"
+  },
+  "resolutions": {
+    "srvx": "link:."
   },
   "dependencies": {
     "cookie-es": "^2.0.0"
@@ -55,7 +52,6 @@
     "get-port-please": "^3.1.2",
     "jiti": "^2.4.2",
     "prettier": "^3.5.3",
-    "srvx": "^0.1.4",
     "typescript": "^5.8.2",
     "unbuild": "^3.5.0",
     "vitest": "^3.0.8"

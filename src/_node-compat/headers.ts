@@ -1,5 +1,5 @@
 import type NodeHttp from "node:http";
-import type { xHeaders } from "../types";
+import type { xHeaders } from "../types.ts";
 import { splitSetCookieString } from "cookie-es";
 import { kNodeInspect, kNodeReq, kNodeRes } from "./_common.ts";
 

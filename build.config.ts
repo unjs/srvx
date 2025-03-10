@@ -20,6 +20,7 @@ export default defineBuildConfig({
       for await (const file of glob("dist/**/*.d.ts")) {
         await rm(file);
       }
+      await rm("dist/types.mjs");
     },
   },
 });

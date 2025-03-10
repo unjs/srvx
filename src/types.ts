@@ -2,9 +2,9 @@ import type * as NodeHttp from "node:http";
 import type * as NodeNet from "node:net";
 import type * as Bun from "bun";
 
-import type { Server } from "./server.ts";
+import type { Server } from "./_server.ts";
 
-export type { Server } from "./server.ts";
+export type { Server } from "./_server.ts";
 
 type MaybePromise<T> = T | Promise<T>;
 

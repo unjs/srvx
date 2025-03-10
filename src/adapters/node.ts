@@ -1,8 +1,11 @@
-import type { ServerOptions, xRequest } from "./types";
+import type { ServerOptions, xRequest } from "../types.ts";
 import NodeHttp from "node:http";
-import { Server } from "./server";
-import { sendNodeResponse, NodeRequestProxy } from "./node-utils/index.ts";
-import { resolvePort } from "./_common.ts";
+import { Server } from "../_server.ts";
+import { sendNodeResponse } from "../_node-compat/send.ts";
+import { NodeRequestProxy } from "../_node-compat/request.ts";
+import { resolvePort } from "../_common.ts";
+
+export { NodeFastResponse as Response } from "../_node-compat/response.ts";
 
 export function serve(options: ServerOptions): Server {
   return new NodeServer(options);

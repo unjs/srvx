@@ -4,6 +4,9 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  srvx: link:.
+
 importers:
 
   .:
@@ -54,9 +57,6 @@ importers:
       prettier:
         specifier: ^3.5.3
         version: 3.5.3
-      srvx:
-        specifier: ^0.1.4
-        version: 0.1.4
       typescript:
         specifier: ^5.8.2
         version: 5.8.2
@@ -70,8 +70,8 @@ importers:
   playground:
     devDependencies:
       srvx:
-        specifier: ^0.1.4
-        version: 0.1.4
+        specifier: link:..
+        version: link:..
 
 packages:
 
@@ -1186,9 +1186,6 @@ packages:
   convert-gitmoji@0.1.5:
     resolution: {integrity: sha512-4wqOafJdk2tqZC++cjcbGcaJ13BZ3kwldf06PTiAQRAB76Z1KJwZNL1SaRZMi2w1FM9RYTgZ6QErS8NUl/GBmQ==}
 
-  cookie-es@1.2.2:
-    resolution: {integrity: sha512-+W7VmiVINB+ywl1HGXJXmrqkOhpKrIiVZV6tQuV54ZyQC7MMuBt81Vc336GMLoHBq5hV/F9eXgt5Mnx0Rha5Fg==}
-
   cookie-es@2.0.0:
     resolution: {integrity: sha512-RAj4E421UYRgqokKUmotqAwuplYw15qtdXfY+hGzgCJ/MBjCVZcSoHK/kH9kocfjRjcDME7IiDWR/1WX1TM2Pg==}
 
@@ -2287,9 +2284,6 @@ packages:
 
   spdx-license-ids@3.0.21:
     resolution: {integrity: sha512-Bvg/8F5XephndSK3JffaRqdT+gyhfqIPwDHpX80tJrF8QQRYMo8sNMeaZ2Dp5+jhwKnUmIOyFFQfHRkjJm5nXg==}
-
-  srvx@0.1.4:
-    resolution: {integrity: sha512-hHt1/s+3o4tOOjC2YCr7bwi4msAXYJYErVpz2w/FcvG3ODRV0GZsdHsBjeKqY46psZmRbItfPLMp2oP7JsZaow==}
 
   stackback@0.0.2:
     resolution: {integrity: sha512-1XMJE5fQo1jGH6Y/7ebnwPOBEkIEnT4QF32d5R1+VXdXveM0IBMJt8zfaxX1P3QhVwrYe+576+jkANtSS2mBbw==}
@@ -3427,8 +3421,6 @@ snapshots:
   consola@3.4.0: {}
 
   convert-gitmoji@0.1.5: {}
-
-  cookie-es@1.2.2: {}
 
   cookie-es@2.0.0: {}
 
@@ -4608,10 +4600,6 @@ snapshots:
       spdx-license-ids: 3.0.21
 
   spdx-license-ids@3.0.21: {}
-
-  srvx@0.1.4:
-    dependencies:
-      cookie-es: 1.2.2
 
   stackback@0.0.2: {}
 

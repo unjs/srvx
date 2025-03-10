@@ -1,5 +1,5 @@
 {
   "imports": {
-    "srvx": "./src/deno.ts"
+    "srvx": "./src/adapters/deno.ts"
   }
 }

@@ -1,7 +1,7 @@
 import { describe, beforeAll, afterAll } from "vitest";
 import { addTests } from "./_tests.ts";
-import { serve } from "../src/node.ts";
-import { NodeFastResponse } from "../src/node-utils/response.ts";
+import { serve } from "../src/adapters/node.ts";
+import { NodeFastResponse } from "../src/_node-compat/response.ts";
 
 describe("node (fast-res)", () => {
   let server: ReturnType<typeof serve> | undefined;

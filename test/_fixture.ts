@@ -3,7 +3,7 @@ import type { ServerPlugin } from "../src/types.ts";
 // prettier-ignore
 const runtime = (globalThis as any).Deno ? "deno" : (globalThis.Bun ? "bun" : "node");
 const { serve } = (await import(
-  `../src/${runtime}.ts`
+  `../src/adapters/${runtime}.ts`
 )) as typeof import("../src/types.ts");
 
 export const server = serve({

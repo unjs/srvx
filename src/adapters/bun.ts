@@ -1,6 +1,6 @@
-import type { ServerOptions } from "./types";
-import { Server } from "./server.ts";
-import { resolvePort } from "./_common.ts";
+import type { ServerOptions } from "../types.ts";
+import { Server } from "../_server.ts";
+import { resolvePort } from "../_common.ts";
 
 export function serve(options: ServerOptions): Server {
   return new BunServer(options);

@@ -4,26 +4,13 @@ import { kNodeInspect, kNodeReq } from "./_common.ts";
 import { NodeReqHeadersProxy } from "./headers.ts";
 import { NodeReqURLProxy } from "./url.ts";
 
-export const NodeRequestProxy = /* @__PURE__ */ (() =>
-  class NodeRequestProxy implements ServerRequest {
-    cache: RequestCache = "default";
-    credentials: RequestCredentials = "same-origin";
-    destination: RequestDestination = "";
-    integrity: string = "";
-    keepalive: boolean = false;
-
-    mode: RequestMode = "cors";
-    redirect: RequestRedirect = "follow";
-    referrer: string = "about:client";
-    referrerPolicy: ReferrerPolicy = "";
-
-    headers: Headers;
-    bodyUsed: boolean = false;
-
+export const NodeRequestProxy = /* @__PURE__ */ (() => {
+  class NodeRequestProxy {
     [kNodeReq]: NodeHttp.IncomingMessage;
 
-    _url: URL;
-
+    #url?: InstanceType<typeof NodeReqURLProxy>;
+    #headers?: InstanceType<typeof NodeReqHeadersProxy>;
+    #bodyUsed: boolean = false;
     #abortSignal?: AbortController;
     #hasBody: boolean | undefined;
     #bodyBytes?: Promise<Uint8Array>;
@@ -35,20 +22,28 @@ export const NodeRequestProxy = /* @__PURE__ */ (() =>
 
     constructor(nodeReq: NodeHttp.IncomingMessage) {
       this[kNodeReq] = nodeReq;
-      this._url = new NodeReqURLProxy(nodeReq) as unknown as URL;
-      this.headers = new NodeReqHeadersProxy(nodeReq);
+    }
+
+    get headers() {
+      if (!this.#headers) {
+        this.#headers = new NodeReqHeadersProxy(this[kNodeReq]);
+      }
+      return this.#headers;
     }
 
     get remoteAddress() {
       return this[kNodeReq].socket?.remoteAddress;
     }
 
-    clone(): ServerRequest {
+    clone() {
       return new NodeRequestProxy(this[kNodeReq]);
     }
 
     get url() {
-      return this._url.href;
+      if (!this.#url) {
+        this.#url = new NodeReqURLProxy(this[kNodeReq]);
+      }
+      return this.#url.href;
     }
 
     get method() {
@@ -60,6 +55,10 @@ export const NodeRequestProxy = /* @__PURE__ */ (() =>
         this.#abortSignal = new AbortController();
       }
       return this.#abortSignal.signal;
+    }
+
+    get bodyUsed() {
+      return this.#bodyUsed;
     }
 
     get _hasBody() {
@@ -101,7 +100,7 @@ export const NodeRequestProxy = /* @__PURE__ */ (() =>
         return null;
       }
       if (!this.#bodyStream) {
-        this.bodyUsed = true;
+        this.#bodyUsed = true;
         this.#bodyStream = new ReadableStream({
           start: (controller) => {
             this[kNodeReq]
@@ -192,7 +191,10 @@ export const NodeRequestProxy = /* @__PURE__ */ (() =>
         headers: this.headers,
       };
     }
-  })();
+  }
+  Object.setPrototypeOf(NodeRequestProxy.prototype, Request.prototype);
+  return NodeRequestProxy;
+})() as unknown as { new (nodeReq: NodeHttp.IncomingMessage): ServerRequest };
 
 async function _readStream(stream: ReadableStream) {
   const chunks: Uint8Array[] = [];

@@ -2,7 +2,7 @@ import type NodeHttp from "node:http";
 import { splitSetCookieString } from "cookie-es";
 import { kNodeInspect, kNodeReq, kNodeRes } from "./_common.ts";
 
-export const NodeReqHeadersProxy = /* @__PURE__ */ (() =>
+export const NodeReqHeadersProxy = /* @__PURE__ */ (() => {
   class NodeReqHeadersProxy implements Headers {
     [kNodeReq]: NodeHttp.IncomingMessage;
 
@@ -123,7 +123,10 @@ export const NodeReqHeadersProxy = /* @__PURE__ */ (() =>
     [kNodeInspect]() {
       return Object.fromEntries(this.entries());
     }
-  })();
+  }
+  Object.setPrototypeOf(NodeReqHeadersProxy.prototype, Headers.prototype);
+  return NodeReqHeadersProxy;
+})();
 
 export const NodeResHeadersProxy = /* @__PURE__ */ (() =>
   class NodeResHeadersProxy implements Headers {

@@ -47,6 +47,12 @@ export const server = serve({
       case "/ip": {
         return new Response(`ip: ${req.remoteAddress}`);
       }
+      case "/req-instanceof": {
+        return new Response(req instanceof Request ? "yes" : "no");
+      }
+      case "/req-headers-instanceof": {
+        return new Response(req.headers instanceof Headers ? "yes" : "no");
+      }
     }
     return new Response("404", { status: 404 });
   },

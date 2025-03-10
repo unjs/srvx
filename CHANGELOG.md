@@ -1,5 +1,48 @@
 # Changelog
 
+## v0.2.0
+
+[compare changes](https://github.com/unjs/srvx/compare/v0.1.4...v0.2.0)
+
+### 🚀 Enhancements
+
+- Initial cloudflare support ([cab127c](https://github.com/unjs/srvx/commit/cab127c))
+- Expose `server.node.handler` ([c84d604](https://github.com/unjs/srvx/commit/c84d604))
+- `manual` mode ([ef6f9ed](https://github.com/unjs/srvx/commit/ef6f9ed))
+
+### 💅 Refactors
+
+- ⚠️  Update exports ([7153090](https://github.com/unjs/srvx/commit/7153090))
+- ⚠️  Overhaul internal implementation ([d444c74](https://github.com/unjs/srvx/commit/d444c74))
+
+### 📦 Build
+
+- Remove extra files ([0f655b1](https://github.com/unjs/srvx/commit/0f655b1))
+
+### 🏡 Chore
+
+- Update deps ([0b8494a](https://github.com/unjs/srvx/commit/0b8494a))
+- Update ci ([4b59db0](https://github.com/unjs/srvx/commit/4b59db0))
+- Apply automated updates ([06d094c](https://github.com/unjs/srvx/commit/06d094c))
+- Apply automated updates ([0dc2044](https://github.com/unjs/srvx/commit/0dc2044))
+
+### ✅ Tests
+
+- Fix coverage report ([1f8ba79](https://github.com/unjs/srvx/commit/1f8ba79))
+
+### 🤖 CI
+
+- Update to node 22 ([2e3044e](https://github.com/unjs/srvx/commit/2e3044e))
+
+#### ⚠️ Breaking Changes
+
+- ⚠️  Update exports ([7153090](https://github.com/unjs/srvx/commit/7153090))
+- ⚠️  Overhaul internal implementation ([d444c74](https://github.com/unjs/srvx/commit/d444c74))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](https://github.com/pi0))
+
 ## v0.1.4
 
 [compare changes](https://github.com/unjs/srvx/compare/v0.1.3...v0.1.4)

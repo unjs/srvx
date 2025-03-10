@@ -28,12 +28,12 @@ export const NodeFastResponse = /* @__PURE__ */ (() =>
 
       const headers: NodeHttp.OutgoingHttpHeader[] = [];
 
-      let headersInit = this.#init?.headers;
+      const headersInit = this.#init?.headers;
       if (headersInit) {
-        if (typeof headersInit === "object") {
-          headersInit = Object.entries(headersInit);
-        }
-        for (const [key, value] of headersInit) {
+        const headerEntries = headersInit.entries
+          ? (headersInit as Headers).entries()
+          : Object.entries(headersInit);
+        for (const [key, value] of headerEntries) {
           if (key === "set-cookie") {
             for (const setCookie of splitSetCookieString(value)) {
               headers.push(["set-cookie", setCookie]);

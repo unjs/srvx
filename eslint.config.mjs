@@ -5,5 +5,5 @@ export default unjs({
   rules: {
     "unicorn/no-null": "off",
     "unicorn/prefer-top-level-await": "off",
-  }
+  },
 });

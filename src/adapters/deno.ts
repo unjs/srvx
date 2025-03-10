@@ -1,11 +1,8 @@
-import type { Server, ServerOptions } from "../types.ts";
+import type { DenoFetchHandler, Server, ServerOptions } from "../types.ts";
 import { fmtURL, resolvePort } from "../_utils.ts";
 import { wrapFetch } from "../_plugin.ts";
 
-type DenoHandler = (
-  request: Request,
-  info?: Deno.ServeHandlerInfo<Deno.NetAddr>,
-) => Response | Promise<Response>;
+export const Response = globalThis.Response;
 
 export function serve(options: ServerOptions): DenoServer {
   return new DenoServer(options);
@@ -13,12 +10,12 @@ export function serve(options: ServerOptions): DenoServer {
 
 // https://docs.deno.com/api/deno/~/Deno.serve
 
-class DenoServer implements Server<DenoHandler> {
+class DenoServer implements Server<DenoFetchHandler> {
   readonly runtime = "deno";
   readonly options: ServerOptions;
   readonly deno: Server["deno"] = {};
   readonly serveOptions: Deno.ServeTcpOptions;
-  readonly fetch: DenoHandler;
+  readonly fetch: DenoFetchHandler;
 
   #listeningPromise?: Promise<void>;
   #listeningInfo?: { hostname: string; port: number };

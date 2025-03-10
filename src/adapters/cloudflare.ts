@@ -1,6 +1,12 @@
-import type { Server, ServerOptions } from "../types.ts";
+import type {
+  CloudflareFetchHandler,
+  Server,
+  ServerOptions,
+} from "../types.ts";
 import type * as CF from "@cloudflare/workers-types";
 import { wrapFetch } from "../_plugin.ts";
+
+export const Response = globalThis.Response;
 
 export function serve(
   options: ServerOptions,
@@ -8,7 +14,7 @@ export function serve(
   return new CloudflareServer(options);
 }
 
-class CloudflareServer implements Server<CF.ExportedHandlerFetchHandler> {
+class CloudflareServer implements Server<CloudflareFetchHandler> {
   readonly runtime = "cloudflare";
   readonly options: ServerOptions;
   readonly serveOptions: CF.ExportedHandler;

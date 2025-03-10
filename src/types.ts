@@ -209,3 +209,26 @@ export interface ServerRequest extends Request {
     context: CF.ExecutionContext;
   };
 }
+
+// ----------------------------------------------------------------------------
+// Different handler types
+// ----------------------------------------------------------------------------
+
+export type FetchHandler = (request: Request) => Response | Promise<Response>;
+
+export type BunFetchandler = (
+  request: Request,
+  server?: Bun.Server,
+) => Response | Promise<Response>;
+
+export type DenoFetchHandler = (
+  request: Request,
+  info?: Deno.ServeHandlerInfo<Deno.NetAddr>,
+) => Response | Promise<Response>;
+
+export type NodeHttpHandler = (
+  nodeReq: NodeHttp.IncomingMessage,
+  nodeRes: NodeHttp.ServerResponse,
+) => void | Promise<void>;
+
+export type CloudflareFetchHandler = CF.ExportedHandlerFetchHandler;

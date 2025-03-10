@@ -1,4 +1,6 @@
 import type {
+  FetchHandler,
+  NodeHttpHandler,
   Server,
   ServerHandler,
   ServerOptions,
@@ -16,14 +18,7 @@ export function serve(options: ServerOptions): Server {
   return new NodeServer(options);
 }
 
-export type NodeHandler = (
-  nodeReq: NodeHttp.IncomingMessage,
-  nodeRes: NodeHttp.ServerResponse,
-) => void | Promise<void>;
-
-export type FetchHandler = (request: Request) => Response | Promise<Response>;
-
-export function toNodeHandler(fetchHandler: FetchHandler): NodeHandler {
+export function toNodeHandler(fetchHandler: FetchHandler): NodeHttpHandler {
   return (
     nodeReq: NodeHttp.IncomingMessage,
     nodeRes: NodeHttp.ServerResponse,

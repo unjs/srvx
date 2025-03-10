@@ -1,12 +1,9 @@
-import type { Server, ServerOptions } from "../types.ts";
+import type { BunFetchandler, Server, ServerOptions } from "../types.ts";
 import type * as bun from "bun";
 import { resolvePort } from "../_utils.ts";
 import { wrapFetch } from "../_plugin.ts";
 
-type BunHandler = (
-  request: Request,
-  server?: bun.Server,
-) => Response | Promise<Response>;
+export const Response = globalThis.Response;
 
 export function serve(options: ServerOptions): BunServer {
   return new BunServer(options);
@@ -14,12 +11,12 @@ export function serve(options: ServerOptions): BunServer {
 
 // https://bun.sh/docs/api/http
 
-class BunServer implements Server<BunHandler> {
+class BunServer implements Server<BunFetchandler> {
   readonly runtime = "bun";
   readonly options: ServerOptions;
   readonly bun: Server["bun"] = {};
   readonly serveOptions: bun.ServeOptions;
-  readonly fetch: BunHandler;
+  readonly fetch: BunFetchandler;
 
   constructor(options: ServerOptions) {
     this.options = options;

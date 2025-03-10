@@ -12,8 +12,8 @@
 
 ### 💅 Refactors
 
-- ⚠️  Update exports ([7153090](https://github.com/unjs/srvx/commit/7153090))
-- ⚠️  Overhaul internal implementation ([d444c74](https://github.com/unjs/srvx/commit/d444c74))
+- ⚠️ Update exports ([7153090](https://github.com/unjs/srvx/commit/7153090))
+- ⚠️ Overhaul internal implementation ([d444c74](https://github.com/unjs/srvx/commit/d444c74))
 
 ### 📦 Build
 
@@ -36,8 +36,8 @@
 
 #### ⚠️ Breaking Changes
 
-- ⚠️  Update exports ([7153090](https://github.com/unjs/srvx/commit/7153090))
-- ⚠️  Overhaul internal implementation ([d444c74](https://github.com/unjs/srvx/commit/d444c74))
+- ⚠️ Update exports ([7153090](https://github.com/unjs/srvx/commit/7153090))
+- ⚠️ Overhaul internal implementation ([d444c74](https://github.com/unjs/srvx/commit/d444c74))
 
 ### ❤️ Contributors
 

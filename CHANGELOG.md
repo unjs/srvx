@@ -1,5 +1,23 @@
 # Changelog
 
+## v0.2.2
+
+[compare changes](https://github.com/unjs/srvx/compare/v0.2.1...v0.2.2)
+
+### 🚀 Enhancements
+
+- **node:** Support node readable stream ([bc72436](https://github.com/unjs/srvx/commit/bc72436))
+
+### 🩹 Fixes
+
+- **node:** Don't send headers if already sent ([bbf6b86](https://github.com/unjs/srvx/commit/bbf6b86))
+- Add `Response` export type ([e63919b](https://github.com/unjs/srvx/commit/e63919b))
+- **node:** Use `headers.entries` when full Headers is set as init ([7f8cac8](https://github.com/unjs/srvx/commit/7f8cac8))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](https://github.com/pi0))
+
 ## v0.2.1
 
 [compare changes](https://github.com/unjs/srvx/compare/v0.2.0...v0.2.1)

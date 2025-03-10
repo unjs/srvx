@@ -6,6 +6,7 @@
   "license": "MIT",
   "sideEffects": false,
   "type": "module",
+  "types": "./dist/types.d.mts",
   "exports": {
     "./types": "./dist/types.d.mts",
     "./deno": "./dist/adapters/deno.mjs",

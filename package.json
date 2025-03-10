@@ -17,7 +17,8 @@
       "deno": "./dist/adapters/deno.mjs",
       "bun": "./dist/adapters/bun.mjs",
       "workerd": "./dist/adapters/cloudflare.mjs",
-      "node": "./dist/adapters/node.mjs"
+      "node": "./dist/adapters/node.mjs",
+      "types": "./dist/types.d.mts"
     }
   },
   "files": [

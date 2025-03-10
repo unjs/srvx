@@ -4,7 +4,6 @@ import type {
   Server,
   ServerHandler,
   ServerOptions,
-  ServerRequest,
 } from "../types.ts";
 import NodeHttp from "node:http";
 import { sendNodeResponse } from "../_node-compat/send.ts";

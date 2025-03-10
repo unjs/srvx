@@ -34,6 +34,11 @@ export interface ServerOptions {
   plugins?: (ServerPlugin | ServerPluginInstance)[];
 
   /**
+   * If set to `true`, server will not start listening automatically.
+   */
+  manual?: boolean;
+
+  /**
    * The port server should be listening to.
    *
    * Default is read from `PORT` environment variable or will be `3000`.
@@ -98,7 +103,7 @@ export interface Server<Handler = ServerHandler> {
    * Node.js context.
    */
   readonly node?: {
-    server: NodeHttp.Server;
+    server?: NodeHttp.Server;
     handler: (
       nodeReq: NodeHttp.IncomingMessage,
       nodeRes: NodeHttp.ServerResponse,
@@ -108,12 +113,12 @@ export interface Server<Handler = ServerHandler> {
   /**
    * Bun context.
    */
-  readonly bun?: { server: Bun.Server };
+  readonly bun?: { server?: Bun.Server };
 
   /**
    * Deno context.
    */
-  readonly deno?: { server: Deno.HttpServer };
+  readonly deno?: { server?: Deno.HttpServer };
 
   /**
    * Server fetch handler

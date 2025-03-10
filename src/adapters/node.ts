@@ -22,6 +22,7 @@ class NodeServer implements Server {
   readonly runtime = "node";
   readonly options: ServerOptions;
   readonly node: Server["node"];
+  readonly serveOptions: ServerOptions["node"];
   readonly fetch: ServerHandler;
 
   #listeningPromise?: Promise<void>;
@@ -29,9 +30,10 @@ class NodeServer implements Server {
   constructor(options: ServerOptions) {
     this.options = options;
 
-    const fetchHandler = (this.fetch = wrapFetch(this, this.options.fetch));
+    const fetchHandler = wrapFetch(this, this.options.fetch);
+    this.fetch = fetchHandler;
 
-    const nodeHandler = (
+    const handler = (
       nodeReq: NodeHttp.IncomingMessage,
       nodeRes: NodeHttp.ServerResponse,
     ) => {
@@ -43,24 +45,29 @@ class NodeServer implements Server {
         : sendNodeResponse(nodeRes, res);
     };
 
-    const nodeServer = NodeHttp.createServer(
-      this.options.node || {},
-      nodeHandler,
-    );
+    this.serveOptions = {
+      port: resolvePort(this.options.port, globalThis.process?.env.PORT),
+      host: this.options.hostname,
+      exclusive: !this.options.reusePort,
+      ...this.options.node,
+    };
 
+    const server = NodeHttp.createServer(this.serveOptions, handler);
+
+    this.node = { server, handler };
+
+    if (!options.manual) {
+      this.serve();
+    }
+  }
+
+  serve() {
+    if (this.#listeningPromise) {
+      return Promise.resolve(this.#listeningPromise).then(() => this);
+    }
     this.#listeningPromise = new Promise<void>((resolve) => {
-      nodeServer.listen(
-        {
-          port: resolvePort(this.options.port, globalThis.process?.env.PORT),
-          host: this.options.hostname,
-          exclusive: !this.options.reusePort,
-          ...this.options.node,
-        },
-        () => resolve(),
-      );
+      this.node!.server!.listen(this.serveOptions, () => resolve());
     });
-
-    this.node = { server: nodeServer, handler: nodeHandler };
   }
 
   get url() {

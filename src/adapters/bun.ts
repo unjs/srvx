@@ -1,42 +1,60 @@
-import type { Server, ServerHandler, ServerOptions } from "../types.ts";
+import type { Server, ServerOptions } from "../types.ts";
+import type * as bun from "bun";
 import { resolvePort } from "../_utils.ts";
 import { wrapFetch } from "../_plugin.ts";
 
-export function serve(options: ServerOptions): Server {
+type BunHandler = (
+  request: Request,
+  server?: bun.Server,
+) => Response | Promise<Response>;
+
+export function serve(options: ServerOptions): BunServer {
   return new BunServer(options);
 }
 
 // https://bun.sh/docs/api/http
 
-class BunServer implements Server {
+class BunServer implements Server<BunHandler> {
   readonly runtime = "bun";
   readonly options: ServerOptions;
-  readonly bun: Server["bun"];
-  readonly fetch: ServerHandler;
+  readonly bun: Server["bun"] = {};
+  readonly serveOptions: bun.ServeOptions;
+  readonly fetch: BunHandler;
 
   constructor(options: ServerOptions) {
     this.options = options;
 
-    const fetchHandler = (this.fetch = wrapFetch(this, this.options.fetch));
+    const fetchHandler = wrapFetch(this, this.options.fetch);
 
-    const server = Bun.serve({
-      port: resolvePort(this.options.port, globalThis.process?.env.PORT),
+    this.fetch = (request, server) => {
+      Object.defineProperties(request, {
+        bun: { value: { server }, enumerable: true },
+        remoteAddress: {
+          get: () => server?.requestIP(request as Request)?.address,
+          enumerable: true,
+        },
+      });
+      return fetchHandler(request);
+    };
+
+    this.serveOptions = {
       hostname: this.options.hostname,
       reusePort: this.options.reusePort,
+      port: resolvePort(this.options.port, globalThis.process?.env.PORT),
       ...this.options.bun,
-      fetch(request) {
-        Object.defineProperties(request, {
-          bun: { value: { server: this }, enumerable: true },
-          remoteAddress: {
-            get: () => this?.requestIP(request as Request)?.address,
-            enumerable: true,
-          },
-        });
-        return fetchHandler(request);
-      },
-    });
+      fetch: this.fetch,
+    };
 
-    this.bun = { server };
+    if (!options.manual) {
+      this.serve();
+    }
+  }
+
+  serve() {
+    if (!this.bun!.server) {
+      this.bun!.server = Bun.serve(this.serveOptions);
+    }
+    return Promise.resolve(this);
   }
 
   get url() {

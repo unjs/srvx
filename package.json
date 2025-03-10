@@ -29,7 +29,7 @@
     "lint": "eslint . && prettier -c .",
     "lint:fix": "automd && eslint . --fix && prettier -w .",
     "play:node": "node playground/app.mjs",
-    "play:deno": "deno serve -A playground/app.mjs",
+    "play:deno": "deno run -A playground/app.mjs",
     "play:bun": "bun playground/app.mjs",
     "play:cf": "pnpx wrangler dev playground/app.mjs",
     "prepack": "pnpm build",

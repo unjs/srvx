@@ -11,6 +11,7 @@ export function serve(
 class CloudflareServer implements Server<CF.ExportedHandlerFetchHandler> {
   readonly runtime = "cloudflare";
   readonly options: ServerOptions;
+  readonly serveOptions: CF.ExportedHandler;
   readonly fetch: CF.ExportedHandlerFetchHandler;
 
   constructor(options: ServerOptions) {
@@ -33,6 +34,21 @@ class CloudflareServer implements Server<CF.ExportedHandlerFetchHandler> {
         | CF.Response
         | Promise<CF.Response>;
     };
+
+    this.serveOptions = {
+      fetch: this.fetch,
+    };
+
+    if (!options.manual) {
+      this.serve();
+    }
+  }
+
+  serve() {
+    addEventListener("fetch", (event) => {
+      // @ts-expect-error
+      event.respondWith(this.fetch(event.request, {}, event));
+    });
   }
 
   ready(): Promise<Server<CF.ExportedHandlerFetchHandler>> {

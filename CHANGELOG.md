@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.2.4
+
+[compare changes](https://github.com/unjs/srvx/compare/v0.2.3...v0.2.4)
+
+### 🩹 Fixes
+
+- Fix `Response` type export ([e8d25e9](https://github.com/unjs/srvx/commit/e8d25e9))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](https://github.com/pi0))
+
 ## v0.2.3
 
 [compare changes](https://github.com/unjs/srvx/compare/v0.2.2...v0.2.3)

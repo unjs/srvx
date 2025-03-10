@@ -1,5 +1,6 @@
 import type NodeHttp from "node:http";
 import type { NodeFastResponse } from "./response";
+import type { Readable as NodeReadable } from "node:stream";
 import { splitSetCookieString } from "cookie-es";
 
 export async function sendNodeResponse(
@@ -17,10 +18,15 @@ export async function sendNodeResponse(
     if (!nodeRes.headersSent) {
       nodeRes.writeHead(res.status, res.statusText, res.headers);
     }
-    if (res.body instanceof ReadableStream) {
-      return streamBody(res.body, nodeRes);
+    if (res.body) {
+      if (res.body instanceof ReadableStream) {
+        return streamBody(res.body, nodeRes);
+      } else if (typeof (res.body as NodeReadable)?.pipe === "function") {
+        (res.body as NodeReadable).pipe(nodeRes);
+        return new Promise((resolve) => nodeRes.on("close", resolve));
+      }
+      nodeRes.write(res.body);
     }
-    nodeRes.write(res.body);
     return endNodeResponse(nodeRes);
   }
 

@@ -1,4 +1,5 @@
 import type NodeHttp from "node:http";
+import type { Readable as NodeReadable } from "node:stream";
 import { splitSetCookieString } from "cookie-es";
 
 export type NodeFastResponse = InstanceType<typeof NodeFastResponse>;
@@ -43,9 +44,9 @@ export const NodeFastResponse = /* @__PURE__ */ (() =>
         }
       }
 
-      const bodyInit = this.#body;
+      const bodyInit = this.#body as BodyInit | null | undefined | NodeReadable;
       // prettier-ignore
-      let body: string | Buffer | Uint8Array | DataView | ReadableStream<Uint8Array> | undefined | null;
+      let body: string | Buffer | Uint8Array | DataView | ReadableStream<Uint8Array> | NodeReadable | undefined | null;
       if (bodyInit) {
         if (typeof bodyInit === "string") {
           body = bodyInit;
@@ -62,8 +63,10 @@ export const NodeFastResponse = /* @__PURE__ */ (() =>
           if (bodyInit.type) {
             headers.push(["content-type", bodyInit.type]);
           }
+        } else if (typeof (bodyInit as NodeReadable).pipe === "function") {
+          body = bodyInit as NodeReadable;
         } else {
-          const res = new Response(bodyInit);
+          const res = new Response(bodyInit as BodyInit);
           body = res.body;
           for (const [key, value] of res.headers) {
             headers.push([key, value]);

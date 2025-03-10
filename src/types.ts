@@ -97,7 +97,13 @@ export interface Server<Handler = ServerHandler> {
   /**
    * Node.js context.
    */
-  readonly node?: { server: NodeHttp.Server };
+  readonly node?: {
+    server: NodeHttp.Server;
+    handler: (
+      nodeReq: NodeHttp.IncomingMessage,
+      nodeRes: NodeHttp.ServerResponse,
+    ) => void | Promise<void>;
+  };
 
   /**
    * Bun context.

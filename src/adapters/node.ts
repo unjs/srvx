@@ -31,18 +31,21 @@ class NodeServer implements Server {
 
     const fetchHandler = (this.fetch = wrapFetch(this, this.options.fetch));
 
+    const nodeHandler = (
+      nodeReq: NodeHttp.IncomingMessage,
+      nodeRes: NodeHttp.ServerResponse,
+    ) => {
+      const request = new NodeRequestProxy(nodeReq) as ServerRequest;
+      request.node = { req: nodeReq, res: nodeRes };
+      const res = fetchHandler(request);
+      return res instanceof Promise
+        ? res.then((resolvedRes) => sendNodeResponse(nodeRes, resolvedRes))
+        : sendNodeResponse(nodeRes, res);
+    };
+
     const nodeServer = NodeHttp.createServer(
-      {
-        ...this.options.node,
-      },
-      (nodeReq, nodeRes) => {
-        const request = new NodeRequestProxy(nodeReq) as ServerRequest;
-        request.node = { req: nodeReq, res: nodeRes };
-        const res = fetchHandler(request);
-        return res instanceof Promise
-          ? res.then((resolvedRes) => sendNodeResponse(nodeRes, resolvedRes))
-          : sendNodeResponse(nodeRes, res);
-      },
+      this.options.node || {},
+      nodeHandler,
     );
 
     this.#listeningPromise = new Promise<void>((resolve) => {
@@ -57,7 +60,7 @@ class NodeServer implements Server {
       );
     });
 
-    this.node = { server: nodeServer };
+    this.node = { server: nodeServer, handler: nodeHandler };
   }
 
   get url() {

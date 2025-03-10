@@ -1,5 +1,29 @@
 # Changelog
 
+## v0.2.3
+
+[compare changes](https://github.com/unjs/srvx/compare/v0.2.2...v0.2.3)
+
+### 🩹 Fixes
+
+- **node:** Use `headers.entries` when full Headers is set as init ([7f8cac8](https://github.com/unjs/srvx/commit/7f8cac8))
+- **node:** Make `req instanceof Request` working ([24b3f83](https://github.com/unjs/srvx/commit/24b3f83))
+
+### 📦 Build
+
+- Fix types export ([#36](https://github.com/unjs/srvx/pull/36))
+- Add types export for `.` ([#37](https://github.com/unjs/srvx/pull/37))
+
+### 🏡 Chore
+
+- **release:** V0.2.2 ([f015aa3](https://github.com/unjs/srvx/commit/f015aa3))
+- Lint ([f043d58](https://github.com/unjs/srvx/commit/f043d58))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](https://github.com/pi0))
+- Oskar Lebuda ([@OskarLebuda](https://github.com/OskarLebuda))
+
 ## v0.2.2
 
 [compare changes](https://github.com/unjs/srvx/compare/v0.2.1...v0.2.2)

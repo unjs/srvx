@@ -12,8 +12,8 @@ export async function sendNodeResponse(
   }
 
   // Fast path for NodeFastResponse
-  if ((webRes as NodeFastResponse).xNodeResponse) {
-    const res = (webRes as NodeFastResponse).xNodeResponse();
+  if ((webRes as NodeFastResponse).nodeResponse) {
+    const res = (webRes as NodeFastResponse).nodeResponse();
     nodeRes.writeHead(res.status, res.statusText, res.headers);
     if (res.body instanceof ReadableStream) {
       return streamBody(res.body, nodeRes);

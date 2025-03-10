@@ -1,6 +1,6 @@
-import type { ServerOptions } from "../types.ts";
-import { Server } from "../_server.ts";
-import { resolvePort } from "../_common.ts";
+import type { Server, ServerHandler, ServerOptions } from "../types.ts";
+import { fmtURL, resolvePort } from "../_utils.ts";
+import { wrapFetch } from "../_plugin.ts";
 
 export function serve(options: ServerOptions): Server {
   return new DenoServer(options);
@@ -8,27 +8,24 @@ export function serve(options: ServerOptions): Server {
 
 // https://docs.deno.com/api/deno/~/Deno.serve
 
-class DenoServer extends Server {
+class DenoServer implements Server {
   readonly runtime = "deno";
+  readonly options: ServerOptions;
+  readonly deno: Server["deno"];
+  readonly fetch: ServerHandler;
 
+  #listeningPromise?: Promise<void>;
   #listeningInfo?: { hostname: string; port: number };
 
-  protected _listen() {
-    const onListenPromise = Promise.withResolvers<void>();
+  constructor(options: ServerOptions) {
+    this.options = options;
 
-    let serverFetch = this.fetch as Deno.ServeHandler;
-    if (this.options.xRemoteAddress) {
-      const userFetch = serverFetch as typeof this.fetch;
-      serverFetch = (request, info) => {
-        Object.defineProperty(request, "xRemoteAddress", {
-          get: () => (info?.remoteAddr as Deno.NetAddr)?.hostname,
-          enumerable: true,
-        });
-        return userFetch(request);
-      };
-    }
+    const listenPromise = Promise.withResolvers<void>();
+    this.#listeningPromise = listenPromise.promise;
 
-    this.denoServer = Deno.serve(
+    const fetchHandler = (this.fetch = wrapFetch(this, this.options.fetch));
+
+    const server = Deno.serve(
       {
         port: resolvePort(
           this.options.port,
@@ -42,22 +39,36 @@ class DenoServer extends Server {
             this.options.deno.onListen(info);
           }
           this.#listeningInfo = info;
-          onListenPromise.resolve();
+          listenPromise.resolve();
         },
       },
-      serverFetch,
+      (request, info) => {
+        Object.defineProperties(request, {
+          deno: { value: { info, server }, enumerable: true },
+          remoteAddress: {
+            get: () => (info?.remoteAddr as Deno.NetAddr)?.hostname,
+            enumerable: true,
+          },
+        });
+        return fetchHandler(request);
+      },
     );
+
+    this.deno = { server };
   }
 
-  get port() {
-    return this.#listeningInfo?.port ?? null;
+  get url() {
+    return this.#listeningInfo
+      ? fmtURL(this.#listeningInfo.hostname, this.#listeningInfo.port, false)
+      : undefined;
   }
 
-  get addr() {
-    return this.#listeningInfo?.hostname ?? null;
+  ready(): Promise<Server> {
+    return Promise.resolve(this.#listeningPromise).then(() => this);
   }
 
-  close(_closeAll?: boolean /* TODO */) {
-    this.denoServer?.shutdown();
+  close() {
+    // TODO: closeAll is not supported
+    return Promise.resolve(this.deno?.server?.shutdown());
   }
 }

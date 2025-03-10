@@ -8,7 +8,6 @@ const { serve } = (await import(
 
 export const server = serve({
   hostname: "localhost",
-  xRemoteAddress: true,
   plugins: [false, true].map(
     (withBody) =>
       (() => ({
@@ -46,7 +45,7 @@ export const server = serve({
         return new Response(await req.text());
       }
       case "/ip": {
-        return new Response(`ip: ${req.xRemoteAddress}`);
+        return new Response(`ip: ${req.remoteAddress}`);
       }
     }
     return new Response("404", { status: 404 });

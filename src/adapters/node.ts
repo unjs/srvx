@@ -1,9 +1,14 @@
-import type { ServerOptions, xRequest } from "../types.ts";
+import type {
+  Server,
+  ServerHandler,
+  ServerOptions,
+  ServerRequest,
+} from "../types.ts";
 import NodeHttp from "node:http";
-import { Server } from "../_server.ts";
 import { sendNodeResponse } from "../_node-compat/send.ts";
 import { NodeRequestProxy } from "../_node-compat/request.ts";
-import { resolvePort } from "../_common.ts";
+import { fmtURL, resolvePort } from "../_utils.ts";
+import { wrapFetch } from "../_plugin.ts";
 
 export { NodeFastResponse as Response } from "../_node-compat/response.ts";
 
@@ -13,25 +18,34 @@ export function serve(options: ServerOptions): Server {
 
 // https://nodejs.org/api/http.html
 
-class NodeServer extends Server {
+class NodeServer implements Server {
   readonly runtime = "node";
+  readonly options: ServerOptions;
+  readonly node: Server["node"];
+  readonly fetch: ServerHandler;
 
-  protected _listen() {
-    const nodeServer = (this.nodeServer = NodeHttp.createServer(
+  #listeningPromise?: Promise<void>;
+
+  constructor(options: ServerOptions) {
+    this.options = options;
+
+    const fetchHandler = (this.fetch = wrapFetch(this, this.options.fetch));
+
+    const nodeServer = NodeHttp.createServer(
       {
         ...this.options.node,
       },
       (nodeReq, nodeRes) => {
-        const request = new NodeRequestProxy(nodeReq) as xRequest;
-        request.xNode = { req: nodeReq, res: nodeRes };
-        const res = this.fetch(request);
+        const request = new NodeRequestProxy(nodeReq) as ServerRequest;
+        request.node = { req: nodeReq, res: nodeRes };
+        const res = fetchHandler(request);
         return res instanceof Promise
           ? res.then((resolvedRes) => sendNodeResponse(nodeRes, resolvedRes))
           : sendNodeResponse(nodeRes, res);
       },
-    ));
+    );
 
-    return new Promise<void>((resolve) => {
+    this.#listeningPromise = new Promise<void>((resolve) => {
       nodeServer.listen(
         {
           port: resolvePort(this.options.port, globalThis.process?.env.PORT),
@@ -42,37 +56,30 @@ class NodeServer extends Server {
         () => resolve(),
       );
     });
+
+    this.node = { server: nodeServer };
   }
 
-  get port() {
-    const addr = this.#addr;
+  get url() {
+    const addr = this.node?.server?.address();
     if (!addr) {
-      return null;
+      return;
     }
-    return addr.port;
+    return typeof addr === "string"
+      ? addr /* socket */
+      : fmtURL(addr.address, addr.port, false);
   }
 
-  get addr() {
-    const addr = this.#addr;
-    if (!addr) {
-      return null;
-    }
-    return addr.address;
-  }
-
-  get #addr() {
-    const addr = this.nodeServer?.address();
-    if (addr && typeof addr !== "string") {
-      return addr;
-    }
+  ready(): Promise<Server> {
+    return Promise.resolve(this.#listeningPromise).then(() => this);
   }
 
   close(closeAll?: boolean): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       if (closeAll) {
-        this.nodeServer?.closeAllConnections?.();
+        this.node?.server?.closeAllConnections?.();
       }
-      this.nodeServer?.close((error?: Error) =>
+      this.node?.server?.close((error?: Error) =>
         error ? reject(error) : resolve(),
       );
     });

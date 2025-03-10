@@ -1,10 +1,9 @@
 import type NodeHttp from "node:http";
-import type { xHeaders } from "../types.ts";
 import { splitSetCookieString } from "cookie-es";
 import { kNodeInspect, kNodeReq, kNodeRes } from "./_common.ts";
 
 export const NodeReqHeadersProxy = /* @__PURE__ */ (() =>
-  class NodeReqHeadersProxy implements xHeaders {
+  class NodeReqHeadersProxy implements Headers {
     [kNodeReq]: NodeHttp.IncomingMessage;
 
     constructor(req: NodeHttp.IncomingMessage) {
@@ -52,6 +51,16 @@ export const NodeReqHeadersProxy = /* @__PURE__ */ (() =>
     set(name: string, value: string): void {
       name = name.toLowerCase();
       this[kNodeReq].headers[name] = value;
+    }
+
+    get count(): number {
+      // Bun-specific addon
+      throw new Error("Method not implemented.");
+    }
+
+    getAll(_name: "set-cookie" | "Set-Cookie"): string[] {
+      // Bun-specific addon
+      throw new Error("Method not implemented.");
     }
 
     toJSON(): Record<string, string> {
@@ -117,7 +126,7 @@ export const NodeReqHeadersProxy = /* @__PURE__ */ (() =>
   })();
 
 export const NodeResHeadersProxy = /* @__PURE__ */ (() =>
-  class NodeResHeadersProxy implements xHeaders {
+  class NodeResHeadersProxy implements Headers {
     [kNodeRes]: NodeHttp.ServerResponse;
 
     constructor(res: NodeHttp.ServerResponse) {
@@ -150,6 +159,27 @@ export const NodeResHeadersProxy = /* @__PURE__ */ (() =>
 
     set(name: string, value: string): void {
       this[kNodeRes].setHeader(name, value);
+    }
+
+    get count(): number {
+      // Bun-specific addon
+      throw new Error("Method not implemented.");
+    }
+
+    getAll(_name: "set-cookie" | "Set-Cookie"): string[] {
+      // Bun-specific addon
+      throw new Error("Method not implemented.");
+    }
+
+    toJSON(): Record<string, string> {
+      const _headers = this[kNodeRes].getHeaders();
+      const result: Record<string, string> = {};
+      for (const key in _headers) {
+        if (_headers[key]) {
+          result[key] = _normalizeValue(_headers[key]);
+        }
+      }
+      return result;
     }
 
     forEach(

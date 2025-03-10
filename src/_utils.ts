@@ -10,3 +10,17 @@ export function resolvePort(
     ? portInput
     : Number.parseInt(portInput, 10);
 }
+
+export function fmtURL(
+  host: string | undefined,
+  port: number | undefined,
+  ssl: boolean,
+) {
+  if (!host || !port) {
+    return undefined;
+  }
+  if (host.includes(":")) {
+    host = `[${host}]`;
+  }
+  return `http${ssl ? "s" : ""}://${host}:${port}/`;
+}

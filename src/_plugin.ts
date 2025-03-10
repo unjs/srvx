@@ -1,17 +1,22 @@
-import type { ServerPluginInstance, ServerOptions, Server } from "./types.ts";
+import type {
+  ServerPluginInstance,
+  Server,
+  ServerRequest,
+  ServerHandler,
+} from "./types.ts";
 
-export async function applyPlugins(server: Server) {
-  const options = server.options as ServerOptions;
+export function wrapFetch(server: Server, fetchHandler: ServerHandler) {
+  const plugins = server.options.plugins;
 
-  if (!options.plugins?.length) {
-    return;
+  if (!plugins?.length) {
+    return fetchHandler;
   }
 
   const requestHooks: NonNullable<ServerPluginInstance["request"]>[] = [];
   const responseHooks: NonNullable<ServerPluginInstance["response"]>[] = [];
 
-  for (const ctor of options.plugins) {
-    const plugin = typeof ctor === "function" ? await ctor(server) : ctor;
+  for (const ctor of plugins) {
+    const plugin = typeof ctor === "function" ? ctor(server) : ctor;
     if (plugin.request) {
       requestHooks.push(plugin.request);
     }
@@ -23,67 +28,69 @@ export async function applyPlugins(server: Server) {
   const hasRequestHooks = requestHooks.length > 0;
   const hasResponseHooks = responseHooks.length > 0;
 
-  if (hasRequestHooks || hasResponseHooks) {
-    server.fetch = (request) => {
-      let resValue: undefined | Response;
-      let resPromise: undefined | Promise<Response | void>;
-
-      // Request hooks
-      if (hasRequestHooks) {
-        for (const reqHook of requestHooks) {
-          if (resPromise) {
-            resPromise = resPromise.then((res) => res || reqHook(request));
-          } else {
-            const res = reqHook(request);
-            if (res) {
-              if (res instanceof Promise) {
-                resPromise = res;
-              } else {
-                return res;
-              }
-            }
-          }
-        }
-      }
-
-      // User handler
-      if (resPromise) {
-        resPromise = resPromise.then((res) => res || options.fetch(request));
-      } else {
-        const res = options.fetch(request);
-        if (res instanceof Promise) {
-          resPromise = res;
-        } else {
-          resValue = res;
-        }
-      }
-
-      // Response hooks
-      if (hasResponseHooks) {
-        for (const resHook of responseHooks) {
-          if (resPromise) {
-            resPromise = resPromise.then((res) => {
-              if (res) {
-                resValue = res;
-              }
-              return resHook(request, resValue!);
-            });
-          } else {
-            const res = resHook(request, resValue!);
-            if (res) {
-              if (res instanceof Promise) {
-                resPromise = res;
-              } else {
-                resValue = res;
-              }
-            }
-          }
-        }
-      }
-
-      return (
-        resPromise ? resPromise.then((res) => res || resValue) : resValue
-      ) as Response | Promise<Response>;
-    };
+  if (!hasRequestHooks && !hasResponseHooks) {
+    return fetchHandler;
   }
+
+  return (request: ServerRequest) => {
+    let resValue: undefined | Response;
+    let resPromise: undefined | Promise<Response | void>;
+
+    // Request hooks
+    if (hasRequestHooks) {
+      for (const reqHook of requestHooks) {
+        if (resPromise) {
+          resPromise = resPromise.then((res) => res || reqHook(request));
+        } else {
+          const res = reqHook(request);
+          if (res) {
+            if (res instanceof Promise) {
+              resPromise = res;
+            } else {
+              return res;
+            }
+          }
+        }
+      }
+    }
+
+    // User handler
+    if (resPromise) {
+      resPromise = resPromise.then((res) => res || fetchHandler(request));
+    } else {
+      const res = fetchHandler(request);
+      if (res instanceof Promise) {
+        resPromise = res;
+      } else {
+        resValue = res;
+      }
+    }
+
+    // Response hooks
+    if (hasResponseHooks) {
+      for (const resHook of responseHooks) {
+        if (resPromise) {
+          resPromise = resPromise.then((res) => {
+            if (res) {
+              resValue = res;
+            }
+            return resHook(request, resValue!);
+          });
+        } else {
+          const res = resHook(request, resValue!);
+          if (res) {
+            if (res instanceof Promise) {
+              resPromise = res;
+            } else {
+              resValue = res;
+            }
+          }
+        }
+      }
+    }
+
+    return (
+      resPromise ? resPromise.then((res) => res || resValue) : resValue
+    ) as Response | Promise<Response>;
+  };
 }

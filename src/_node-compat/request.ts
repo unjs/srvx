@@ -1,11 +1,11 @@
 import type NodeHttp from "node:http";
-import type { xRequest, xHeaders } from "../types.ts";
+import type { ServerRequest } from "../types.ts";
 import { kNodeInspect, kNodeReq } from "./_common.ts";
 import { NodeReqHeadersProxy } from "./headers.ts";
 import { NodeReqURLProxy } from "./url.ts";
 
 export const NodeRequestProxy = /* @__PURE__ */ (() =>
-  class NodeRequestProxy implements xRequest {
+  class NodeRequestProxy implements ServerRequest {
     cache: RequestCache = "default";
     credentials: RequestCredentials = "same-origin";
     destination: RequestDestination = "";
@@ -17,7 +17,7 @@ export const NodeRequestProxy = /* @__PURE__ */ (() =>
     referrer: string = "about:client";
     referrerPolicy: ReferrerPolicy = "";
 
-    headers: xHeaders;
+    headers: Headers;
     bodyUsed: boolean = false;
 
     [kNodeReq]: NodeHttp.IncomingMessage;
@@ -39,11 +39,11 @@ export const NodeRequestProxy = /* @__PURE__ */ (() =>
       this.headers = new NodeReqHeadersProxy(nodeReq);
     }
 
-    get xRemoteAddress() {
+    get remoteAddress() {
       return this[kNodeReq].socket?.remoteAddress;
     }
 
-    clone(): xRequest {
+    clone(): ServerRequest {
       return new NodeRequestProxy(this[kNodeReq]);
     }
 

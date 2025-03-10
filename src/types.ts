@@ -2,10 +2,6 @@ import type * as NodeHttp from "node:http";
 import type * as NodeNet from "node:net";
 import type * as Bun from "bun";
 
-import type { Server } from "./_server.ts";
-
-export type { Server } from "./_server.ts";
-
 type MaybePromise<T> = T | Promise<T>;
 
 // ----------------------------------------------------------------------------
@@ -20,7 +16,7 @@ export declare function serve(options: ServerOptions): Server;
 /**
  * Web fetch compatible request handler
  */
-export type ServerHandler = (request: xRequest) => MaybePromise<Response>;
+export type ServerHandler = (request: ServerRequest) => MaybePromise<Response>;
 
 /**
  * Server options
@@ -32,7 +28,7 @@ export interface ServerOptions {
   fetch: ServerHandler;
 
   /**
-   * Server plugins
+   * Server plugins.
    */
   plugins?: (ServerPlugin | ServerPluginInstance)[];
 
@@ -62,23 +58,7 @@ export interface ServerOptions {
   reusePort?: boolean;
 
   /**
-   * If this option is enabled, `request.xRemoteAddress` will be available.
-   *  **Example:**
-   *
-   *  ```js
-   *  serve({
-   *   port: 3000,
-   *    xRemoteAddress: true,
-   *    fetch: (request) =>
-   *      new Response(`Your ip address is ${request.xRemoteAddress}`),
-   *  });
-   * ```
-   * **Note:** In order to to provide cross-runtime consistency, a small wrapper function will be enabled for Deno and Bun runtimes if `xRemoteAddress` option is set.
-   */
-  xRemoteAddress?: boolean;
-
-  /**
-   * Node.js http server options.
+   * Node.js server options.
    */
   node?: NodeHttp.ServerOptions & NodeNet.ListenOptions;
 
@@ -97,13 +77,63 @@ export interface ServerOptions {
   deno?: Deno.ServeOptions;
 }
 
+export interface Server {
+  /**
+   * Current runtime name
+   */
+  readonly runtime: "node" | "deno" | "bun";
+
+  /**
+   * Server options
+   */
+  readonly options: ServerOptions;
+
+  /**
+   * Server URL address.
+   */
+  readonly url?: string;
+
+  /**
+   * Node.js context.
+   */
+  readonly node?: { server: NodeHttp.Server };
+
+  /**
+   * Bun context.
+   */
+  readonly bun?: { server: Bun.Server };
+
+  /**
+   * Deno context.
+   */
+  readonly deno?: { server: Deno.HttpServer };
+
+  /**
+   * Server fetch handler
+   */
+  readonly fetch: ServerHandler;
+
+  /**
+   * Returns a promise that resolves when the server is ready.
+   */
+  ready(): Promise<Server>;
+
+  /**
+   * Stop listening to prevent new connections from being accepted.
+   *
+   * By default, it does not cancel in-flight requests or websockets. That means it may take some time before all network activity stops.
+   *
+   * @param closeActiveConnections Immediately terminate in-flight requests, websockets, and stop accepting new connections.
+   * @default false
+   */
+  close(closeActiveConnections?: boolean): Promise<void>;
+}
+
 // ----------------------------------------------------------------------------
 // Plugins
 // ----------------------------------------------------------------------------
 
-export type ServerPlugin = (
-  server: Server,
-) => MaybePromise<ServerPluginInstance>;
+export type ServerPlugin = (server: Server) => ServerPluginInstance;
 
 export interface ServerPluginInstance {
   /**
@@ -115,49 +145,47 @@ export interface ServerPluginInstance {
    * Hook to allow running logic before user fetch handler
    * If an response value is returned, user fetch handler and the next plugins will be skipped.
    */
-  request?: (request: xRequest) => MaybePromise<Response | void>;
+  request?: (request: ServerRequest) => MaybePromise<Response | void>;
 
   /**
    * Hook to allow running logic after user fetch handler
    * If a response value is returned, user response and the next plugins will be skipped.
    */
   response?: (
-    request: xRequest,
+    request: ServerRequest,
     response: Response,
   ) => MaybePromise<void | Response>;
 }
 
 // ----------------------------------------------------------------------------
-// Web-platform compatible types
-// - Possible runtime specific augmentations are removed.
-// - Runtime specific types are namespaces as optional keys.
+// Request with runtime addons.
 // ----------------------------------------------------------------------------
 
-/**
- * https://developer.mozilla.org/en-US/docs/Web/API/Headers
- */
-export type xHeaders = Omit<
-  Headers,
-  "count" | "toJSON" | "getAll" /* bun specific */
->;
+export interface ServerRequest extends Request {
+  /**
+   * Remote address of the client.
+   */
+  remoteAddress?: string | undefined;
 
-/**
- * https://developer.mozilla.org/en-US/docs/Web/API/Request
- */
-export interface xRequest extends Omit<Request, "headers" | "clone"> {
-  headers: xHeaders;
-  clone(): xRequest;
-
-  xNode?: {
+  /**
+   * Underlying Node.js server request info.
+   */
+  node?: {
     req: NodeHttp.IncomingMessage;
     res: NodeHttp.ServerResponse;
   };
 
   /**
-   * Remote address of the client.
+   * Underlying Deno server request info.
    */
-  xRemoteAddress?: string | null;
+  deno?: {
+    info: Deno.ServeHandlerInfo<Deno.NetAddr>;
+  };
 
-  /** Optional user context */
-  xContext?: Record<string, unknown>;
+  /**
+   * Underlying Bun server request context.
+   */
+  bun?: {
+    server: Bun.Server;
+  };
 }

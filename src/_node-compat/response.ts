@@ -21,7 +21,7 @@ export const NodeFastResponse = /* @__PURE__ */ (() =>
     /**
      * Prepare Node.js response object
      */
-    xNodeResponse() {
+    nodeResponse() {
       const status = this.#init?.status ?? 200;
       const statusText = this.#init?.statusText ?? "";
 

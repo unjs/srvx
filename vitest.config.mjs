@@ -5,7 +5,12 @@ export default defineConfig({
     typecheck: { enabled: true },
     coverage: {
       include: ["src/**/*.ts"],
-      exclude: ["src/adapters/bun.ts", "src/adapters/cloudflare.ts", "src/adapters/deno.ts", "src/types.ts"],
+      exclude: [
+        "src/adapters/bun.ts",
+        "src/adapters/cloudflare.ts",
+        "src/adapters/deno.ts",
+        "src/types.ts",
+      ],
       reporter: ["text", "clover", "json"],
     },
   },

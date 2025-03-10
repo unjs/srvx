@@ -16,6 +16,27 @@ export function serve(options: ServerOptions): Server {
   return new NodeServer(options);
 }
 
+export type NodeHandler = (
+  nodeReq: NodeHttp.IncomingMessage,
+  nodeRes: NodeHttp.ServerResponse,
+) => void | Promise<void>;
+
+export type FetchHandler = (request: Request) => Response | Promise<Response>;
+
+export function toNodeHandler(fetchHandler: FetchHandler): NodeHandler {
+  return (
+    nodeReq: NodeHttp.IncomingMessage,
+    nodeRes: NodeHttp.ServerResponse,
+  ) => {
+    const request = new NodeRequestProxy(nodeReq) as ServerRequest;
+    request.node = { req: nodeReq, res: nodeRes };
+    const res = fetchHandler(request);
+    return res instanceof Promise
+      ? res.then((resolvedRes) => sendNodeResponse(nodeRes, resolvedRes))
+      : sendNodeResponse(nodeRes, res);
+  };
+}
+
 // https://nodejs.org/api/http.html
 
 class NodeServer implements Server {

@@ -9,6 +9,8 @@ type MaybePromise<T> = T | Promise<T>;
 // srvx API
 // ----------------------------------------------------------------------------
 
+export declare const Response: globalThis.Response;
+
 /**
  * Create a new server instance.
  */

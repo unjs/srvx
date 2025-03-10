@@ -1,6 +1,6 @@
 import { serve } from "srvx";
 
-const server = serve({
+export default serve({
   port: 3000,
   fetch(_request) {
     return new Response(
@@ -17,5 +17,4 @@ const server = serve({
   },
 });
 
-await server.ready();
-console.log(`🚀 Server ready at ${server.url}`);
+// server.ready().then(() => console.log(`🚀 Server ready at ${server.url}`))

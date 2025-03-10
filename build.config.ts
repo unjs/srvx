@@ -4,7 +4,7 @@ import { defineBuildConfig } from "unbuild";
 
 export default defineBuildConfig({
   declaration: true,
-  externals: ["deno", "bun"],
+  externals: ["deno", "bun", "@cloudflare/workers-types"],
   rollup: {
     esbuild: {
       target: "ES2022",

@@ -4,10 +4,6 @@ export default unjs({
   ignores: ["**/.docs"],
   rules: {
     "unicorn/no-null": "off",
-  },
-  markdown: {
-    rules: {
-      // markdown rule overrides
-    },
-  },
+    "unicorn/prefer-top-level-await": "off",
+  }
 });

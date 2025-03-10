@@ -1,6 +1,7 @@
 import type * as NodeHttp from "node:http";
 import type * as NodeNet from "node:net";
 import type * as Bun from "bun";
+import type * as CF from "@cloudflare/workers-types";
 
 type MaybePromise<T> = T | Promise<T>;
 
@@ -77,11 +78,11 @@ export interface ServerOptions {
   deno?: Deno.ServeOptions;
 }
 
-export interface Server {
+export interface Server<Handler = ServerHandler> {
   /**
    * Current runtime name
    */
-  readonly runtime: "node" | "deno" | "bun";
+  readonly runtime: "node" | "deno" | "bun" | "cloudflare";
 
   /**
    * Server options
@@ -111,12 +112,12 @@ export interface Server {
   /**
    * Server fetch handler
    */
-  readonly fetch: ServerHandler;
+  readonly fetch: Handler;
 
   /**
    * Returns a promise that resolves when the server is ready.
    */
-  ready(): Promise<Server>;
+  ready(): Promise<Server<Handler>>;
 
   /**
    * Stop listening to prevent new connections from being accepted.
@@ -187,5 +188,13 @@ export interface ServerRequest extends Request {
    */
   bun?: {
     server: Bun.Server;
+  };
+
+  /**
+   * Underlying Cloudflare request context.
+   */
+  cloudflare?: {
+    env: unknown;
+    context: CF.ExecutionContext;
   };
 }

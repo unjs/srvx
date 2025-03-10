@@ -11,9 +11,11 @@
     "./deno": "./dist/adapters/deno.mjs",
     "./bun": "./dist/adapters/bun.mjs",
     "./node": "./dist/adapters/node.mjs",
+    "./cloudflare": "./dist/adapters/cloudflare.mjs",
     ".": {
       "deno": "./dist/adapters/deno.mjs",
       "bun": "./dist/adapters/bun.mjs",
+      "workerd": "./dist/adapters/cloudflare.mjs",
       "node": "./dist/adapters/node.mjs"
     }
   },
@@ -26,6 +28,10 @@
     "dev": "vitest dev",
     "lint": "eslint . && prettier -c .",
     "lint:fix": "automd && eslint . --fix && prettier -w .",
+    "play:node": "node playground/app.mjs",
+    "play:deno": "deno serve -A playground/app.mjs",
+    "play:bun": "bun playground/app.mjs",
+    "play:cf": "pnpx wrangler dev playground/app.mjs",
     "prepack": "pnpm build",
     "release": "pnpm test && changelogen --release && npm publish && git push --follow-tags",
     "test": "pnpm lint && pnpm test:types && vitest run --coverage",
@@ -38,6 +44,7 @@
     "cookie-es": "^2.0.0"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250303.0",
     "@hono/node-server": "^1.13.8",
     "@mjackson/node-fetch-server": "^0.6.1",
     "@types/bun": "^1.2.4",

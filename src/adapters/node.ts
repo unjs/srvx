@@ -72,12 +72,21 @@ class NodeServer implements Server {
       ...this.options.node,
     };
 
+    if (
+      this.isHttps &&
+      this.options.https &&
+      this.options.https.key &&
+      this.options.https.cert
+    ) {
+      this.serveOptions = {
+        ...this.serveOptions,
+        ...this.options.https,
+      };
+    }
+
     // Create HTTPS server if HTTPS options are provided, otherwise create HTTP server
     const server = this.isHttps
-      ? NodeHttps.createServer(
-          { ...this.options.https, ...this.serveOptions },
-          handler,
-        )
+      ? NodeHttps.createServer(this.serveOptions, handler)
       : NodeHttp.createServer(this.serveOptions, handler);
 
     this.node = { server, handler };
@@ -101,7 +110,7 @@ class NodeServer implements Server {
     if (!addr) {
       return;
     }
-    // Use https:// in URL if HTTPS is enabled
+
     return typeof addr === "string"
       ? addr /* socket */
       : fmtURL(addr.address, addr.port, this.isHttps);

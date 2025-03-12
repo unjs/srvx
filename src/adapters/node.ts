@@ -74,7 +74,10 @@ class NodeServer implements Server {
 
     // Create HTTPS server if HTTPS options are provided, otherwise create HTTP server
     const server = this.isHttps
-      ? NodeHttps.createServer({...this.options.https, ...this.serveOptions }, handler)
+      ? NodeHttps.createServer(
+          { ...this.options.https, ...this.serveOptions },
+          handler,
+        )
       : NodeHttp.createServer(this.serveOptions, handler);
 
     this.node = { server, handler };

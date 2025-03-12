@@ -44,13 +44,12 @@ class BunServer implements Server<BunFetchandler> {
       fetch: this.fetch,
     };
 
-
-    if (this.isHttps
-      && this.options.https
-      && this.options.https.key
-      && this.options.https.cert
+    if (
+      this.isHttps &&
+      this.options.https &&
+      this.options.https.key &&
+      this.options.https.cert
     ) {
-
       this.serveOptions = {
         ...this.serveOptions,
         ...this.options.https,

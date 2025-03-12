@@ -64,7 +64,7 @@ export interface ServerOptions {
    * **Note:** Despite Node.js built-in behavior that has `exclusive` flag (opposite of `reusePort`) enabled by default, srvx uses non-exclusive mode for consistency.
    */
   reusePort?: boolean;
-  
+
   /**
    * HTTPS configuration options.
    * If provided, the server will use HTTPS instead of HTTP.
@@ -75,17 +75,17 @@ export interface ServerOptions {
      * The key content as string/buffer.
      */
     key?: string | Buffer;
-    
+
     /**
      * The certificate content as string/buffer.
      */
     cert?: string | Buffer;
-    
+
     /**
      * CA certificate content as string/buffer.
      */
     ca?: string | Buffer | Array<string | Buffer>;
-    
+
     /**
      * Passphrase for the private key or pfx.
      */

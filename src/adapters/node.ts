@@ -7,6 +7,7 @@ import type {
   ServerRequest,
 } from "../types.ts";
 import NodeHttp from "node:http";
+import NodeHttps from "node:https";
 import { sendNodeResponse } from "../_node-compat/send.ts";
 import { NodeRequestProxy } from "../_node-compat/request.ts";
 import { fmtURL, resolvePort } from "../_utils.ts";
@@ -33,6 +34,7 @@ export function toNodeHandler(fetchHandler: FetchHandler): NodeHttpHandler {
 }
 
 // https://nodejs.org/api/http.html
+// https://nodejs.org/api/https.html
 
 class NodeServer implements Server {
   readonly runtime = "node";
@@ -40,11 +42,13 @@ class NodeServer implements Server {
   readonly node: Server["node"];
   readonly serveOptions: ServerOptions["node"];
   readonly fetch: ServerHandler;
+  readonly isHttps: boolean;
 
   #listeningPromise?: Promise<void>;
 
   constructor(options: ServerOptions) {
     this.options = options;
+    this.isHttps = !!options.https;
 
     const fetchHandler = wrapFetch(this, this.options.fetch);
     this.fetch = fetchHandler;
@@ -68,7 +72,10 @@ class NodeServer implements Server {
       ...this.options.node,
     };
 
-    const server = NodeHttp.createServer(this.serveOptions, handler);
+    // Create HTTPS server if HTTPS options are provided, otherwise create HTTP server
+    const server = this.isHttps
+      ? NodeHttps.createServer({...this.options.https, ...this.serveOptions }, handler)
+      : NodeHttp.createServer(this.serveOptions, handler);
 
     this.node = { server, handler };
 
@@ -91,9 +98,10 @@ class NodeServer implements Server {
     if (!addr) {
       return;
     }
+    // Use https:// in URL if HTTPS is enabled
     return typeof addr === "string"
       ? addr /* socket */
-      : fmtURL(addr.address, addr.port, false);
+      : fmtURL(addr.address, addr.port, this.isHttps);
   }
 
   ready(): Promise<Server> {

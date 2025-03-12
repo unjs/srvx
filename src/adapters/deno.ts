@@ -14,14 +14,16 @@ class DenoServer implements Server<DenoFetchHandler> {
   readonly runtime = "deno";
   readonly options: ServerOptions;
   readonly deno: Server["deno"] = {};
-  readonly serveOptions: Deno.ServeTcpOptions;
+  readonly serveOptions: Deno.ServeTcpOptions | (Deno.ServeTcpOptions & Deno.TlsCertifiedKeyPem);
   readonly fetch: DenoFetchHandler;
+  readonly isHttps: boolean;
 
   #listeningPromise?: Promise<void>;
   #listeningInfo?: { hostname: string; port: number };
 
   constructor(options: ServerOptions) {
     this.options = options;
+    this.isHttps = !!options.https;
 
     const fetchHandler = wrapFetch(this, this.options.fetch);
 
@@ -42,6 +44,18 @@ class DenoServer implements Server<DenoFetchHandler> {
       reusePort: this.options.reusePort,
       ...this.options.deno,
     };
+
+    // If HTTPS is enabled and key and cert are provided, use them
+    if (this.isHttps
+        && this.options.https
+        && this.options.https.key
+        && this.options.https.cert
+      ) {
+      this.serveOptions = {
+        ...this.serveOptions,
+        ...this.options.https,
+      };
+    }
 
     if (!options.manual) {
       this.serve();
@@ -72,7 +86,7 @@ class DenoServer implements Server<DenoFetchHandler> {
 
   get url() {
     return this.#listeningInfo
-      ? fmtURL(this.#listeningInfo.hostname, this.#listeningInfo.port, false)
+      ? fmtURL(this.#listeningInfo.hostname, this.#listeningInfo.port, this.isHttps)
       : undefined;
   }
 

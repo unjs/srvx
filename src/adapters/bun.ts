@@ -15,11 +15,13 @@ class BunServer implements Server<BunFetchandler> {
   readonly runtime = "bun";
   readonly options: ServerOptions;
   readonly bun: Server["bun"] = {};
-  readonly serveOptions: bun.ServeOptions;
+  readonly serveOptions: bun.ServeOptions | bun.TLSServeOptions;
   readonly fetch: BunFetchandler;
+  readonly isHttps: boolean;
 
   constructor(options: ServerOptions) {
     this.options = options;
+    this.isHttps = !!options.https;
 
     const fetchHandler = wrapFetch(this, this.options.fetch);
 
@@ -41,6 +43,19 @@ class BunServer implements Server<BunFetchandler> {
       ...this.options.bun,
       fetch: this.fetch,
     };
+
+
+    if (this.isHttps
+      && this.options.https
+      && this.options.https.key
+      && this.options.https.cert
+    ) {
+
+      this.serveOptions = {
+        ...this.serveOptions,
+        ...this.options.https,
+      };
+    }
 
     if (!options.manual) {
       this.serve();

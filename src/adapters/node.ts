@@ -8,6 +8,7 @@ import type {
 } from "../types.ts";
 import NodeHttp from "node:http";
 import NodeHttps from "node:https";
+import { readFileSync } from "node:fs";
 import { sendNodeResponse } from "../_node-compat/send.ts";
 import { NodeRequestProxy } from "../_node-compat/request.ts";
 import { fmtURL, resolvePort } from "../_utils.ts";
@@ -75,12 +76,24 @@ class NodeServer implements Server {
     if (
       this.isHttps &&
       this.options.https &&
-      this.options.https.key &&
-      this.options.https.cert
+      (this.options.https.key || this.options.https.inlineKey) &&
+      (this.options.https.cert || this.options.https.inlineCert)
     ) {
+      const key = this.options.https.inlineKey || 
+        (this.options.https.key ? readFileSync(this.options.https.key) : undefined);
+      
+      const cert = this.options.https.inlineCert ||
+        (this.options.https.cert ? readFileSync(this.options.https.cert) : undefined);
+
+      const ca = this.options.https.inlineCa ||
+        (this.options.https.ca?.map(caPath => readFileSync(caPath)));
+
       this.serveOptions = {
         ...this.serveOptions,
         ...this.options.https,
+        key,
+        cert,
+        ca,
       };
     }
 

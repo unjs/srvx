@@ -54,9 +54,17 @@ class DenoServer implements Server<DenoFetchHandler> {
       this.options.https.key &&
       this.options.https.cert
     ) {
+      const key = this.options.https.inlineKey ||
+        (this.options.https.key ? Deno.readTextFileSync(this.options.https.key) : '');
+
+      const cert = this.options.https.inlineCert ||
+        (this.options.https.cert ? Deno.readTextFileSync(this.options.https.cert) : '');
+
       this.serveOptions = {
         ...this.serveOptions,
         ...this.options.https,
+        key: (typeof key === 'string' ? key : key.toString()),
+        cert: (typeof cert === 'string' ? cert : cert.toString()),
       };
     }
 

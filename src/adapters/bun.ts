@@ -47,12 +47,24 @@ class BunServer implements Server<BunFetchandler> {
     if (
       this.isHttps &&
       this.options.https &&
-      this.options.https.key &&
-      this.options.https.cert
+      (this.options.https.key || this.options.https.inlineKey) &&
+      (this.options.https.cert || this.options.https.inlineCert)
     ) {
+      const key = this.options.https.inlineKey ||
+        (this.options.https.key ? Bun.file(this.options.https.key) : undefined);
+
+      const cert = this.options.https.inlineCert ||
+        (this.options.https.cert ? Bun.file(this.options.https.cert) : undefined);
+
+      const ca = this.options.https.inlineCa ||
+        (this.options.https.ca?.map(caPath => Bun.file(caPath)));
+        
       this.serveOptions = {
         ...this.serveOptions,
         ...this.options.https,
+        key,
+        cert,
+        ca,
       };
     }
 

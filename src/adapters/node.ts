@@ -79,14 +79,21 @@ class NodeServer implements Server {
       (this.options.https.key || this.options.https.inlineKey) &&
       (this.options.https.cert || this.options.https.inlineCert)
     ) {
-      const key = this.options.https.inlineKey || 
-        (this.options.https.key ? readFileSync(this.options.https.key) : undefined);
-      
-      const cert = this.options.https.inlineCert ||
-        (this.options.https.cert ? readFileSync(this.options.https.cert) : undefined);
+      const key =
+        this.options.https.inlineKey ||
+        (this.options.https.key
+          ? readFileSync(this.options.https.key)
+          : undefined);
 
-      const ca = this.options.https.inlineCa ||
-        (this.options.https.ca?.map(caPath => readFileSync(caPath)));
+      const cert =
+        this.options.https.inlineCert ||
+        (this.options.https.cert
+          ? readFileSync(this.options.https.cert)
+          : undefined);
+
+      const ca =
+        this.options.https.inlineCa ||
+        this.options.https.ca?.map((caPath) => readFileSync(caPath));
 
       this.serveOptions = {
         ...this.serveOptions,

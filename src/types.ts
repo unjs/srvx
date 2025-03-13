@@ -87,7 +87,7 @@ export interface ServerOptions {
      */
     cert?: string;
 
-    /** 
+    /**
      * The certificate content as string/buffer.
      */
     inlineCert?: string | Buffer;
@@ -111,7 +111,8 @@ export interface ServerOptions {
   /**
    * Node.js server options.
    */
-  node?: (NodeHttp.ServerOptions | NodeHttps.ServerOptions) & NodeNet.ListenOptions;
+  node?: (NodeHttp.ServerOptions | NodeHttps.ServerOptions) &
+    NodeNet.ListenOptions;
 
   /**
    * Bun server options

@@ -9,7 +9,7 @@
 
 Universal Server API based on web platform standards. Works with [Deno](https://deno.com/), [Bun](https://bun.sh/) and [Node.js](https://nodejs.org/en).
 
-- ✅ Seamless runtime integration with identical usage ([handler](https://srvx.unjs.io/guide/handler) and
+- ✅ Seamless runtime integration with identical usage ([handler](https://srvx.unjs.io/guide/handler) and [instance](https://srvx.unjs.io/guide/server))
 - ✅ Zero overhead [Deno](https://deno.com/) and [Bun](https://bun.sh/) support
 - ✅ [Node.js compatibility](https://srvx.unjs.io/guide/node) with ~native perf and [fast response](https://srvx.unjs.io/guide/node#fast-response) support
 

@@ -1,4 +1,5 @@
 import type * as NodeHttp from "node:http";
+import type * as NodeHttps from "node:https";
 import type * as NodeNet from "node:net";
 import type * as Bun from "bun";
 import type * as CF from "@cloudflare/workers-types";
@@ -66,9 +67,52 @@ export interface ServerOptions {
   reusePort?: boolean;
 
   /**
+   * HTTPS configuration options.
+   * If provided, the server will use HTTPS instead of HTTP.
+   * You need to provide at minimum the key and cert options.
+   */
+  https?: {
+    /**
+     * The path to the key file.
+     */
+    key?: string;
+
+    /**
+     * The key content as string/buffer.
+     */
+    inlineKey?: string | Buffer;
+
+    /**
+     * The path to the certificate file.
+     */
+    cert?: string;
+
+    /**
+     * The certificate content as string/buffer.
+     */
+    inlineCert?: string | Buffer;
+
+    /**
+     * The path to the CA certificates file.
+     */
+    ca?: string[];
+
+    /**
+     * The CA certificates content as string/buffer.
+     */
+    inlineCa?: string[] | Buffer[];
+
+    /**
+     * Passphrase for the private key or pfx.
+     */
+    passphrase?: string;
+  };
+
+  /**
    * Node.js server options.
    */
-  node?: NodeHttp.ServerOptions & NodeNet.ListenOptions;
+  node?: (NodeHttp.ServerOptions | NodeHttps.ServerOptions) &
+    NodeNet.ListenOptions;
 
   /**
    * Bun server options

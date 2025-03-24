@@ -10,7 +10,7 @@ type MaybePromise<T> = T | Promise<T>;
 // srvx API
 // ----------------------------------------------------------------------------
 
-export declare const Response: globalThis.Response;
+export declare const Response: typeof globalThis.Response;
 
 /**
  * Create a new server instance.

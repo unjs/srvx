@@ -1,5 +1,4 @@
-import { describe } from "node:test";
-import { expect, test } from "vitest";
+import { describe, expect, test } from "vitest";
 
 export function addTests(
   url: (path: string) => string,
@@ -9,6 +8,18 @@ export function addTests(
     const response = await fetch(url("/"));
     expect(response.status).toBe(200);
     expect(await response.text()).toMatch("ok");
+  });
+
+  test("request instanceof Request", async () => {
+    const response = await fetch(url("/req-instanceof"));
+    expect(response.status).toBe(200);
+    expect(await response.text()).toMatch("yes");
+  });
+
+  test("request.headers instanceof Headers", async () => {
+    const response = await fetch(url("/req-headers-instanceof"));
+    expect(response.status).toBe(200);
+    expect(await response.text()).toMatch("yes");
   });
 
   test("POST works (binary body)", async () => {

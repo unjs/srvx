@@ -33,8 +33,8 @@ export function resolveTLSOptions(opts: ServerOptions) {
   if (!opts?.tls) {
     return;
   }
-  const cert = resolveCert(opts.tls.cert);
-  const key = resolveCert(opts.tls.key);
+  const cert = resolveCertorKey(opts.tls.cert);
+  const key = resolveCertorKey(opts.tls.key);
   if (!cert && !key) {
     return;
   }
@@ -48,12 +48,14 @@ export function resolveTLSOptions(opts: ServerOptions) {
   };
 }
 
-function resolveCert(value?: unknown): undefined | string {
+function resolveCertorKey(value?: unknown): undefined | string {
   if (!value) {
     return;
   }
   if (typeof value !== "string") {
-    throw new TypeError("TLS certificate must be a string");
+    throw new TypeError(
+      "TLS certificate and key must be strings in PEM format or file paths.",
+    );
   }
   if (value.startsWith("-----BEGIN ")) {
     return value;

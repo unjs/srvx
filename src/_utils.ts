@@ -33,8 +33,8 @@ export function resolveTLSOptions(opts: ServerOptions) {
   if (!opts.tls || opts.protocol === "http") {
     return;
   }
-  const cert = resolveCertorKey(opts.tls.cert);
-  const key = resolveCertorKey(opts.tls.key);
+  const cert = resolveCertOrKey(opts.tls.cert);
+  const key = resolveCertOrKey(opts.tls.key);
   if (!cert && !key) {
     if (opts.protocol === "https") {
       throw new TypeError(
@@ -53,7 +53,7 @@ export function resolveTLSOptions(opts: ServerOptions) {
   };
 }
 
-function resolveCertorKey(value?: unknown): undefined | string {
+function resolveCertOrKey(value?: unknown): undefined | string {
   if (!value) {
     return;
   }

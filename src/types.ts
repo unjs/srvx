@@ -80,16 +80,12 @@ export interface ServerOptions {
    */
   tls?: {
     /**
-     * File path or inlined TLS certificate in PEM format.
-     *
-     * To enable TLS, both `cert` and `key` options are required.
+     * File path or inlined TLS certificate in PEM format (required).
      */
     cert?: string;
 
     /**
-     * File path or inlined TLS private key in PEM format.
-     *
-     * To enable TLS, both `cert` and `key` options are required.
+     * File path or inlined TLS private key in PEM format (required).
      */
     key?: string;
 

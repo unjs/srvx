@@ -1,5 +1,5 @@
 import type { DenoFetchHandler, Server, ServerOptions } from "../types.ts";
-import { fmtURL, resolvePort } from "../_utils.ts";
+import { fmtURL, resolveHTTPSOptions, resolvePort } from "../_utils.ts";
 import { wrapFetch } from "../_plugin.ts";
 
 export const Response = globalThis.Response;
@@ -18,14 +18,12 @@ class DenoServer implements Server<DenoFetchHandler> {
     | Deno.ServeTcpOptions
     | (Deno.ServeTcpOptions & Deno.TlsCertifiedKeyPem);
   readonly fetch: DenoFetchHandler;
-  readonly isHttps: boolean;
 
   #listeningPromise?: Promise<void>;
   #listeningInfo?: { hostname: string; port: number };
 
   constructor(options: ServerOptions) {
     this.options = options;
-    this.isHttps = !!options.https;
 
     const fetchHandler = wrapFetch(this, this.options.fetch);
 
@@ -44,35 +42,9 @@ class DenoServer implements Server<DenoFetchHandler> {
       port: resolvePort(this.options.port, globalThis.Deno?.env.get("PORT")),
       hostname: this.options.hostname,
       reusePort: this.options.reusePort,
+      ...resolveHTTPSOptions(this.options),
       ...this.options.deno,
     };
-
-    // If HTTPS is enabled and key and cert are provided, use them
-    if (
-      this.isHttps &&
-      this.options.https &&
-      this.options.https.key &&
-      this.options.https.cert
-    ) {
-      const key =
-        this.options.https.inlineKey ||
-        (this.options.https.key
-          ? Deno.readTextFileSync(this.options.https.key)
-          : "");
-
-      const cert =
-        this.options.https.inlineCert ||
-        (this.options.https.cert
-          ? Deno.readTextFileSync(this.options.https.cert)
-          : "");
-
-      this.serveOptions = {
-        ...this.serveOptions,
-        ...this.options.https,
-        key: typeof key === "string" ? key : key.toString(),
-        cert: typeof cert === "string" ? cert : cert.toString(),
-      };
-    }
 
     if (!options.manual) {
       this.serve();
@@ -106,7 +78,7 @@ class DenoServer implements Server<DenoFetchHandler> {
       ? fmtURL(
           this.#listeningInfo.hostname,
           this.#listeningInfo.port,
-          this.isHttps,
+          !!(this.serveOptions as { cert: string }).cert,
         )
       : undefined;
   }

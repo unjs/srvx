@@ -2,8 +2,8 @@ import { serve } from "srvx";
 
 const server = serve({
   https: {
-    key: "key.pem",
-    cert: "cert.pem",
+    cert: "./srvx.crt",
+    key: "./srvx.key",
   },
   port: 3000,
   fetch(_request) {

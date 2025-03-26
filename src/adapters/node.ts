@@ -7,10 +7,9 @@ import type {
 } from "../types.ts";
 import NodeHttp from "node:http";
 import NodeHttps from "node:https";
-import { readFileSync } from "node:fs";
 import { sendNodeResponse } from "../_node-compat/send.ts";
 import { NodeRequestProxy } from "../_node-compat/request.ts";
-import { fmtURL, resolvePort } from "../_utils.ts";
+import { fmtURL, resolveHTTPSOptions, resolvePort } from "../_utils.ts";
 import { wrapFetch } from "../_plugin.ts";
 
 export { NodeFastResponse as Response } from "../_node-compat/response.ts";
@@ -42,13 +41,11 @@ class NodeServer implements Server {
   readonly node: Server["node"];
   readonly serveOptions: ServerOptions["node"];
   readonly fetch: ServerHandler;
-  readonly isHttps: boolean;
 
   #listeningPromise?: Promise<void>;
 
   constructor(options: ServerOptions) {
     this.options = options;
-    this.isHttps = !!options.https;
 
     const fetchHandler = wrapFetch(this, this.options.fetch);
     this.fetch = fetchHandler;
@@ -69,43 +66,16 @@ class NodeServer implements Server {
       port: resolvePort(this.options.port, globalThis.process?.env.PORT),
       host: this.options.hostname,
       exclusive: !this.options.reusePort,
+      ...resolveHTTPSOptions(this.options),
       ...this.options.node,
     };
 
-    if (
-      this.isHttps &&
-      this.options.https &&
-      (this.options.https.key || this.options.https.inlineKey) &&
-      (this.options.https.cert || this.options.https.inlineCert)
-    ) {
-      const key =
-        this.options.https.inlineKey ||
-        (this.options.https.key
-          ? readFileSync(this.options.https.key)
-          : undefined);
-
-      const cert =
-        this.options.https.inlineCert ||
-        (this.options.https.cert
-          ? readFileSync(this.options.https.cert)
-          : undefined);
-
-      const ca =
-        this.options.https.inlineCa ||
-        this.options.https.ca?.map((caPath) => readFileSync(caPath));
-
-      this.serveOptions = {
-        ...this.serveOptions,
-        ...this.options.https,
-        key,
-        cert,
-        ca,
-      };
-    }
-
     // Create HTTPS server if HTTPS options are provided, otherwise create HTTP server
-    const server = this.isHttps
-      ? NodeHttps.createServer(this.serveOptions, handler)
+    const server = (this.serveOptions as { cert: string }).cert
+      ? NodeHttps.createServer(
+          this.serveOptions as NodeHttps.ServerOptions,
+          handler,
+        )
       : NodeHttp.createServer(this.serveOptions, handler);
 
     this.node = { server, handler };
@@ -132,7 +102,7 @@ class NodeServer implements Server {
 
     return typeof addr === "string"
       ? addr /* socket */
-      : fmtURL(addr.address, addr.port, this.isHttps);
+      : fmtURL(addr.address, addr.port, "cert" in this.serveOptions!);
   }
 
   ready(): Promise<Server> {

@@ -6,9 +6,10 @@ import type {
   ServerOptions,
 } from "../types.ts";
 import NodeHttp from "node:http";
+import NodeHttps from "node:https";
 import { sendNodeResponse } from "../_node-compat/send.ts";
 import { NodeRequestProxy } from "../_node-compat/request.ts";
-import { fmtURL, resolvePort } from "../_utils.ts";
+import { fmtURL, resolvePort, resolveTLSOptions } from "../_utils.ts";
 import { wrapFetch } from "../_plugin.ts";
 
 export { NodeFastResponse as Response } from "../_node-compat/response.ts";
@@ -32,6 +33,7 @@ export function toNodeHandler(fetchHandler: FetchHandler): NodeHttpHandler {
 }
 
 // https://nodejs.org/api/http.html
+// https://nodejs.org/api/https.html
 
 class NodeServer implements Server {
   readonly runtime = "node";
@@ -60,14 +62,24 @@ class NodeServer implements Server {
         : sendNodeResponse(nodeRes, res);
     };
 
+    const tls = resolveTLSOptions(this.options);
     this.serveOptions = {
       port: resolvePort(this.options.port, globalThis.process?.env.PORT),
       host: this.options.hostname,
       exclusive: !this.options.reusePort,
+      ...(tls
+        ? { cert: tls.cert, key: tls.key, passphrase: tls.passphrase }
+        : {}),
       ...this.options.node,
     };
 
-    const server = NodeHttp.createServer(this.serveOptions, handler);
+    // Create HTTPS server if HTTPS options are provided, otherwise create HTTP server
+    const server = (this.serveOptions as { cert: string }).cert
+      ? NodeHttps.createServer(
+          this.serveOptions as NodeHttps.ServerOptions,
+          handler,
+        )
+      : NodeHttp.createServer(this.serveOptions, handler);
 
     this.node = { server, handler };
 
@@ -90,9 +102,14 @@ class NodeServer implements Server {
     if (!addr) {
       return;
     }
+
     return typeof addr === "string"
       ? addr /* socket */
-      : fmtURL(addr.address, addr.port, false);
+      : fmtURL(
+          addr.address,
+          addr.port,
+          this.node!.server! instanceof NodeHttps.Server,
+        );
   }
 
   ready(): Promise<Server> {

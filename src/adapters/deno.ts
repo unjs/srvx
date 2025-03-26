@@ -1,5 +1,5 @@
 import type { DenoFetchHandler, Server, ServerOptions } from "../types.ts";
-import { fmtURL, resolvePort } from "../_utils.ts";
+import { fmtURL, resolvePort, resolveTLSOptions } from "../_utils.ts";
 import { wrapFetch } from "../_plugin.ts";
 
 export const Response = globalThis.Response;
@@ -14,7 +14,9 @@ class DenoServer implements Server<DenoFetchHandler> {
   readonly runtime = "deno";
   readonly options: ServerOptions;
   readonly deno: Server["deno"] = {};
-  readonly serveOptions: Deno.ServeTcpOptions;
+  readonly serveOptions:
+    | Deno.ServeTcpOptions
+    | (Deno.ServeTcpOptions & Deno.TlsCertifiedKeyPem);
   readonly fetch: DenoFetchHandler;
 
   #listeningPromise?: Promise<void>;
@@ -36,10 +38,14 @@ class DenoServer implements Server<DenoFetchHandler> {
       return fetchHandler(request);
     };
 
+    const tls = resolveTLSOptions(this.options);
     this.serveOptions = {
       port: resolvePort(this.options.port, globalThis.Deno?.env.get("PORT")),
       hostname: this.options.hostname,
       reusePort: this.options.reusePort,
+      ...(tls
+        ? { key: tls.key, cert: tls.cert, passphrase: tls.passphrase }
+        : {}),
       ...this.options.deno,
     };
 
@@ -72,7 +78,11 @@ class DenoServer implements Server<DenoFetchHandler> {
 
   get url() {
     return this.#listeningInfo
-      ? fmtURL(this.#listeningInfo.hostname, this.#listeningInfo.port, false)
+      ? fmtURL(
+          this.#listeningInfo.hostname,
+          this.#listeningInfo.port,
+          !!(this.serveOptions as { cert: string }).cert,
+        )
       : undefined;
   }
 

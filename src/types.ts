@@ -1,4 +1,5 @@
 import type * as NodeHttp from "node:http";
+import type * as NodeHttps from "node:https";
 import type * as NodeNet from "node:net";
 import type * as Bun from "bun";
 import type * as CF from "@cloudflare/workers-types";
@@ -66,16 +67,46 @@ export interface ServerOptions {
   reusePort?: boolean;
 
   /**
+   * The protocol to use for the server.
+   *
+   * Possible values are `http` and `https`.
+   *
+   * If `protocol` is not set, Server will use `http` as the default protocol or `https` if both `tls.cert` and `tls.key` options are provided.
+   */
+  protocol?: "http" | "https";
+
+  /**
+   * TLS server options.
+   */
+  tls?: {
+    /**
+     * File path or inlined TLS certificate in PEM format (required).
+     */
+    cert?: string;
+
+    /**
+     * File path or inlined TLS private key in PEM format (required).
+     */
+    key?: string;
+
+    /**
+     * Passphrase for the private key (optional).
+     */
+    passphrase?: string;
+  };
+
+  /**
    * Node.js server options.
    */
-  node?: NodeHttp.ServerOptions & NodeNet.ListenOptions;
+  node?: (NodeHttp.ServerOptions | NodeHttps.ServerOptions) &
+    NodeNet.ListenOptions;
 
   /**
    * Bun server options
    *
    * @docs https://bun.sh/docs/api/http
    */
-  bun?: Omit<Bun.ServeOptions, "fetch">;
+  bun?: Omit<Bun.ServeOptions | Bun.TLSServeOptions, "fetch">;
 
   /**
    * Deno server options

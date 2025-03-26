@@ -67,43 +67,27 @@ export interface ServerOptions {
   reusePort?: boolean;
 
   /**
-   * HTTPS configuration options.
+   * TLS configuration options.
    * If provided, the server will use HTTPS instead of HTTP.
    * You need to provide at minimum the key and cert options.
    */
-  https?: {
+  tls?: {
     /**
-     * The path to the key file.
+     * File path or inlined TLS private key.
+     *
+     * To enable TLS, this option is required.
      */
-    key?: string;
+    key?: string | Uint8Array;
 
     /**
-     * The key content as string/buffer.
+     * File path or inlined TLS certificate.
+     *
+     * To enable TLS, this option is required.
      */
-    inlineKey?: string | Buffer;
+    cert?: string | Uint8Array;
 
     /**
-     * The path to the certificate file.
-     */
-    cert?: string;
-
-    /**
-     * The certificate content as string/buffer.
-     */
-    inlineCert?: string | Buffer;
-
-    /**
-     * The path to the CA certificates file.
-     */
-    ca?: string[];
-
-    /**
-     * The CA certificates content as string/buffer.
-     */
-    inlineCa?: string[] | Buffer[];
-
-    /**
-     * Passphrase for the private key or pfx.
+     * Passphrase for the private key or PFX.
      */
     passphrase?: string;
   };
@@ -119,7 +103,7 @@ export interface ServerOptions {
    *
    * @docs https://bun.sh/docs/api/http
    */
-  bun?: Omit<Bun.ServeOptions, "fetch">;
+  bun?: Omit<Bun.ServeOptions | Bun.TLSServeOptions, "fetch">;
 
   /**
    * Deno server options

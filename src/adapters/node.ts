@@ -9,7 +9,7 @@ import NodeHttp from "node:http";
 import NodeHttps from "node:https";
 import { sendNodeResponse } from "../_node-compat/send.ts";
 import { NodeRequestProxy } from "../_node-compat/request.ts";
-import { fmtURL, resolveHTTPSOptions, resolvePort } from "../_utils.ts";
+import { fmtURL, resolvePort, resolveTLSOptions } from "../_utils.ts";
 import { wrapFetch } from "../_plugin.ts";
 
 export { NodeFastResponse as Response } from "../_node-compat/response.ts";
@@ -62,11 +62,14 @@ class NodeServer implements Server {
         : sendNodeResponse(nodeRes, res);
     };
 
+    const tls = resolveTLSOptions(this.options);
     this.serveOptions = {
       port: resolvePort(this.options.port, globalThis.process?.env.PORT),
       host: this.options.hostname,
       exclusive: !this.options.reusePort,
-      ...resolveHTTPSOptions(this.options),
+      ...(tls
+        ? { cert: tls.cert, key: tls.key, passphrase: tls.passphrase }
+        : {}),
       ...this.options.node,
     };
 
@@ -102,7 +105,11 @@ class NodeServer implements Server {
 
     return typeof addr === "string"
       ? addr /* socket */
-      : fmtURL(addr.address, addr.port, "cert" in this.serveOptions!);
+      : fmtURL(
+          addr.address,
+          addr.port,
+          this.node!.server! instanceof NodeHttps.Server,
+        );
   }
 
   ready(): Promise<Server> {

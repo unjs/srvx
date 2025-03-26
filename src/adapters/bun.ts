@@ -1,6 +1,6 @@
 import type { BunFetchandler, Server, ServerOptions } from "../types.ts";
 import type * as bun from "bun";
-import { resolveHTTPSOptions, resolvePort } from "../_utils.ts";
+import { resolvePort, resolveTLSOptions } from "../_utils.ts";
 import { wrapFetch } from "../_plugin.ts";
 
 export const Response = globalThis.Response;
@@ -34,12 +34,18 @@ class BunServer implements Server<BunFetchandler> {
       return fetchHandler(request);
     };
 
+    const tls = resolveTLSOptions(this.options);
     this.serveOptions = {
       hostname: this.options.hostname,
       reusePort: this.options.reusePort,
       port: resolvePort(this.options.port, globalThis.process?.env.PORT),
-      ...resolveHTTPSOptions(this.options),
       ...this.options.bun,
+      tls: {
+        cert: tls?.cert,
+        key: tls?.key,
+        passphrase: tls?.passphrase,
+        ...(this.options.bun as bun.TLSServeOptions)?.tls,
+      },
       fetch: this.fetch,
     };
 

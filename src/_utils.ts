@@ -29,39 +29,34 @@ export function fmtURL(
   return `http${ssl ? "s" : ""}://${host}:${port}/`;
 }
 
-export function resolveHTTPSOptions(opts: ServerOptions) {
+export function resolveTLSOptions(opts: ServerOptions) {
   if (!opts?.https) {
     return;
   }
-
   const cert = resolveCert(opts.https.cert);
   const key = resolveCert(opts.https.key);
-  const ca = opts.https.ca?.map(resolveCert);
-
   if (!cert && !key) {
     return;
   }
-  if (!cert) {
-    throw new Error("https.cert is missing");
+  if (!cert || !key) {
+    throw new TypeError("TLS `cert` and `key` must be provided together.");
   }
-  if (!key) {
-    throw new Error("https.key is missing");
-  }
-
   return {
     cert,
     key,
-    ca,
+    passphrase: opts.https.passphrase,
   };
 }
 
-function resolveCert(value?: string) {
+function resolveCert(value?: unknown): undefined | string {
   if (!value) {
     return;
   }
-  // PEM block starting line
+  if (typeof value !== "string") {
+    throw new TypeError("TLS certificate must be a string");
+  }
   if (value.startsWith("-----BEGIN ")) {
     return value;
   }
-  return readFileSync(value);
+  return readFileSync(value, "utf8");
 }

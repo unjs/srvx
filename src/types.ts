@@ -67,27 +67,27 @@ export interface ServerOptions {
   reusePort?: boolean;
 
   /**
-   * TLS configuration options.
-   * If provided, the server will use HTTPS instead of HTTP.
-   * You need to provide at minimum the key and cert options.
+   * TLS server options.
+   *
+   * When both `cert` and `key` are provided, the server will use HTTPS instead of HTTP.
    */
   tls?: {
     /**
-     * File path or inlined TLS private key.
+     * File path or inlined TLS certificate in PEM format.
      *
-     * To enable TLS, this option is required.
+     * To enable TLS, both `cert` and `key` options are required.
      */
-    key?: string | Uint8Array;
+    cert?: string;
 
     /**
-     * File path or inlined TLS certificate.
+     * File path or inlined TLS private key in PEM format.
      *
-     * To enable TLS, this option is required.
+     * To enable TLS, both `cert` and `key` options are required.
      */
-    cert?: string | Uint8Array;
+    key?: string;
 
     /**
-     * Passphrase for the private key or PFX.
+     * Passphrase for the private key (optional).
      */
     passphrase?: string;
   };

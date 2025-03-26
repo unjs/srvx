@@ -59,7 +59,8 @@ function resolveCert(value?: string) {
   if (!value) {
     return;
   }
-  if (value.startsWith("-----BEGIN CERTIFICATE-----")) {
+  // PEM block starting line
+  if (value.startsWith("-----BEGIN ")) {
     return value;
   }
   return readFileSync(value);

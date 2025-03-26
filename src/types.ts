@@ -67,9 +67,16 @@ export interface ServerOptions {
   reusePort?: boolean;
 
   /**
-   * TLS server options.
+   * The protocol to use for the server.
    *
-   * When both `cert` and `key` are provided, the server will use HTTPS instead of HTTP.
+   * Possible values are `http` and `https`.
+   *
+   * If `protocol` is not set, Server will use `http` as the default protocol or `https` if both `tls.cert` and `tls.key` options are provided.
+   */
+  protocol?: "http" | "https";
+
+  /**
+   * TLS server options.
    */
   tls?: {
     /**

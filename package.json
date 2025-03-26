@@ -30,6 +30,7 @@
     "dev": "vitest dev",
     "lint": "eslint . && prettier -c .",
     "lint:fix": "automd && eslint . --fix && prettier -w .",
+    "play:mkcert": "openssl req -x509 -newkey rsa:2048 -nodes -keyout server.key -out server.crt -days 365 -subj /CN=srvx.local",
     "play:node": "node playground/app.mjs",
     "play:deno": "deno run -A playground/app.mjs",
     "play:bun": "bun playground/app.mjs",

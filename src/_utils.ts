@@ -18,7 +18,7 @@ export function resolvePort(
 export function fmtURL(
   host: string | undefined,
   port: number | undefined,
-  ssl: boolean,
+  secure: boolean,
 ) {
   if (!host || !port) {
     return undefined;
@@ -26,16 +26,21 @@ export function fmtURL(
   if (host.includes(":")) {
     host = `[${host}]`;
   }
-  return `http${ssl ? "s" : ""}://${host}:${port}/`;
+  return `http${secure ? "s" : ""}://${host}:${port}/`;
 }
 
 export function resolveTLSOptions(opts: ServerOptions) {
-  if (!opts?.tls) {
+  if (!opts.tls || opts.protocol === "http") {
     return;
   }
   const cert = resolveCertorKey(opts.tls.cert);
   const key = resolveCertorKey(opts.tls.key);
   if (!cert && !key) {
+    if (opts.protocol === "https") {
+      throw new TypeError(
+        "TLS `cert` and `key` must be provided for `https` protocol.",
+      );
+    }
     return;
   }
   if (!cert || !key) {

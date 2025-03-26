@@ -30,11 +30,11 @@ export function fmtURL(
 }
 
 export function resolveTLSOptions(opts: ServerOptions) {
-  if (!opts?.https) {
+  if (!opts?.tls) {
     return;
   }
-  const cert = resolveCert(opts.https.cert);
-  const key = resolveCert(opts.https.key);
+  const cert = resolveCert(opts.tls.cert);
+  const key = resolveCert(opts.tls.key);
   if (!cert && !key) {
     return;
   }
@@ -44,7 +44,7 @@ export function resolveTLSOptions(opts: ServerOptions) {
   return {
     cert,
     key,
-    passphrase: opts.https.passphrase,
+    passphrase: opts.tls.passphrase,
   };
 }
 

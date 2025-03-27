@@ -1,5 +1,33 @@
 # Changelog
 
+## v0.2.6
+
+[compare changes](https://github.com/unjs/srvx/compare/v0.2.5...v0.2.6)
+
+### 🚀 Enhancements
+
+- Support `tls` and `protocol` ([#38](https://github.com/unjs/srvx/pull/38))
+
+### 🔥 Performance
+
+- **adapters/node:** Check `req._hasBody` once ([978a27d](https://github.com/unjs/srvx/commit/978a27d))
+
+### 🩹 Fixes
+
+- **node:** Flatten headers to handle node slow path ([#40](https://github.com/unjs/srvx/pull/40))
+
+### 🏡 Chore
+
+- Update readme ([#39](https://github.com/unjs/srvx/pull/39))
+- Update deps ([2b1f9f7](https://github.com/unjs/srvx/commit/2b1f9f7))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](https://github.com/pi0))
+- Oskar Lebuda <oskar.lebuda@enp.pl>
+- Markthree ([@markthree](https://github.com/markthree))
+- Alexander Lichter ([@TheAlexLichter](https://github.com/TheAlexLichter))
+
 ## v0.2.5
 
 [compare changes](https://github.com/unjs/srvx/compare/v0.2.3...v0.2.5)

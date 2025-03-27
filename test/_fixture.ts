@@ -39,8 +39,8 @@ export const server = serve({
         return new Response("ok");
       }
       case "/headers": {
-        // Trigger Node.js writeHead slowpath to reproduce issue
-        req.node?.res.setHeader("x-set-with-node", "true");
+        // Trigger Node.js writeHead slowpath to reproduce https://github.com/unjs/srvx/pull/40
+        req.node?.res.setHeader("x-set-with-node", "");
         const resHeaders = new Headers();
         for (const [key, value] of req.headers) {
           resHeaders.append(`x-req-${key}`, value);

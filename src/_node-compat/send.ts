@@ -16,7 +16,7 @@ export async function sendNodeResponse(
   if ((webRes as NodeFastResponse).nodeResponse) {
     const res = (webRes as NodeFastResponse).nodeResponse();
     if (!nodeRes.headersSent) {
-      nodeRes.writeHead(res.status, res.statusText, res.headers);
+      nodeRes.writeHead(res.status, res.statusText, res.headers.flat());
     }
     if (res.body) {
       if (res.body instanceof ReadableStream) {
@@ -42,7 +42,11 @@ export async function sendNodeResponse(
   }
 
   if (!nodeRes.headersSent) {
-    nodeRes.writeHead(webRes.status || 200, webRes.statusText, headerEntries);
+    nodeRes.writeHead(
+      webRes.status || 200,
+      webRes.statusText,
+      headerEntries.flat(),
+    );
   }
 
   return webRes.body

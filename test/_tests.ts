@@ -22,6 +22,16 @@ export function addTests(
     expect(await response.text()).toMatch("yes");
   });
 
+  test("headers", async () => {
+    const response = await fetch(url("/headers"), {
+      headers: { foo: "bar", bar: "baz" },
+    });
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({ foo: "bar", bar: "baz" });
+    expect(response.headers.get("x-req-foo")).toBe("bar");
+    expect(response.headers.get("x-req-bar")).toBe("baz");
+  });
+
   test("POST works (binary body)", async () => {
     const response = await fetch(url("/body/binary"), {
       method: "POST",

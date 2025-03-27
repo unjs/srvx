@@ -38,6 +38,18 @@ export const server = serve({
       case "/": {
         return new Response("ok");
       }
+      case "/headers": {
+        // Trigger Node.js writeHead slowpath to reproduce issue
+        req.node?.res.setHeader("x-set-with-node", "true");
+        const resHeaders = new Headers();
+        for (const [key, value] of req.headers) {
+          resHeaders.append(`x-req-${key}`, value);
+        }
+        return new Response(
+          JSON.stringify(Object.fromEntries(req.headers.entries())),
+          { headers: resHeaders },
+        );
+      }
       case "/body/binary": {
         return new Response(req.body);
       }

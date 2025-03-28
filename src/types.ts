@@ -249,7 +249,7 @@ export interface ServerRequest extends Request {
 
 export type FetchHandler = (request: Request) => Response | Promise<Response>;
 
-export type BunFetchandler = (
+export type BunFetchHandler = (
   request: Request,
   server?: Bun.Server,
 ) => Response | Promise<Response>;

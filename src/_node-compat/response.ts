@@ -10,7 +10,7 @@ export type NodeFastResponse = InstanceType<typeof NodeFastResponse>;
  * It is faster because in most cases it doesn't create a full Response instance.
  */
 export const NodeFastResponse = /* @__PURE__ */ (() => {
-  class NodeFastResponse implements Response {
+  const _Response = class Response implements globalThis.Response {
     #body?: BodyInit | null;
     #init?: ResponseInit;
 
@@ -263,9 +263,9 @@ export const NodeFastResponse = /* @__PURE__ */ (() => {
       }
       return this.text().then((text) => JSON.parse(text));
     }
-  }
+  };
 
-  Object.setPrototypeOf(NodeFastResponse.prototype, Response.prototype);
+  Object.setPrototypeOf(_Response.prototype, globalThis.Response.prototype);
 
-  return NodeFastResponse;
+  return _Response;
 })();

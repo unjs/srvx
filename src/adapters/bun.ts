@@ -1,4 +1,4 @@
-import type { BunFetchandler, Server, ServerOptions } from "../types.ts";
+import type { BunFetchHandler, Server, ServerOptions } from "../types.ts";
 import type * as bun from "bun";
 import { resolvePort, resolveTLSOptions } from "../_utils.ts";
 import { wrapFetch } from "../_plugin.ts";
@@ -11,12 +11,12 @@ export function serve(options: ServerOptions): BunServer {
 
 // https://bun.sh/docs/api/http
 
-class BunServer implements Server<BunFetchandler> {
+class BunServer implements Server<BunFetchHandler> {
   readonly runtime = "bun";
   readonly options: ServerOptions;
   readonly bun: Server["bun"] = {};
   readonly serveOptions: bun.ServeOptions | bun.TLSServeOptions;
-  readonly fetch: BunFetchandler;
+  readonly fetch: BunFetchHandler;
 
   constructor(options: ServerOptions) {
     this.options = options;

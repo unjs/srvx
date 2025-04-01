@@ -1,5 +1,33 @@
 # Changelog
 
+## v0.2.7
+
+[compare changes](https://github.com/unjs/srvx/compare/v0.2.6...v0.2.7)
+
+### 🚀 Enhancements
+
+- **node:** Expose `node` context to proxy interfaces ([5f20d9e](https://github.com/unjs/srvx/commit/5f20d9e))
+
+### 🩹 Fixes
+
+- **node:** Make sure response constructor name is `Response` ([782ee13](https://github.com/unjs/srvx/commit/782ee13))
+- **node:** Make sure all proxies mimic global name and instance ([5883995](https://github.com/unjs/srvx/commit/5883995))
+- **node:** Use global Response for cloing ([effa940](https://github.com/unjs/srvx/commit/effa940))
+- **node:** Avoid conflict with undici prototype ([40cacf2](https://github.com/unjs/srvx/commit/40cacf2))
+
+### 💅 Refactors
+
+- **types:** Fix typo for `BunFetchHandler` ([#41](https://github.com/unjs/srvx/pull/41))
+
+### 📦 Build
+
+- Add `engines` field ([ea8a9c9](https://github.com/unjs/srvx/commit/ea8a9c9))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](https://github.com/pi0))
+- Benny Yen ([@benny123tw](https://github.com/benny123tw))
+
 ## v0.2.6
 
 [compare changes](https://github.com/unjs/srvx/compare/v0.2.5...v0.2.6)

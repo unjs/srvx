@@ -5,6 +5,9 @@ export const NodeReqURLProxy = /* @__PURE__ */ (() => {
   const _URL = class URL implements Partial<globalThis.URL> {
     node: { req: NodeHttp.IncomingMessage; res?: NodeHttp.ServerResponse };
 
+    _hash = "";
+    _username = "";
+    _password = "";
     _protocol?: string;
     _hostname?: string;
     _port?: string;
@@ -13,15 +16,35 @@ export const NodeReqURLProxy = /* @__PURE__ */ (() => {
     _search?: string;
     _searchParams?: URLSearchParams;
 
-    hash: string = "";
-    password: string = "";
-    username: string = "";
-
     constructor(nodeCtx: {
       req: NodeHttp.IncomingMessage;
       res?: NodeHttp.ServerResponse;
     }) {
       this.node = nodeCtx;
+    }
+
+    get hash() {
+      return this._hash;
+    }
+
+    set hash(value: string) {
+      this._hash = value;
+    }
+
+    get username() {
+      return this._username;
+    }
+
+    set username(value: string) {
+      this._username = value;
+    }
+
+    get password() {
+      return this._password;
+    }
+
+    set password(value: string) {
+      this._password = value;
     }
 
     // host

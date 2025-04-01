@@ -66,7 +66,7 @@ export const NodeFastResponse = /* @__PURE__ */ (() => {
         } else if (typeof (bodyInit as NodeReadable).pipe === "function") {
           body = bodyInit as NodeReadable;
         } else {
-          const res = new Response(bodyInit as BodyInit);
+          const res = new globalThis.Response(bodyInit as BodyInit);
           body = res.body;
           for (const [key, value] of res.headers) {
             headers.push([key, value]);
@@ -89,21 +89,21 @@ export const NodeFastResponse = /* @__PURE__ */ (() => {
     // ... the rest is for interface compatibility only and usually not to be used ...
 
     /** Lazy initialized response instance */
-    #responseObj?: Response;
+    #responseObj?: globalThis.Response;
 
     /** Lazy initialized headers instance */
     #headersObj?: Headers;
 
-    clone(): Response {
+    clone(): globalThis.Response {
       if (this.#responseObj) {
         return this.#responseObj.clone();
       }
-      return new Response(this.#body, this.#init);
+      return new globalThis.Response(this.#body, this.#init);
     }
 
-    get #response(): Response {
+    get #response(): globalThis.Response {
       if (!this.#responseObj) {
-        this.#responseObj = new Response(this.#body, this.#init);
+        this.#responseObj = new globalThis.Response(this.#body, this.#init);
         // Free up memory
         this.#body = undefined;
         this.#init = undefined;

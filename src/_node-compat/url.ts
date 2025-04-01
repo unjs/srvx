@@ -1,8 +1,8 @@
 import type NodeHttp from "node:http";
 import { kNodeInspect } from "./_common.ts";
 
-export const NodeReqURLProxy = /* @__PURE__ */ (() =>
-  class _NodeReqURLProxy implements Partial<URL> {
+export const NodeReqURLProxy = /* @__PURE__ */ (() => {
+  const _URL = class URL implements Partial<globalThis.URL> {
     node: { req: NodeHttp.IncomingMessage; res?: NodeHttp.ServerResponse };
 
     _protocol?: string;
@@ -151,7 +151,7 @@ export const NodeReqURLProxy = /* @__PURE__ */ (() =>
       return `${this.protocol}//${this.host}${this.pathname}${this.search}`;
     }
     set href(value: string) {
-      const _url = new URL(value);
+      const _url = new globalThis.URL(value);
       this._protocol = _url.protocol;
       this.username = _url.username;
       this.password = _url.password;
@@ -177,7 +177,12 @@ export const NodeReqURLProxy = /* @__PURE__ */ (() =>
     [kNodeInspect]() {
       return this.href;
     }
-  })();
+  };
+
+  Object.setPrototypeOf(_URL.prototype, globalThis.URL.prototype);
+
+  return _URL;
+})();
 
 function parsePath(input: string): [pathname: string, search: string] {
   const url = (input || "/").replace(/\\/g, "/");

@@ -5,7 +5,7 @@ import { NodeReqHeadersProxy } from "./headers.ts";
 import { NodeReqURLProxy } from "./url.ts";
 
 export const NodeRequestProxy = /* @__PURE__ */ (() => {
-  class NodeRequestProxy {
+  const _Request = class Request {
     #url?: InstanceType<typeof NodeReqURLProxy>;
     #headers?: InstanceType<typeof NodeReqHeadersProxy>;
     #bodyUsed: boolean = false;
@@ -39,7 +39,7 @@ export const NodeRequestProxy = /* @__PURE__ */ (() => {
     }
 
     clone() {
-      return new NodeRequestProxy({ ...this.node });
+      return new _Request({ ...this.node });
     }
 
     get _url() {
@@ -199,10 +199,17 @@ export const NodeRequestProxy = /* @__PURE__ */ (() => {
         headers: this.headers,
       };
     }
-  }
-  Object.setPrototypeOf(NodeRequestProxy.prototype, Request.prototype);
-  return NodeRequestProxy;
-})() as unknown as { new (nodeReq: NodeHttp.IncomingMessage): ServerRequest };
+  };
+
+  Object.setPrototypeOf(_Request.prototype, globalThis.Request.prototype);
+
+  return _Request;
+})() as unknown as {
+  new (nodeCtx: {
+    req: NodeHttp.IncomingMessage;
+    res: NodeHttp.ServerResponse;
+  }): ServerRequest;
+};
 
 async function _readStream(stream: ReadableStream) {
   const chunks: Uint8Array[] = [];

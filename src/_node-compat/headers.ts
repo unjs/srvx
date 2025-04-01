@@ -3,7 +3,7 @@ import { splitSetCookieString } from "cookie-es";
 import { kNodeInspect } from "./_common.ts";
 
 export const NodeReqHeadersProxy = /* @__PURE__ */ (() => {
-  class NodeReqHeadersProxy implements Headers {
+  const _Headers = class Headers implements globalThis.Headers {
     node: { req: NodeHttp.IncomingMessage; res?: NodeHttp.ServerResponse };
 
     constructor(nodeCtx: {
@@ -126,13 +126,15 @@ export const NodeReqHeadersProxy = /* @__PURE__ */ (() => {
     [kNodeInspect]() {
       return Object.fromEntries(this.entries());
     }
-  }
-  Object.setPrototypeOf(NodeReqHeadersProxy.prototype, Headers.prototype);
-  return NodeReqHeadersProxy;
+  };
+
+  Object.setPrototypeOf(_Headers.prototype, globalThis.Headers.prototype);
+
+  return _Headers;
 })();
 
-export const NodeResHeadersProxy = /* @__PURE__ */ (() =>
-  class NodeResHeadersProxy implements Headers {
+export const NodeResHeadersProxy = /* @__PURE__ */ (() => {
+  const _Headers = class Headers implements globalThis.Headers {
     node: { res: NodeHttp.ServerResponse };
 
     constructor(res: NodeHttp.ServerResponse) {
@@ -237,7 +239,12 @@ export const NodeResHeadersProxy = /* @__PURE__ */ (() =>
     [kNodeInspect]() {
       return Object.fromEntries(this.entries());
     }
-  })();
+  };
+
+  Object.setPrototypeOf(_Headers.prototype, globalThis.Headers.prototype);
+
+  return _Headers;
+})();
 
 function _normalizeValue(
   value: string | string[] | number | undefined,

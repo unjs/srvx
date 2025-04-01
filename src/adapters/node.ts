@@ -23,7 +23,7 @@ export function toNodeHandler(fetchHandler: FetchHandler): NodeHttpHandler {
     nodeReq: NodeHttp.IncomingMessage,
     nodeRes: NodeHttp.ServerResponse,
   ) => {
-    const request = new NodeRequestProxy(nodeReq);
+    const request = new NodeRequestProxy(nodeReq, nodeRes);
     request.node = { req: nodeReq, res: nodeRes };
     const res = fetchHandler(request);
     return res instanceof Promise

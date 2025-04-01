@@ -1,9 +1,3 @@
-export const kNodeReq: unique symbol =
-  /* @__PURE__ */ Symbol.for("srvx.node.request");
-
-export const kNodeRes: unique symbol =
-  /* @__PURE__ */ Symbol.for("srvx.node.response");
-
 export const kNodeInspect = /* @__PURE__ */ Symbol.for(
   "nodejs.util.inspect.custom",
 );

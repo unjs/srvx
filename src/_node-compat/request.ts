@@ -1,13 +1,11 @@
 import type NodeHttp from "node:http";
 import type { ServerRequest } from "../types.ts";
-import { kNodeInspect, kNodeReq } from "./_common.ts";
+import { kNodeInspect } from "./_common.ts";
 import { NodeReqHeadersProxy } from "./headers.ts";
 import { NodeReqURLProxy } from "./url.ts";
 
 export const NodeRequestProxy = /* @__PURE__ */ (() => {
   class NodeRequestProxy {
-    [kNodeReq]: NodeHttp.IncomingMessage;
-
     #url?: InstanceType<typeof NodeReqURLProxy>;
     #headers?: InstanceType<typeof NodeReqHeadersProxy>;
     #bodyUsed: boolean = false;
@@ -20,34 +18,43 @@ export const NodeRequestProxy = /* @__PURE__ */ (() => {
     #textBody?: Promise<string>;
     #bodyStream?: undefined | ReadableStream<Uint8Array>;
 
-    constructor(nodeReq: NodeHttp.IncomingMessage) {
-      this[kNodeReq] = nodeReq;
+    node: { req: NodeHttp.IncomingMessage; res?: NodeHttp.ServerResponse };
+
+    constructor(nodeCtx: {
+      req: NodeHttp.IncomingMessage;
+      res?: NodeHttp.ServerResponse;
+    }) {
+      this.node = nodeCtx;
     }
 
     get headers() {
       if (!this.#headers) {
-        this.#headers = new NodeReqHeadersProxy(this[kNodeReq]);
+        this.#headers = new NodeReqHeadersProxy(this.node);
       }
       return this.#headers;
     }
 
     get remoteAddress() {
-      return this[kNodeReq].socket?.remoteAddress;
+      return this.node.req.socket?.remoteAddress;
     }
 
     clone() {
-      return new NodeRequestProxy(this[kNodeReq]);
+      return new NodeRequestProxy({ ...this.node });
+    }
+
+    get _url() {
+      if (!this.#url) {
+        this.#url = new NodeReqURLProxy(this.node);
+      }
+      return this.#url;
     }
 
     get url() {
-      if (!this.#url) {
-        this.#url = new NodeReqURLProxy(this[kNodeReq]);
-      }
-      return this.#url.href;
+      return this._url.href;
     }
 
     get method() {
-      return this[kNodeReq].method || "GET";
+      return this.node.req.method || "GET";
     }
 
     get signal() {
@@ -66,7 +73,7 @@ export const NodeRequestProxy = /* @__PURE__ */ (() => {
         return this.#hasBody;
       }
       // Check if request method requires a payload
-      const method = this[kNodeReq].method?.toUpperCase();
+      const method = this.node.req.method?.toUpperCase();
       if (
         !method ||
         !(
@@ -81,8 +88,8 @@ export const NodeRequestProxy = /* @__PURE__ */ (() => {
       }
 
       // Make sure either content-length or transfer-encoding/chunked is set
-      if (!Number.parseInt(this[kNodeReq].headers["content-length"] || "")) {
-        const isChunked = (this[kNodeReq].headers["transfer-encoding"] || "")
+      if (!Number.parseInt(this.node.req.headers["content-length"] || "")) {
+        const isChunked = (this.node.req.headers["transfer-encoding"] || "")
           .split(",")
           .map((e) => e.trim())
           .filter(Boolean)
@@ -104,7 +111,7 @@ export const NodeRequestProxy = /* @__PURE__ */ (() => {
         this.#bodyUsed = true;
         this.#bodyStream = new ReadableStream({
           start: (controller) => {
-            this[kNodeReq]
+            this.node.req
               .on("data", (chunk) => {
                 controller.enqueue(chunk);
               })
@@ -147,7 +154,7 @@ export const NodeRequestProxy = /* @__PURE__ */ (() => {
       if (!this.#blobBody) {
         this.#blobBody = this.bytes().then((bytes) => {
           return new Blob([bytes], {
-            type: this[kNodeReq].headers["content-type"],
+            type: this.node.req.headers["content-type"],
           });
         });
       }

@@ -1,9 +1,9 @@
-import type { IncomingMessage } from "node:http";
-import { kNodeInspect, kNodeReq } from "./_common.ts";
+import type NodeHttp from "node:http";
+import { kNodeInspect } from "./_common.ts";
 
 export const NodeReqURLProxy = /* @__PURE__ */ (() =>
   class _NodeReqURLProxy implements Partial<URL> {
-    [kNodeReq]: IncomingMessage;
+    node: { req: NodeHttp.IncomingMessage; res?: NodeHttp.ServerResponse };
 
     _protocol?: string;
     _hostname?: string;
@@ -17,24 +17,27 @@ export const NodeReqURLProxy = /* @__PURE__ */ (() =>
     password: string = "";
     username: string = "";
 
-    constructor(req: IncomingMessage) {
-      this[kNodeReq] = req;
+    constructor(nodeCtx: {
+      req: NodeHttp.IncomingMessage;
+      res?: NodeHttp.ServerResponse;
+    }) {
+      this.node = nodeCtx;
     }
 
     // host
     get host() {
-      return this[kNodeReq].headers.host || "";
+      return this.node.req.headers.host || "";
     }
     set host(value: string) {
       this._hostname = undefined;
       this._port = undefined;
-      this[kNodeReq].headers.host = value;
+      this.node.req.headers.host = value;
     }
 
     // hostname
     get hostname() {
       if (this._hostname === undefined) {
-        const [hostname, port] = parseHost(this[kNodeReq].headers.host);
+        const [hostname, port] = parseHost(this.node.req.headers.host);
         if (this._port === undefined && port) {
           this._port = String(Number.parseInt(port) || "");
         }
@@ -49,11 +52,11 @@ export const NodeReqURLProxy = /* @__PURE__ */ (() =>
     // port
     get port() {
       if (this._port === undefined) {
-        const [hostname, port] = parseHost(this[kNodeReq].headers.host);
+        const [hostname, port] = parseHost(this.node.req.headers.host);
         if (this._hostname === undefined && hostname) {
           this._hostname = hostname;
         }
-        this._port = port || String(this[kNodeReq].socket?.localPort || "");
+        this._port = port || String(this.node.req.socket?.localPort || "");
       }
       return this._port;
     }
@@ -64,7 +67,7 @@ export const NodeReqURLProxy = /* @__PURE__ */ (() =>
     // pathname
     get pathname() {
       if (this._pathname === undefined) {
-        const [pathname, search] = parsePath(this[kNodeReq].url || "/");
+        const [pathname, search] = parsePath(this.node.req.url || "/");
         this._pathname = pathname;
         if (this._search === undefined) {
           this._search = search;
@@ -80,13 +83,13 @@ export const NodeReqURLProxy = /* @__PURE__ */ (() =>
         return;
       }
       this._pathname = value;
-      this[kNodeReq].url = value + this.search;
+      this.node.req.url = value + this.search;
     }
 
     // search
     get search() {
       if (this._search === undefined) {
-        const [pathname, search] = parsePath(this[kNodeReq].url || "/");
+        const [pathname, search] = parsePath(this.node.req.url || "/");
         this._search = search;
         if (this._pathname === undefined) {
           this._pathname = pathname;
@@ -105,7 +108,7 @@ export const NodeReqURLProxy = /* @__PURE__ */ (() =>
       }
       this._search = value;
       this._searchParams = undefined;
-      this[kNodeReq].url = this.pathname + value;
+      this.node.req.url = this.pathname + value;
     }
 
     // searchParams
@@ -124,8 +127,8 @@ export const NodeReqURLProxy = /* @__PURE__ */ (() =>
     get protocol() {
       if (!this._protocol) {
         this._protocol =
-          (this[kNodeReq].socket as any)?.encrypted ||
-          this[kNodeReq].headers["x-forwarded-proto"] === "https"
+          (this.node.req.socket as any)?.encrypted ||
+          this.node.req.headers["x-forwarded-proto"] === "https"
             ? "https:"
             : "http:";
       }

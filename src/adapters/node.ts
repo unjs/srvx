@@ -23,8 +23,7 @@ export function toNodeHandler(fetchHandler: FetchHandler): NodeHttpHandler {
     nodeReq: NodeHttp.IncomingMessage,
     nodeRes: NodeHttp.ServerResponse,
   ) => {
-    const request = new NodeRequestProxy(nodeReq, nodeRes);
-    request.node = { req: nodeReq, res: nodeRes };
+    const request = new NodeRequestProxy({ req: nodeReq, res: nodeRes });
     const res = fetchHandler(request);
     return res instanceof Promise
       ? res.then((resolvedRes) => sendNodeResponse(nodeRes, resolvedRes))
@@ -54,8 +53,7 @@ class NodeServer implements Server {
       nodeReq: NodeHttp.IncomingMessage,
       nodeRes: NodeHttp.ServerResponse,
     ) => {
-      const request = new NodeRequestProxy(nodeReq);
-      request.node = { req: nodeReq, res: nodeRes };
+      const request = new NodeRequestProxy({ req: nodeReq, res: nodeRes });
       const res = fetchHandler(request);
       return res instanceof Promise
         ? res.then((resolvedRes) => sendNodeResponse(nodeRes, resolvedRes))

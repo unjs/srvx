@@ -6,7 +6,6 @@
   "license": "MIT",
   "sideEffects": false,
   "type": "module",
-  "types": "./dist/types.d.mts",
   "exports": {
     "./types": "./dist/types.d.mts",
     "./deno": "./dist/adapters/deno.mjs",
@@ -21,6 +20,7 @@
       "types": "./dist/types.d.mts"
     }
   },
+  "types": "./dist/types.d.mts",
   "files": [
     "dist"
   ],
@@ -30,12 +30,12 @@
     "dev": "vitest dev",
     "lint": "eslint . && prettier -c .",
     "lint:fix": "automd && eslint . --fix && prettier -w .",
-    "play:mkcert": "openssl req -x509 -newkey rsa:2048 -nodes -keyout server.key -out server.crt -days 365 -subj /CN=srvx.local",
-    "play:node": "node playground/app.mjs",
-    "play:deno": "deno run -A playground/app.mjs",
+    "prepack": "pnpm build",
     "play:bun": "bun playground/app.mjs",
     "play:cf": "pnpx wrangler dev playground/app.mjs",
-    "prepack": "pnpm build",
+    "play:deno": "deno run -A playground/app.mjs",
+    "play:mkcert": "openssl req -x509 -newkey rsa:2048 -nodes -keyout server.key -out server.crt -days 365 -subj /CN=srvx.local",
+    "play:node": "node playground/app.mjs",
     "release": "pnpm test && changelogen --release && npm publish && git push --follow-tags",
     "test": "pnpm lint && pnpm test:types && vitest run --coverage",
     "test:types": "tsc --noEmit --skipLibCheck"
@@ -66,5 +66,8 @@
     "unbuild": "^3.5.0",
     "vitest": "^3.0.9"
   },
-  "packageManager": "pnpm@10.6.5"
+  "packageManager": "pnpm@10.6.5",
+  "engines": {
+    "node": ">=20.11.1"
+  }
 }

@@ -1,20 +1,20 @@
 import type NodeHttp from "node:http";
-import type { NodeFastResponse } from "./response";
+import type { NodeResponse } from "./response";
 import type { Readable as NodeReadable } from "node:stream";
 import { splitSetCookieString } from "cookie-es";
 
 export async function sendNodeResponse(
   nodeRes: NodeHttp.ServerResponse,
-  webRes: Response | NodeFastResponse,
+  webRes: Response | NodeResponse,
 ): Promise<void> {
   if (!webRes) {
     nodeRes.statusCode = 500;
     return endNodeResponse(nodeRes);
   }
 
-  // Fast path for NodeFastResponse
-  if ((webRes as NodeFastResponse).nodeResponse) {
-    const res = (webRes as NodeFastResponse).nodeResponse();
+  // Fast path for NodeResponse
+  if ((webRes as NodeResponse).nodeResponse) {
+    const res = (webRes as NodeResponse).nodeResponse();
     if (!nodeRes.headersSent) {
       nodeRes.writeHead(res.status, res.statusText, res.headers.flat());
     }

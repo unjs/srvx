@@ -1,7 +1,7 @@
 import type NodeHttp from "node:http";
 import { kNodeInspect } from "./_common.ts";
 
-export const NodeReqURLProxy = /* @__PURE__ */ (() => {
+export const NodeRequestURL = /* @__PURE__ */ (() => {
   const _URL = class URL implements Partial<globalThis.URL> {
     node: { req: NodeHttp.IncomingMessage; res?: NodeHttp.ServerResponse };
 

@@ -8,11 +8,17 @@ import type {
 import NodeHttp from "node:http";
 import NodeHttps from "node:https";
 import { sendNodeResponse } from "../_node-compat/send.ts";
-import { NodeRequestProxy } from "../_node-compat/request.ts";
+import { NodeRequest } from "../_node-compat/request.ts";
 import { fmtURL, resolvePort, resolveTLSOptions } from "../_utils.ts";
 import { wrapFetch } from "../_plugin.ts";
 
-export { NodeFastResponse as Response } from "../_node-compat/response.ts";
+export {
+  NodeRequest,
+  NodeRequest as Request,
+  NodeRequestHeaders,
+  NodeResponseHeaders,
+  NodeResponse,
+} from "../_node-compat/index.ts";
 
 export function serve(options: ServerOptions): Server {
   return new NodeServer(options);
@@ -23,7 +29,7 @@ export function toNodeHandler(fetchHandler: FetchHandler): NodeHttpHandler {
     nodeReq: NodeHttp.IncomingMessage,
     nodeRes: NodeHttp.ServerResponse,
   ) => {
-    const request = new NodeRequestProxy({ req: nodeReq, res: nodeRes });
+    const request = new NodeRequest({ req: nodeReq, res: nodeRes });
     const res = fetchHandler(request);
     return res instanceof Promise
       ? res.then((resolvedRes) => sendNodeResponse(nodeRes, resolvedRes))
@@ -53,7 +59,7 @@ class NodeServer implements Server {
       nodeReq: NodeHttp.IncomingMessage,
       nodeRes: NodeHttp.ServerResponse,
     ) => {
-      const request = new NodeRequestProxy({ req: nodeReq, res: nodeRes });
+      const request = new NodeRequest({ req: nodeReq, res: nodeRes });
       const res = fetchHandler(request);
       return res instanceof Promise
         ? res.then((resolvedRes) => sendNodeResponse(nodeRes, resolvedRes))

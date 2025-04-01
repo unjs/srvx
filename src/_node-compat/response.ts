@@ -2,14 +2,14 @@ import type NodeHttp from "node:http";
 import type { Readable as NodeReadable } from "node:stream";
 import { splitSetCookieString } from "cookie-es";
 
-export type NodeFastResponse = InstanceType<typeof NodeFastResponse>;
+export type NodeResponse = InstanceType<typeof NodeResponse>;
 
 /**
  * Fast Response for Node.js runtime
  *
  * It is faster because in most cases it doesn't create a full Response instance.
  */
-export const NodeFastResponse = /* @__PURE__ */ (() => {
+export const NodeResponse = /* @__PURE__ */ (() => {
   const _Response = class Response implements globalThis.Response {
     #body?: BodyInit | null;
     #init?: ResponseInit;

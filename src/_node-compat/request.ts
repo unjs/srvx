@@ -1,13 +1,13 @@
 import type NodeHttp from "node:http";
 import type { ServerRequest } from "../types.ts";
 import { kNodeInspect } from "./_common.ts";
-import { NodeReqHeadersProxy } from "./headers.ts";
-import { NodeReqURLProxy } from "./url.ts";
+import { NodeRequestHeaders } from "./headers.ts";
+import { NodeRequestURL } from "./url.ts";
 
-export const NodeRequestProxy = /* @__PURE__ */ (() => {
+export const NodeRequest = /* @__PURE__ */ (() => {
   const _Request = class Request {
-    #url?: InstanceType<typeof NodeReqURLProxy>;
-    #headers?: InstanceType<typeof NodeReqHeadersProxy>;
+    #url?: InstanceType<typeof NodeRequestURL>;
+    #headers?: InstanceType<typeof NodeRequestHeaders>;
     #bodyUsed: boolean = false;
     #abortSignal?: AbortController;
     #hasBody: boolean | undefined;
@@ -29,7 +29,7 @@ export const NodeRequestProxy = /* @__PURE__ */ (() => {
 
     get headers() {
       if (!this.#headers) {
-        this.#headers = new NodeReqHeadersProxy(this.node);
+        this.#headers = new NodeRequestHeaders(this.node);
       }
       return this.#headers;
     }
@@ -44,7 +44,7 @@ export const NodeRequestProxy = /* @__PURE__ */ (() => {
 
     get _url() {
       if (!this.#url) {
-        this.#url = new NodeReqURLProxy(this.node);
+        this.#url = new NodeRequestURL(this.node);
       }
       return this.#url;
     }

@@ -13,11 +13,11 @@
     "./node": "./dist/adapters/node.mjs",
     "./cloudflare": "./dist/adapters/cloudflare.mjs",
     ".": {
+      "types": "./dist/types.d.mts",
       "deno": "./dist/adapters/deno.mjs",
       "bun": "./dist/adapters/bun.mjs",
       "workerd": "./dist/adapters/cloudflare.mjs",
-      "node": "./dist/adapters/node.mjs",
-      "types": "./dist/types.d.mts"
+      "node": "./dist/adapters/node.mjs"
     }
   },
   "types": "./dist/types.d.mts",

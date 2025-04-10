@@ -35,6 +35,10 @@ export const NodeRequestHeaders = /* @__PURE__ */ (() => {
 
     get(name: string): string | null {
       name = name.toLowerCase();
+      const rawValue = this.node.req.headers[name];
+      if (rawValue === undefined) {
+        return null;
+      }
       return _normalizeValue(this.node.req.headers[name]);
     }
 
@@ -153,7 +157,11 @@ export const NodeResponseHeaders = /* @__PURE__ */ (() => {
     }
 
     get(name: string): string | null {
-      return _normalizeValue(this.node.res.getHeader(name));
+      const rawValue = this.node.res.getHeader(name);
+      if (rawValue === undefined) {
+        return null;
+      }
+      return _normalizeValue(rawValue);
     }
 
     getSetCookie(): string[] {
@@ -251,9 +259,9 @@ export const NodeResponseHeaders = /* @__PURE__ */ (() => {
 
 function _normalizeValue(
   value: string | string[] | number | undefined,
-): string | null {
+): string {
   if (Array.isArray(value)) {
     return value.join(", ");
   }
-  return (value as string) || null;
+  return typeof value === "string" ? value : String(value ?? "");
 }

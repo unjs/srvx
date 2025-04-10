@@ -27,7 +27,11 @@ export function addTests(
       headers: { foo: "bar", bar: "baz" },
     });
     expect(response.status).toBe(200);
-    expect(await response.json()).toMatchObject({ foo: "bar", bar: "baz" });
+    expect(await response.json()).toMatchObject({
+      foo: "bar",
+      bar: "baz",
+      unsetHeader: null,
+    });
     expect(response.headers.get("x-req-foo")).toBe("bar");
     expect(response.headers.get("x-req-bar")).toBe("baz");
   });

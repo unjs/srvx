@@ -45,11 +45,11 @@ export const server = serve({
         for (const [key, value] of req.headers) {
           resHeaders.append(`x-req-${key}`, value);
         }
-        return new Response(
-          JSON.stringify({
+        return Response.json(
+          {
             ...Object.fromEntries(req.headers.entries()),
             unsetHeader: req.headers.get("" + Math.random()), // #44
-          }),
+          },
           {
             headers: resHeaders,
           },

@@ -13,11 +13,12 @@ import { fmtURL, resolvePort, resolveTLSOptions } from "../_utils.ts";
 import { wrapFetch } from "../_plugin.ts";
 
 export {
-  NodeRequest,
   NodeRequest as Request,
+  NodeResponse as Response,
+  NodeRequest,
+  NodeResponse,
   NodeRequestHeaders,
   NodeResponseHeaders,
-  NodeResponse,
 } from "../_node-compat/index.ts";
 
 export function serve(options: ServerOptions): Server {

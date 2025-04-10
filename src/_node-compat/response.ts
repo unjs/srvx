@@ -10,6 +10,10 @@ export type NodeResponse = InstanceType<typeof NodeResponse>;
  * It is faster because in most cases it doesn't create a full Response instance.
  */
 export const NodeResponse = /* @__PURE__ */ (() => {
+  const CONTENT_TYPE = "content-type";
+  const JSON_TYPE = "application/json";
+  const JSON_HEADER = [[CONTENT_TYPE, JSON_TYPE]] as HeadersInit;
+
   const _Response = class Response implements globalThis.Response {
     #body?: BodyInit | null;
     #init?: ResponseInit;
@@ -17,6 +21,30 @@ export const NodeResponse = /* @__PURE__ */ (() => {
     constructor(body?: BodyInit | null, init?: ResponseInit) {
       this.#body = body;
       this.#init = init;
+    }
+
+    static json(data: any, init?: ResponseInit): globalThis.Response {
+      if (init?.headers) {
+        if (!(init.headers as Record<string, string>)[CONTENT_TYPE]) {
+          const initHeaders = new Headers(init.headers);
+          if (!initHeaders.has(CONTENT_TYPE)) {
+            initHeaders.set(CONTENT_TYPE, JSON_TYPE);
+          }
+          init = { ...init, headers: initHeaders };
+        }
+      } else {
+        init = init ? { ...init } : {};
+        init.headers = JSON_HEADER;
+      }
+      return new _Response(JSON.stringify(data), init);
+    }
+
+    static error(): globalThis.Response {
+      return globalThis.Response.error();
+    }
+
+    static redirect(url: string | URL, status?: number): globalThis.Response {
+      return globalThis.Response.redirect(url, status);
     }
 
     /**

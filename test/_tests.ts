@@ -32,6 +32,7 @@ export function addTests(
       bar: "baz",
       unsetHeader: null,
     });
+    expect(response.headers.get("content-type")).toMatch(/^application\/json/);
     expect(response.headers.get("x-req-foo")).toBe("bar");
     expect(response.headers.get("x-req-bar")).toBe("baz");
   });

@@ -46,8 +46,13 @@ export const server = serve({
           resHeaders.append(`x-req-${key}`, value);
         }
         return new Response(
-          JSON.stringify(Object.fromEntries(req.headers.entries())),
-          { headers: resHeaders },
+          JSON.stringify({
+            ...Object.fromEntries(req.headers.entries()),
+            unsetHeader: req.headers.get("" + Math.random()), // #44
+          }),
+          {
+            headers: resHeaders,
+          },
         );
       }
       case "/body/binary": {

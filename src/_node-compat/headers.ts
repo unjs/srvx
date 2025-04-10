@@ -251,9 +251,9 @@ export const NodeResponseHeaders = /* @__PURE__ */ (() => {
 
 function _normalizeValue(
   value: string | string[] | number | undefined,
-): string {
+): string | null {
   if (Array.isArray(value)) {
     return value.join(", ");
   }
-  return (value as string) || "";
+  return (value as string) || null;
 }

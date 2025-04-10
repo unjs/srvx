@@ -1,5 +1,36 @@
 # Changelog
 
+## v0.2.8
+
+[compare changes](https://github.com/unjs/srvx/compare/v0.2.7...v0.2.8)
+
+### 🚀 Enhancements
+
+- **node:** Expose internal proxy classes ([0cdfa22](https://github.com/unjs/srvx/commit/0cdfa22))
+- **node:** Support Response static methods ([b9976a4](https://github.com/unjs/srvx/commit/b9976a4))
+
+### 🩹 Fixes
+
+- **node:** Use `null` for unset headers ([#45](https://github.com/unjs/srvx/pull/45))
+
+### 💅 Refactors
+
+- Remove unused symbols ([c726e40](https://github.com/unjs/srvx/commit/c726e40))
+- Accept node ctx for `NodeResponseHeaders` constructor ([8fe9241](https://github.com/unjs/srvx/commit/8fe9241))
+
+### 📦 Build
+
+- Add types condition to top ([82e7fcc](https://github.com/unjs/srvx/commit/82e7fcc))
+
+### 🏡 Chore
+
+- Update node tests ([#42](https://github.com/unjs/srvx/pull/42))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](https://github.com/pi0))
+- Benny Yen ([@benny123tw](https://github.com/benny123tw))
+
 ## v0.2.7
 
 [compare changes](https://github.com/unjs/srvx/compare/v0.2.6...v0.2.7)

@@ -96,6 +96,13 @@ export interface ServerOptions {
   };
 
   /**
+   * Runtime agnostic error handler (optional).
+   *
+   * @note This handler will take precedence over runtime specific error handlers.
+   */
+  onError?: (error: Error) => MaybePromise<Response>;
+
+  /**
    * Node.js server options.
    */
   node?: (NodeHttp.ServerOptions | NodeHttps.ServerOptions) &

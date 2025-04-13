@@ -5,6 +5,7 @@ import type {
 } from "../types.ts";
 import type * as CF from "@cloudflare/workers-types";
 import { wrapFetch } from "../_plugin.ts";
+import { wrapFetchOnError } from "../_utils.ts";
 
 export const Response = globalThis.Response;
 
@@ -23,10 +24,9 @@ class CloudflareServer implements Server<CloudflareFetchHandler> {
   constructor(options: ServerOptions) {
     this.options = options;
 
-    const fetchHandler = wrapFetch(
-      this as unknown as Server,
-      this.options.fetch,
-    );
+    let fetchHandler = this.options.fetch;
+    fetchHandler = wrapFetchOnError(this.options.fetch, this.options.onError);
+    fetchHandler = wrapFetch(this as unknown as Server, fetchHandler);
 
     this.fetch = (request, env, context) => {
       Object.defineProperty(request, "x", {

@@ -1,6 +1,6 @@
 import type { BunFetchHandler, Server, ServerOptions } from "../types.ts";
 import type * as bun from "bun";
-import { resolvePort, resolveTLSOptions } from "../_utils.ts";
+import { resolvePort, resolveTLSOptions, wrapFetchOnError } from "../_utils.ts";
 import { wrapFetch } from "../_plugin.ts";
 
 export const Response = globalThis.Response;
@@ -21,7 +21,9 @@ class BunServer implements Server<BunFetchHandler> {
   constructor(options: ServerOptions) {
     this.options = options;
 
-    const fetchHandler = wrapFetch(this, this.options.fetch);
+    let fetchHandler = this.options.fetch;
+    fetchHandler = wrapFetchOnError(this.options.fetch, this.options.onError);
+    fetchHandler = wrapFetch(this as unknown as Server, fetchHandler);
 
     this.fetch = (request, server) => {
       Object.defineProperty(request, "x", {

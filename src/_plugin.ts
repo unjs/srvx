@@ -66,10 +66,6 @@ export function wrapFetch(server: Server, fetchHandler: ServerHandler) {
       }
     }
 
-    if (resPromise && server.options.onError) {
-      resPromise = resPromise.catch(server.options.onError);
-    }
-
     // Response hooks
     if (hasResponseHooks) {
       for (const resHook of responseHooks) {

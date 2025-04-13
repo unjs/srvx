@@ -9,7 +9,12 @@ import NodeHttp from "node:http";
 import NodeHttps from "node:https";
 import { sendNodeResponse } from "../_node-compat/send.ts";
 import { NodeRequest } from "../_node-compat/request.ts";
-import { fmtURL, resolvePort, resolveTLSOptions } from "../_utils.ts";
+import {
+  fmtURL,
+  resolvePort,
+  resolveTLSOptions,
+  wrapFetchOnError,
+} from "../_utils.ts";
 import { wrapFetch } from "../_plugin.ts";
 
 export {
@@ -53,7 +58,10 @@ class NodeServer implements Server {
   constructor(options: ServerOptions) {
     this.options = options;
 
-    const fetchHandler = wrapFetch(this, this.options.fetch);
+    let fetchHandler = this.options.fetch;
+    fetchHandler = wrapFetchOnError(this.options.fetch, this.options.onError);
+    fetchHandler = wrapFetch(this, fetchHandler);
+
     this.fetch = fetchHandler;
 
     const handler = (

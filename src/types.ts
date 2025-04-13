@@ -100,7 +100,7 @@ export interface ServerOptions {
    *
    * @note This handler will take precedence over runtime specific error handlers.
    */
-  onError?: (error: Error) => MaybePromise<Response>;
+  onError?: ErrorHandler;
 
   /**
    * Node.js server options.
@@ -264,6 +264,8 @@ export interface ServerRequest extends Request {
 // ----------------------------------------------------------------------------
 
 export type FetchHandler = (request: Request) => Response | Promise<Response>;
+
+export type ErrorHandler = (error: Error) => Response | Promise<Response>;
 
 export type BunFetchHandler = (
   request: Request,

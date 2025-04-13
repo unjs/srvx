@@ -1,5 +1,10 @@
 import type { DenoFetchHandler, Server, ServerOptions } from "../types.ts";
-import { fmtURL, resolvePort, resolveTLSOptions } from "../_utils.ts";
+import {
+  fmtURL,
+  resolvePort,
+  resolveTLSOptions,
+  wrapFetchOnError,
+} from "../_utils.ts";
 import { wrapFetch } from "../_plugin.ts";
 
 export const Response = globalThis.Response;
@@ -25,7 +30,9 @@ class DenoServer implements Server<DenoFetchHandler> {
   constructor(options: ServerOptions) {
     this.options = options;
 
-    const fetchHandler = wrapFetch(this, this.options.fetch);
+    let fetchHandler = this.options.fetch;
+    fetchHandler = wrapFetchOnError(this.options.fetch, this.options.onError);
+    fetchHandler = wrapFetch(this, fetchHandler);
 
     this.fetch = (request, info) => {
       Object.defineProperty(request, "x", {

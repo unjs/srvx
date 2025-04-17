@@ -1,5 +1,25 @@
 # Changelog
 
+## v0.4.0
+
+[compare changes](https://github.com/unjs/srvx/compare/v0.3.0...v0.4.0)
+
+### 💅 Refactors
+
+- ⚠️  Use `request.ip` and `request.runtime` ([#51](https://github.com/unjs/srvx/pull/51))
+
+### 🏡 Chore
+
+- Apply automated updates ([59e28fa](https://github.com/unjs/srvx/commit/59e28fa))
+
+#### ⚠️ Breaking Changes
+
+- ⚠️  Use `request.ip` and `request.runtime` ([#51](https://github.com/unjs/srvx/pull/51))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](https://github.com/pi0))
+
 ## v0.3.0
 
 [compare changes](https://github.com/unjs/srvx/compare/v0.2.8...v0.3.0)

@@ -29,12 +29,18 @@ class CloudflareServer implements Server<CloudflareFetchHandler> {
     );
 
     this.fetch = (request, env, context) => {
-      Object.defineProperty(request, "x", {
-        enumerable: true,
-        value: {
-          runtime: "cloudflare",
-          cloudflare: { env, context },
+      Object.defineProperties(request, {
+        runtime: {
+          enumerable: true,
+          value: { runtime: "cloudflare", cloudflare: { env, context } },
         },
+        // TODO
+        // ip: {
+        //   enumerable: true,
+        //   get() {
+        //     return;
+        //   },
+        // },
       });
       return fetchHandler(request as unknown as Request) as unknown as
         | CF.Response

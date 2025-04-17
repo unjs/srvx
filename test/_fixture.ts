@@ -40,7 +40,7 @@ export const server = serve({
       }
       case "/headers": {
         // Trigger Node.js writeHead slowpath to reproduce https://github.com/unjs/srvx/pull/40
-        req.runtime?.node?.res?.setHeader("x-set-with-node", "");
+        req.x?.node?.res?.setHeader("x-set-with-node", "");
         const resHeaders = new Headers();
         for (const [key, value] of req.headers) {
           resHeaders.append(`x-req-${key}`, value);
@@ -62,7 +62,7 @@ export const server = serve({
         return new Response(await req.text());
       }
       case "/ip": {
-        return new Response(`ip: ${req.remoteAddress}`);
+        return new Response(`ip: ${req.x?.ip}`);
       }
       case "/req-instanceof": {
         return new Response(req instanceof Request ? "yes" : "no");

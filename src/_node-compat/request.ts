@@ -19,14 +19,20 @@ export const NodeRequest = /* @__PURE__ */ (() => {
     #bodyStream?: undefined | ReadableStream<Uint8Array>;
 
     _node: { req: NodeHttp.IncomingMessage; res?: NodeHttp.ServerResponse };
-    runtime: ServerRuntimeContext;
+    x: ServerRuntimeContext;
 
     constructor(nodeCtx: {
       req: NodeHttp.IncomingMessage;
       res?: NodeHttp.ServerResponse;
     }) {
       this._node = nodeCtx;
-      this.runtime = { name: "node", node: nodeCtx };
+      this.x = {
+        runtime: "node",
+        node: nodeCtx,
+        get ip() {
+          return nodeCtx.req.socket?.remoteAddress;
+        },
+      };
     }
 
     get headers() {
@@ -34,10 +40,6 @@ export const NodeRequest = /* @__PURE__ */ (() => {
         this.#headers = new NodeRequestHeaders(this._node);
       }
       return this.#headers;
-    }
-
-    get remoteAddress() {
-      return this._node.req.socket?.remoteAddress;
     }
 
     clone() {

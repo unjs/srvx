@@ -265,7 +265,7 @@ export interface ServerRequest extends Request {
 
 export type FetchHandler = (request: Request) => Response | Promise<Response>;
 
-export type ErrorHandler = (error: Error) => Response | Promise<Response>;
+export type ErrorHandler = (error: unknown) => Response | Promise<Response>;
 
 export type BunFetchHandler = (
   request: Request,

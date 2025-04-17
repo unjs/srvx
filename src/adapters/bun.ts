@@ -54,6 +54,10 @@ class BunServer implements Server<BunFetchHandler> {
       fetch: this.fetch,
     };
 
+    if (this.options.onError) {
+      this.serveOptions.error = this.options.onError;
+    }
+
     if (!options.manual) {
       this.serve();
     }

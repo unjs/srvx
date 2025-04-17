@@ -32,7 +32,7 @@ export const server = serve({
   async onError(err) {
     return new Response(`onError: ${(err as Error).message}`, { status: 500 });
   },
-  async fetch(req) {
+  fetch(req) {
     const Response =
       (globalThis as any).TEST_RESPONSE_CTOR || globalThis.Response;
 
@@ -43,7 +43,7 @@ export const server = serve({
       }
       case "/headers": {
         // Trigger Node.js writeHead slowpath to reproduce https://github.com/unjs/srvx/pull/40
-        req.runtime?.node?.res?.setHeader("x-set-with-node", "");
+        req.x?.node?.res?.setHeader("x-set-with-node", "");
         const resHeaders = new Headers();
         for (const [key, value] of req.headers) {
           resHeaders.append(`x-req-${key}`, value);
@@ -62,10 +62,10 @@ export const server = serve({
         return new Response(req.body);
       }
       case "/body/text": {
-        return new Response(await req.text());
+        return req.text().then((text) => new Response(text));
       }
       case "/ip": {
-        return new Response(`ip: ${req.ip}`);
+        return new Response(`ip: ${req.x?.ip}`);
       }
       case "/req-instanceof": {
         return new Response(req instanceof Request ? "yes" : "no");

@@ -54,6 +54,10 @@ class DenoServer implements Server<DenoFetchHandler> {
       ...this.options.deno,
     };
 
+    if (this.options.onError) {
+      this.serveOptions.onError = this.options.onError;
+    }
+
     if (!options.manual) {
       this.serve();
     }

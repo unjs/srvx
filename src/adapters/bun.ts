@@ -24,12 +24,14 @@ class BunServer implements Server<BunFetchHandler> {
     const fetchHandler = wrapFetch(this, this.options.fetch);
 
     this.fetch = (request, server) => {
-      Object.defineProperty(request, "x", {
-        enumerable: true,
-        value: {
-          runtime: "bun",
-          bun: { server },
-          get ip() {
+      Object.defineProperties(request, {
+        runtime: {
+          enumerable: true,
+          value: { runtime: "bun", bun: { server } },
+        },
+        ip: {
+          enumerable: true,
+          get() {
             return server?.requestIP(request as Request)?.address;
           },
         },

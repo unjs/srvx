@@ -19,20 +19,21 @@ export const NodeRequest = /* @__PURE__ */ (() => {
     #bodyStream?: undefined | ReadableStream<Uint8Array>;
 
     _node: { req: NodeHttp.IncomingMessage; res?: NodeHttp.ServerResponse };
-    x: ServerRuntimeContext;
+    runtime: ServerRuntimeContext;
 
     constructor(nodeCtx: {
       req: NodeHttp.IncomingMessage;
       res?: NodeHttp.ServerResponse;
     }) {
       this._node = nodeCtx;
-      this.x = {
-        runtime: "node",
+      this.runtime = {
+        name: "node",
         node: nodeCtx,
-        get ip() {
-          return nodeCtx.req.socket?.remoteAddress;
-        },
       };
+    }
+
+    get ip() {
+      return this._node.req.socket?.remoteAddress;
     }
 
     get headers() {

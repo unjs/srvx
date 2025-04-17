@@ -207,12 +207,7 @@ export interface ServerPluginInstance {
 // ----------------------------------------------------------------------------
 
 export interface ServerRuntimeContext {
-  runtime: "node" | "deno" | "bun" | "cloudflare" | (string & {});
-
-  /**
-   * IP address of the client.
-   */
-  ip?: string | undefined;
+  name: "node" | "deno" | "bun" | "cloudflare" | (string & {});
 
   /**
    * Underlying Node.js server request info.
@@ -249,7 +244,12 @@ export interface ServerRequest extends Request {
   /**
    * Runtime specific request context.
    */
-  x?: ServerRuntimeContext;
+  runtime?: ServerRuntimeContext;
+
+  /**
+   * IP address of the client.
+   */
+  ip?: string | undefined;
 }
 
 // ----------------------------------------------------------------------------

@@ -1,5 +1,31 @@
 # Changelog
 
+## v0.3.0
+
+[compare changes](https://github.com/unjs/srvx/compare/v0.2.8...v0.3.0)
+
+### 💅 Refactors
+
+- ⚠️  Move extended request context under `request.x.*` ([#50](https://github.com/unjs/srvx/pull/50))
+
+### 📖 Documentation
+
+- Improve quick start ([#49](https://github.com/unjs/srvx/pull/49))
+
+### 🏡 Chore
+
+- Update editorconfig to include typescript files ([#47](https://github.com/unjs/srvx/pull/47))
+
+#### ⚠️ Breaking Changes
+
+- ⚠️  Move extended request context under `request.x.*` ([#50](https://github.com/unjs/srvx/pull/50))
+
+### ❤️ Contributors
+
+- Daniel Perez <danielpza@protonmail.com>
+- Pooya Parsa ([@pi0](https://github.com/pi0))
+- Sébastien Chopin <seb@nuxtlabs.com>
+
 ## v0.2.8
 
 [compare changes](https://github.com/unjs/srvx/compare/v0.2.7...v0.2.8)

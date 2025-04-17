@@ -30,7 +30,10 @@ class CloudflareServer implements Server<CloudflareFetchHandler> {
 
     this.fetch = (request, env, context) => {
       Object.defineProperties(request, {
-        cloudflare: { value: { env, context }, enumerable: true },
+        runtime: {
+          enumerable: true,
+          value: { name: "cloudflare", cloudflare: { env, context } },
+        },
         remoteAddress: {
           get: () => undefined,
           enumerable: true,

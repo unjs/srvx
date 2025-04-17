@@ -206,18 +206,15 @@ export interface ServerPluginInstance {
 // Request with runtime addons.
 // ----------------------------------------------------------------------------
 
-export interface ServerRequest extends Request {
-  /**
-   * Remote address of the client.
-   */
-  remoteAddress?: string | undefined;
+export interface ServerRuntimeContext {
+  name: "node" | "deno" | "bun" | "cloudflare" | (string & {});
 
   /**
    * Underlying Node.js server request info.
    */
   node?: {
     req: NodeHttp.IncomingMessage;
-    res: NodeHttp.ServerResponse;
+    res?: NodeHttp.ServerResponse;
   };
 
   /**
@@ -241,6 +238,18 @@ export interface ServerRequest extends Request {
     env: unknown;
     context: CF.ExecutionContext;
   };
+}
+
+export interface ServerRequest extends Request {
+  /**
+   * Runtime specific request context.
+   */
+  runtime?: ServerRuntimeContext;
+
+  /**
+   * Remote address of the client.
+   */
+  remoteAddress?: string | undefined;
 }
 
 // ----------------------------------------------------------------------------

@@ -4,18 +4,18 @@ import { kNodeInspect } from "./_common.ts";
 
 export const NodeRequestHeaders = /* @__PURE__ */ (() => {
   const _Headers = class Headers implements globalThis.Headers {
-    node: { req: NodeHttp.IncomingMessage; res?: NodeHttp.ServerResponse };
+    _node: { req: NodeHttp.IncomingMessage; res?: NodeHttp.ServerResponse };
 
     constructor(nodeCtx: {
       req: NodeHttp.IncomingMessage;
       res?: NodeHttp.ServerResponse;
     }) {
-      this.node = nodeCtx;
+      this._node = nodeCtx;
     }
 
     append(name: string, value: string): void {
       name = name.toLowerCase();
-      const _headers = this.node.req.headers;
+      const _headers = this._node.req.headers;
       const _current = _headers[name];
       if (_current) {
         if (Array.isArray(_current)) {
@@ -30,20 +30,20 @@ export const NodeRequestHeaders = /* @__PURE__ */ (() => {
 
     delete(name: string): void {
       name = name.toLowerCase();
-      this.node.req.headers[name] = undefined;
+      this._node.req.headers[name] = undefined;
     }
 
     get(name: string): string | null {
       name = name.toLowerCase();
-      const rawValue = this.node.req.headers[name];
+      const rawValue = this._node.req.headers[name];
       if (rawValue === undefined) {
         return null;
       }
-      return _normalizeValue(this.node.req.headers[name]);
+      return _normalizeValue(this._node.req.headers[name]);
     }
 
     getSetCookie(): string[] {
-      const setCookie = this.node.req.headers["set-cookie"];
+      const setCookie = this._node.req.headers["set-cookie"];
       if (!setCookie || setCookie.length === 0) {
         return [];
       }
@@ -52,12 +52,12 @@ export const NodeRequestHeaders = /* @__PURE__ */ (() => {
 
     has(name: string): boolean {
       name = name.toLowerCase();
-      return !!this.node.req.headers[name];
+      return !!this._node.req.headers[name];
     }
 
     set(name: string, value: string): void {
       name = name.toLowerCase();
-      this.node.req.headers[name] = value;
+      this._node.req.headers[name] = value;
     }
 
     get count(): number {
@@ -71,7 +71,7 @@ export const NodeRequestHeaders = /* @__PURE__ */ (() => {
     }
 
     toJSON(): Record<string, string> {
-      const _headers = this.node.req.headers;
+      const _headers = this._node.req.headers;
       const result: Record<string, string> = {};
       for (const key in _headers) {
         if (_headers[key]) {
@@ -85,7 +85,7 @@ export const NodeRequestHeaders = /* @__PURE__ */ (() => {
       cb: (value: string, key: string, parent: Headers) => void,
       thisArg?: any,
     ): void {
-      const _headers = this.node.req.headers;
+      const _headers = this._node.req.headers;
       for (const key in _headers) {
         if (_headers[key]) {
           cb.call(
@@ -99,21 +99,21 @@ export const NodeRequestHeaders = /* @__PURE__ */ (() => {
     }
 
     *entries(): HeadersIterator<[string, string]> {
-      const _headers = this.node.req.headers;
+      const _headers = this._node.req.headers;
       for (const key in _headers) {
         yield [key, _normalizeValue(_headers[key])];
       }
     }
 
     *keys(): HeadersIterator<string> {
-      const keys = Object.keys(this.node.req.headers);
+      const keys = Object.keys(this._node.req.headers);
       for (const key of keys) {
         yield key;
       }
     }
 
     *values(): HeadersIterator<string> {
-      const values = Object.values(this.node.req.headers);
+      const values = Object.values(this._node.req.headers);
       for (const value of values) {
         yield _normalizeValue(value);
       }
@@ -139,25 +139,25 @@ export const NodeRequestHeaders = /* @__PURE__ */ (() => {
 
 export const NodeResponseHeaders = /* @__PURE__ */ (() => {
   const _Headers = class Headers implements globalThis.Headers {
-    node: { req?: NodeHttp.IncomingMessage; res: NodeHttp.ServerResponse };
+    _node: { req?: NodeHttp.IncomingMessage; res: NodeHttp.ServerResponse };
 
     constructor(nodeCtx: {
       req?: NodeHttp.IncomingMessage;
       res: NodeHttp.ServerResponse;
     }) {
-      this.node = nodeCtx;
+      this._node = nodeCtx;
     }
 
     append(name: string, value: string): void {
-      this.node.res.appendHeader(name, value);
+      this._node.res.appendHeader(name, value);
     }
 
     delete(name: string): void {
-      this.node.res.removeHeader(name);
+      this._node.res.removeHeader(name);
     }
 
     get(name: string): string | null {
-      const rawValue = this.node.res.getHeader(name);
+      const rawValue = this._node.res.getHeader(name);
       if (rawValue === undefined) {
         return null;
       }
@@ -165,7 +165,7 @@ export const NodeResponseHeaders = /* @__PURE__ */ (() => {
     }
 
     getSetCookie(): string[] {
-      const setCookie = _normalizeValue(this.node.res.getHeader("set-cookie"));
+      const setCookie = _normalizeValue(this._node.res.getHeader("set-cookie"));
       if (!setCookie) {
         return [];
       }
@@ -173,11 +173,11 @@ export const NodeResponseHeaders = /* @__PURE__ */ (() => {
     }
 
     has(name: string): boolean {
-      return this.node.res.hasHeader(name);
+      return this._node.res.hasHeader(name);
     }
 
     set(name: string, value: string): void {
-      this.node.res.setHeader(name, value);
+      this._node.res.setHeader(name, value);
     }
 
     get count(): number {
@@ -191,7 +191,7 @@ export const NodeResponseHeaders = /* @__PURE__ */ (() => {
     }
 
     toJSON(): Record<string, string> {
-      const _headers = this.node.res.getHeaders();
+      const _headers = this._node.res.getHeaders();
       const result: Record<string, string> = {};
       for (const key in _headers) {
         if (_headers[key]) {
@@ -205,7 +205,7 @@ export const NodeResponseHeaders = /* @__PURE__ */ (() => {
       cb: (value: string, key: string, parent: Headers) => void,
       thisArg?: any,
     ): void {
-      const _headers = this.node.res.getHeaders();
+      const _headers = this._node.res.getHeaders();
       for (const key in _headers) {
         if (_headers[key]) {
           cb.call(
@@ -219,21 +219,21 @@ export const NodeResponseHeaders = /* @__PURE__ */ (() => {
     }
 
     *entries(): HeadersIterator<[string, string]> {
-      const _headers = this.node.res.getHeaders();
+      const _headers = this._node.res.getHeaders();
       for (const key in _headers) {
         yield [key, _normalizeValue(_headers[key])];
       }
     }
 
     *keys(): HeadersIterator<string> {
-      const keys = this.node.res.getHeaderNames();
+      const keys = this._node.res.getHeaderNames();
       for (const key of keys) {
         yield key;
       }
     }
 
     *values(): HeadersIterator<string> {
-      const values = Object.values(this.node.res.getHeaders());
+      const values = Object.values(this._node.res.getHeaders());
       for (const value of values) {
         yield _normalizeValue(value);
       }

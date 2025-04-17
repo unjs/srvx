@@ -6,7 +6,7 @@
 
 ### 💅 Refactors
 
-- ⚠️  Move extended request context under `request.x.*` ([#50](https://github.com/unjs/srvx/pull/50))
+- ⚠️ Move extended request context under `request.x.*` ([#50](https://github.com/unjs/srvx/pull/50))
 
 ### 📖 Documentation
 
@@ -18,7 +18,7 @@
 
 #### ⚠️ Breaking Changes
 
-- ⚠️  Move extended request context under `request.x.*` ([#50](https://github.com/unjs/srvx/pull/50))
+- ⚠️ Move extended request context under `request.x.*` ([#50](https://github.com/unjs/srvx/pull/50))
 
 ### ❤️ Contributors
 

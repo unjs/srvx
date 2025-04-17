@@ -30,7 +30,7 @@ export const server = serve({
       })) satisfies ServerPlugin,
   ),
   async onError(err) {
-    return new Response(`onError: ${err.message}`, { status: 500 });
+    return new Response(`onError: ${(err as Error).message}`, { status: 500 });
   },
   fetch(req) {
     const Response =

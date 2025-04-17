@@ -29,11 +29,11 @@ class CloudflareServer implements Server<CloudflareFetchHandler> {
     );
 
     this.fetch = (request, env, context) => {
-      Object.defineProperties(request, {
-        cloudflare: { value: { env, context }, enumerable: true },
-        remoteAddress: {
-          get: () => undefined,
-          enumerable: true,
+      Object.defineProperty(request, "x", {
+        enumerable: true,
+        value: {
+          runtime: "cloudflare",
+          cloudflare: { env, context },
         },
       });
       return fetchHandler(request as unknown as Request) as unknown as

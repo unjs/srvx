@@ -1,5 +1,5 @@
 import type NodeHttp from "node:http";
-import type { ServerRequest } from "../types.ts";
+import type { ServerRequest, ServerRuntimeContext } from "../types.ts";
 import { kNodeInspect } from "./_common.ts";
 import { NodeRequestHeaders } from "./headers.ts";
 import { NodeRequestURL } from "./url.ts";
@@ -18,33 +18,37 @@ export const NodeRequest = /* @__PURE__ */ (() => {
     #textBody?: Promise<string>;
     #bodyStream?: undefined | ReadableStream<Uint8Array>;
 
-    node: { req: NodeHttp.IncomingMessage; res?: NodeHttp.ServerResponse };
+    _node: { req: NodeHttp.IncomingMessage; res?: NodeHttp.ServerResponse };
+    x: ServerRuntimeContext;
 
     constructor(nodeCtx: {
       req: NodeHttp.IncomingMessage;
       res?: NodeHttp.ServerResponse;
     }) {
-      this.node = nodeCtx;
+      this._node = nodeCtx;
+      this.x = {
+        runtime: "node",
+        node: nodeCtx,
+        get ip() {
+          return nodeCtx.req.socket?.remoteAddress;
+        },
+      };
     }
 
     get headers() {
       if (!this.#headers) {
-        this.#headers = new NodeRequestHeaders(this.node);
+        this.#headers = new NodeRequestHeaders(this._node);
       }
       return this.#headers;
     }
 
-    get remoteAddress() {
-      return this.node.req.socket?.remoteAddress;
-    }
-
     clone() {
-      return new _Request({ ...this.node });
+      return new _Request({ ...this._node });
     }
 
     get _url() {
       if (!this.#url) {
-        this.#url = new NodeRequestURL(this.node);
+        this.#url = new NodeRequestURL(this._node);
       }
       return this.#url;
     }
@@ -54,7 +58,7 @@ export const NodeRequest = /* @__PURE__ */ (() => {
     }
 
     get method() {
-      return this.node.req.method || "GET";
+      return this._node.req.method || "GET";
     }
 
     get signal() {
@@ -73,7 +77,7 @@ export const NodeRequest = /* @__PURE__ */ (() => {
         return this.#hasBody;
       }
       // Check if request method requires a payload
-      const method = this.node.req.method?.toUpperCase();
+      const method = this._node.req.method?.toUpperCase();
       if (
         !method ||
         !(
@@ -88,8 +92,8 @@ export const NodeRequest = /* @__PURE__ */ (() => {
       }
 
       // Make sure either content-length or transfer-encoding/chunked is set
-      if (!Number.parseInt(this.node.req.headers["content-length"] || "")) {
-        const isChunked = (this.node.req.headers["transfer-encoding"] || "")
+      if (!Number.parseInt(this._node.req.headers["content-length"] || "")) {
+        const isChunked = (this._node.req.headers["transfer-encoding"] || "")
           .split(",")
           .map((e) => e.trim())
           .filter(Boolean)
@@ -111,7 +115,7 @@ export const NodeRequest = /* @__PURE__ */ (() => {
         this.#bodyUsed = true;
         this.#bodyStream = new ReadableStream({
           start: (controller) => {
-            this.node.req
+            this._node.req
               .on("data", (chunk) => {
                 controller.enqueue(chunk);
               })
@@ -154,7 +158,7 @@ export const NodeRequest = /* @__PURE__ */ (() => {
       if (!this.#blobBody) {
         this.#blobBody = this.bytes().then((bytes) => {
           return new Blob([bytes], {
-            type: this.node.req.headers["content-type"],
+            type: this._node.req.headers["content-type"],
           });
         });
       }

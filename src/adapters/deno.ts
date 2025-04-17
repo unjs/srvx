@@ -28,11 +28,14 @@ class DenoServer implements Server<DenoFetchHandler> {
     const fetchHandler = wrapFetch(this, this.options.fetch);
 
     this.fetch = (request, info) => {
-      Object.defineProperties(request, {
-        deno: { value: { info, server: this.deno?.server }, enumerable: true },
-        remoteAddress: {
-          get: () => (info?.remoteAddr as Deno.NetAddr)?.hostname,
-          enumerable: true,
+      Object.defineProperty(request, "x", {
+        enumerable: true,
+        value: {
+          runtime: "deno",
+          deno: { info, server: this.deno?.server },
+          get ip() {
+            return (info?.remoteAddr as Deno.NetAddr)?.hostname;
+          },
         },
       });
       return fetchHandler(request);

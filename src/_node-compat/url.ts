@@ -3,7 +3,7 @@ import { kNodeInspect } from "./_common.ts";
 
 export const NodeRequestURL = /* @__PURE__ */ (() => {
   const _URL = class URL implements Partial<globalThis.URL> {
-    node: { req: NodeHttp.IncomingMessage; res?: NodeHttp.ServerResponse };
+    _node: { req: NodeHttp.IncomingMessage; res?: NodeHttp.ServerResponse };
 
     _hash = "";
     _username = "";
@@ -20,7 +20,7 @@ export const NodeRequestURL = /* @__PURE__ */ (() => {
       req: NodeHttp.IncomingMessage;
       res?: NodeHttp.ServerResponse;
     }) {
-      this.node = nodeCtx;
+      this._node = nodeCtx;
     }
 
     get hash() {
@@ -49,18 +49,18 @@ export const NodeRequestURL = /* @__PURE__ */ (() => {
 
     // host
     get host() {
-      return this.node.req.headers.host || "";
+      return this._node.req.headers.host || "";
     }
     set host(value: string) {
       this._hostname = undefined;
       this._port = undefined;
-      this.node.req.headers.host = value;
+      this._node.req.headers.host = value;
     }
 
     // hostname
     get hostname() {
       if (this._hostname === undefined) {
-        const [hostname, port] = parseHost(this.node.req.headers.host);
+        const [hostname, port] = parseHost(this._node.req.headers.host);
         if (this._port === undefined && port) {
           this._port = String(Number.parseInt(port) || "");
         }
@@ -75,11 +75,11 @@ export const NodeRequestURL = /* @__PURE__ */ (() => {
     // port
     get port() {
       if (this._port === undefined) {
-        const [hostname, port] = parseHost(this.node.req.headers.host);
+        const [hostname, port] = parseHost(this._node.req.headers.host);
         if (this._hostname === undefined && hostname) {
           this._hostname = hostname;
         }
-        this._port = port || String(this.node.req.socket?.localPort || "");
+        this._port = port || String(this._node.req.socket?.localPort || "");
       }
       return this._port;
     }
@@ -90,7 +90,7 @@ export const NodeRequestURL = /* @__PURE__ */ (() => {
     // pathname
     get pathname() {
       if (this._pathname === undefined) {
-        const [pathname, search] = parsePath(this.node.req.url || "/");
+        const [pathname, search] = parsePath(this._node.req.url || "/");
         this._pathname = pathname;
         if (this._search === undefined) {
           this._search = search;
@@ -106,13 +106,13 @@ export const NodeRequestURL = /* @__PURE__ */ (() => {
         return;
       }
       this._pathname = value;
-      this.node.req.url = value + this.search;
+      this._node.req.url = value + this.search;
     }
 
     // search
     get search() {
       if (this._search === undefined) {
-        const [pathname, search] = parsePath(this.node.req.url || "/");
+        const [pathname, search] = parsePath(this._node.req.url || "/");
         this._search = search;
         if (this._pathname === undefined) {
           this._pathname = pathname;
@@ -131,7 +131,7 @@ export const NodeRequestURL = /* @__PURE__ */ (() => {
       }
       this._search = value;
       this._searchParams = undefined;
-      this.node.req.url = this.pathname + value;
+      this._node.req.url = this.pathname + value;
     }
 
     // searchParams
@@ -150,8 +150,8 @@ export const NodeRequestURL = /* @__PURE__ */ (() => {
     get protocol() {
       if (!this._protocol) {
         this._protocol =
-          (this.node.req.socket as any)?.encrypted ||
-          this.node.req.headers["x-forwarded-proto"] === "https"
+          (this._node.req.socket as any)?.encrypted ||
+          this._node.req.headers["x-forwarded-proto"] === "https"
             ? "https:"
             : "http:";
       }

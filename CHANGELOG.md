@@ -1,5 +1,40 @@
 # Changelog
 
+## v0.5.0
+
+[compare changes](https://github.com/h3js/srvx/compare/v0.4.0...v0.5.0)
+
+### 🚀 Enhancements
+
+- Experimental service-worker adapter ([#53](https://github.com/h3js/srvx/pull/53))
+- **service-worker:** Self-register support ([#55](https://github.com/h3js/srvx/pull/55))
+- Generic adapter ([#56](https://github.com/h3js/srvx/pull/56))
+- ⚠️  Print listening url by default ([#57](https://github.com/h3js/srvx/pull/57))
+- Support `HOST` env for node, deno and bun ([2d94e28](https://github.com/h3js/srvx/commit/2d94e28))
+- Add runtime agnostic error handler ([#48](https://github.com/h3js/srvx/pull/48))
+
+### 💅 Refactors
+
+- Improve types ([89bba05](https://github.com/h3js/srvx/commit/89bba05))
+
+### 🏡 Chore
+
+- Apply automated updates ([840e3a3](https://github.com/h3js/srvx/commit/840e3a3))
+- Move to h3js org ([255cab1](https://github.com/h3js/srvx/commit/255cab1))
+- Use pnpm for docs ([0c92f55](https://github.com/h3js/srvx/commit/0c92f55))
+- Apply automated updates ([599c786](https://github.com/h3js/srvx/commit/599c786))
+- Update deps ([3f18ddb](https://github.com/h3js/srvx/commit/3f18ddb))
+- Rename `_utils` to `_uitils.node` ([71cbe57](https://github.com/h3js/srvx/commit/71cbe57))
+
+#### ⚠️ Breaking Changes
+
+- ⚠️  Print listening url by default ([#57](https://github.com/h3js/srvx/pull/57))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](https://github.com/pi0))
+- Daniel Perez ([@danielpza](https://github.com/danielpza))
+
 ## v0.4.0
 
 [compare changes](https://github.com/h3dev/srvx/compare/v0.3.0...v0.4.0)

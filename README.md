@@ -50,11 +50,11 @@ console.log(`🚀 Server ready at ${server.url}`);
 
 <!-- automd:contributors author=pi0 license=MIT -->
 
-Published under the [MIT](https://github.com/h3dev/srvx/blob/main/LICENSE) license.
-Made by [@pi0](https://github.com/pi0) and [community](https://github.com/h3dev/srvx/graphs/contributors) 💛
+Published under the [MIT](https://github.com/h3js/srvx/blob/main/LICENSE) license.
+Made by [@pi0](https://github.com/pi0) and [community](https://github.com/h3js/srvx/graphs/contributors) 💛
 <br><br>
-<a href="https://github.com/h3dev/srvx/graphs/contributors">
-<img src="https://contrib.rocks/image?repo=h3dev/srvx" />
+<a href="https://github.com/h3js/srvx/graphs/contributors">
+<img src="https://contrib.rocks/image?repo=h3js/srvx" />
 </a>
 
 <!-- /automd -->

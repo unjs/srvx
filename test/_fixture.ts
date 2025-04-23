@@ -29,6 +29,9 @@ export const server: Server = serve({
         },
       })) satisfies ServerPlugin,
   ),
+  async onError(err) {
+    return new Response(`onError: ${(err as Error).message}`, { status: 500 });
+  },
   async fetch(req) {
     const Response =
       (globalThis as any).TEST_RESPONSE_CTOR || globalThis.Response;
@@ -69,6 +72,9 @@ export const server: Server = serve({
       }
       case "/req-headers-instanceof": {
         return new Response(req.headers instanceof Headers ? "yes" : "no");
+      }
+      case "/error": {
+        throw new Error("test error");
       }
     }
     return new Response("404", { status: 404 });

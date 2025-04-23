@@ -63,6 +63,12 @@ export function addTests(
     expect(await response.text()).toMatch(/ip: ::1|ip: 127.0.0.1/);
   });
 
+  test("runtime agnostic error handler (onError)", async () => {
+    const response = await fetch(url("/error"));
+    expect(response.status).toBe(500);
+    expect(await response.text()).toBe("onError: test error");
+  });
+
   describe("plugin", () => {
     for (const hook of ["req", "res"]) {
       for (const type of ["async", "sync"]) {

@@ -11,11 +11,12 @@ import { sendNodeResponse } from "../_node-compat/send.ts";
 import { NodeRequest } from "../_node-compat/request.ts";
 import {
   fmtURL,
+  resolveTLSOptions,
   printListening,
   resolvePortAndHost,
-  resolveTLSOptions,
 } from "../_utils.ts";
 import { wrapFetch } from "../_plugin.ts";
+import { wrapFetchOnError } from "../_error.ts";
 
 export {
   NodeRequest as Request,
@@ -58,7 +59,11 @@ class NodeServer implements Server {
   constructor(options: ServerOptions) {
     this.options = options;
 
-    const fetchHandler = wrapFetch(this, this.options.fetch);
+    const fetchHandler = wrapFetch(
+      this,
+      wrapFetchOnError(this.options.fetch, this.options.onError),
+    );
+
     this.fetch = fetchHandler;
 
     const handler = (

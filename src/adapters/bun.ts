@@ -48,6 +48,7 @@ class BunServer implements Server<BunFetchHandler> {
     this.serveOptions = {
       ...resolvePortAndHost(this.options),
       reusePort: this.options.reusePort,
+      error: this.options.onError,
       ...this.options.bun,
       tls: {
         cert: tls?.cert,

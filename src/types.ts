@@ -101,6 +101,13 @@ export interface ServerOptions {
   };
 
   /**
+   * Runtime agnostic error handler (optional).
+   *
+   * @note This handler will take precedence over runtime specific error handlers.
+   */
+  onError?: ErrorHandler;
+
+  /**
    * Node.js server options.
    */
   node?: (NodeHttp.ServerOptions | NodeHttps.ServerOptions) &
@@ -284,6 +291,8 @@ export interface ServerRequest extends Request {
 // ----------------------------------------------------------------------------
 
 export type FetchHandler = (request: Request) => Response | Promise<Response>;
+
+export type ErrorHandler = (error: unknown) => Response | Promise<Response>;
 
 export type BunFetchHandler = (
   request: Request,

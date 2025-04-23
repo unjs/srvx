@@ -1,5 +1,6 @@
 import type { Server, ServerOptions, ServerRequest } from "../types.ts";
 import { wrapFetch } from "../_plugin.ts";
+import { wrapFetchOnError } from "../_utils.ts";
 
 export const Response: typeof globalThis.Response = globalThis.Response;
 
@@ -22,7 +23,7 @@ class ServiceWorkerServer implements Server<ServiceWorkerHandler> {
 
     const fetchHandler = wrapFetch(
       this as unknown as Server,
-      this.options.fetch,
+      wrapFetchOnError(this.options.fetch, this.options.onError),
     );
 
     this.fetch = (request: Request, event: FetchEvent) => {

@@ -48,15 +48,12 @@ class DenoServer implements Server<DenoFetchHandler> {
       port: resolvePort(this.options.port, globalThis.Deno?.env.get("PORT")),
       hostname: this.options.hostname,
       reusePort: this.options.reusePort,
+      onError: this.options.onError,
       ...(tls
         ? { key: tls.key, cert: tls.cert, passphrase: tls.passphrase }
         : {}),
       ...this.options.deno,
     };
-
-    if (this.options.onError) {
-      this.serveOptions.onError = this.options.onError;
-    }
 
     if (!options.manual) {
       this.serve();

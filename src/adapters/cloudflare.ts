@@ -24,9 +24,10 @@ class CloudflareServer implements Server<CloudflareFetchHandler> {
   constructor(options: ServerOptions) {
     this.options = options;
 
-    let fetchHandler = this.options.fetch;
-    fetchHandler = wrapFetchOnError(this.options.fetch, this.options.onError);
-    fetchHandler = wrapFetch(this as unknown as Server, fetchHandler);
+    const fetchHandler = wrapFetch(
+      this as unknown as Server,
+      wrapFetchOnError(this.options.fetch, this.options.onError),
+    );
 
     this.fetch = (request, env, context) => {
       Object.defineProperties(request, {

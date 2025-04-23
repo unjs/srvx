@@ -58,9 +58,10 @@ class NodeServer implements Server {
   constructor(options: ServerOptions) {
     this.options = options;
 
-    let fetchHandler = this.options.fetch;
-    fetchHandler = wrapFetchOnError(this.options.fetch, this.options.onError);
-    fetchHandler = wrapFetch(this, fetchHandler);
+    const fetchHandler = wrapFetch(
+      this,
+      wrapFetchOnError(this.options.fetch, this.options.onError),
+    );
 
     this.fetch = fetchHandler;
 

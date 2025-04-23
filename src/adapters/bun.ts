@@ -1,6 +1,11 @@
 import type { BunFetchHandler, Server, ServerOptions } from "../types.ts";
 import type * as bun from "bun";
-import { resolvePort, resolveTLSOptions } from "../_utils.ts";
+import {
+  fmtURL,
+  printListening,
+  resolvePortAndHost,
+  resolveTLSOptions,
+} from "../_utils.ts";
 import { wrapFetch } from "../_plugin.ts";
 
 export const Response: typeof globalThis.Response = globalThis.Response;
@@ -41,9 +46,8 @@ class BunServer implements Server<BunFetchHandler> {
 
     const tls = resolveTLSOptions(this.options);
     this.serveOptions = {
-      hostname: this.options.hostname,
+      ...resolvePortAndHost(this.options),
       reusePort: this.options.reusePort,
-      port: resolvePort(this.options.port, globalThis.process?.env.PORT),
       error: this.options.onError,
       ...this.options.bun,
       tls: {
@@ -64,11 +68,27 @@ class BunServer implements Server<BunFetchHandler> {
     if (!this.bun!.server) {
       this.bun!.server = Bun.serve(this.serveOptions);
     }
+    printListening(this.options, this.url);
     return Promise.resolve(this);
   }
 
   get url(): string | undefined {
-    return this.bun?.server?.url.href;
+    const server = this.bun?.server;
+    if (!server) {
+      return;
+    }
+    // Prefer address since server.url hostname is not reliable
+    const address = (
+      server as { address?: { address: string; family: string; port: number } }
+    ).address;
+    if (address) {
+      return fmtURL(
+        address.address,
+        address.port,
+        (server as any).protocol === "https",
+      );
+    }
+    return server.url.href;
   }
 
   ready(): Promise<this> {

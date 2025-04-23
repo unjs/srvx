@@ -76,6 +76,11 @@ export interface ServerOptions {
   protocol?: "http" | "https";
 
   /**
+   * If set to `true`, server will not print the listening address.
+   */
+  silent?: boolean;
+
+  /**
    * TLS server options.
    */
   tls?: {
@@ -121,13 +126,35 @@ export interface ServerOptions {
    * @docs https://docs.deno.com/api/deno/~/Deno.serve
    */
   deno?: Deno.ServeOptions;
+
+  /**
+   * Service worker options
+   */
+  serviceWorker?: {
+    /**
+     * The path to the service worker file to be registered.
+     */
+    url?: string;
+
+    /**
+     * The scope of the service worker.
+     *
+     */
+    scope?: string;
+  };
 }
 
 export interface Server<Handler = ServerHandler> {
   /**
    * Current runtime name
    */
-  readonly runtime: "node" | "deno" | "bun" | "cloudflare" | "service-worker";
+  readonly runtime:
+    | "node"
+    | "deno"
+    | "bun"
+    | "cloudflare"
+    | "service-worker"
+    | "generic";
 
   /**
    * Server options

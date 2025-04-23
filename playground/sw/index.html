@@ -7,26 +7,6 @@
   </head>
   <body>
     <p>Loading service worker...</p>
-    <script type="module">
-      if ("serviceWorker" in navigator) {
-        try {
-          // Register the new service worker
-          const newRegistration = await navigator.serviceWorker.register(
-            "./sw.mjs",
-            { type: "module" },
-          );
-          console.log(
-            "Service Worker registered with scope:",
-            newRegistration.scope,
-          );
-          // Reload the page without adding to history
-          location.replace(location.href);
-        } catch (error) {
-          console.error("Service Worker registration failed:", error);
-        }
-      } else {
-        console.log("Service Workers are not supported in this browser.");
-      }
-    </script>
+    <script type="module" src="./sw.mjs"></script>
   </body>
 </html>

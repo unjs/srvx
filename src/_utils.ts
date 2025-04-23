@@ -2,17 +2,14 @@ import type { ErrorHandler, ServerHandler, ServerOptions } from "./types.ts";
 
 import { readFileSync } from "node:fs";
 
-export function resolvePort(
-  portOptions: string | number | undefined,
-  portEnv: string | undefined,
-): number {
-  const portInput = portOptions ?? portEnv;
-  if (portInput === undefined) {
-    return 3000;
-  }
-  return typeof portInput === "number"
-    ? portInput
-    : Number.parseInt(portInput, 10);
+export function resolvePortAndHost(opts: ServerOptions): {
+  port: number;
+  hostname: string | undefined;
+} {
+  const _port = opts.port ?? globalThis.process?.env.PORT ?? 3000;
+  const port = typeof _port === "number" ? _port : Number.parseInt(_port, 10);
+  const hostname = opts.hostname ?? globalThis.process?.env.HOST;
+  return { port, hostname };
 }
 
 export function fmtURL(
@@ -27,6 +24,33 @@ export function fmtURL(
     host = `[${host}]`;
   }
   return `http${secure ? "s" : ""}://${host}:${port}/`;
+}
+
+export function printListening(
+  opts: ServerOptions,
+  url: string | undefined,
+): void {
+  if (!url || (opts.silent ?? globalThis.process?.env?.TEST)) {
+    return;
+  }
+
+  const _url = new URL(url);
+  const allInterfaces = _url.hostname === "[::]" || _url.hostname === "0.0.0.0";
+  if (allInterfaces) {
+    _url.hostname = "localhost";
+    url = _url.href;
+  }
+
+  let listeningOn = `➜ Listening on:`;
+  let additionalInfo = allInterfaces ? " (all interfaces)" : "";
+
+  if (globalThis.process.stdout?.isTTY) {
+    listeningOn = `\u001B[32m${listeningOn}\u001B[0m`; // ANSI green
+    url = `\u001B[36m${url}\u001B[0m`; // ANSI cyan
+    additionalInfo = `\u001B[2m${additionalInfo}\u001B[0m`; // ANSI dim
+  }
+
+  console.log(`  ${listeningOn} ${url}${additionalInfo}`);
 }
 
 export function resolveTLSOptions(opts: ServerOptions):

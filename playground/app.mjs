@@ -1,9 +1,7 @@
 import { serve } from "srvx";
 
-const server = serve({
-  // protocol: "https",
+serve({
   // tls: { cert: "server.crt", key: "server.key" },
-  port: 3000,
   fetch(_request) {
     return new Response(
       /*html */ `
@@ -26,5 +24,3 @@ const server = serve({
     );
   },
 });
-
-server.ready().then(() => console.log(`🚀 Server ready at ${server.url}`));

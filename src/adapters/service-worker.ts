@@ -9,6 +9,9 @@ export type ServiceWorkerHandler = (
   event: FetchEvent,
 ) => Response | Promise<Response>;
 
+const isMainThread = () =>
+  typeof navigator !== "undefined" && "serviceWorker" in navigator;
+
 export function serve(options: ServerOptions): Server<ServiceWorkerHandler> {
   return new ServiceWorkerServer(options);
 }
@@ -17,6 +20,9 @@ class ServiceWorkerServer implements Server<ServiceWorkerHandler> {
   readonly runtime = "service-worker";
   readonly options: ServerOptions;
   readonly fetch: ServiceWorkerHandler;
+
+  #fetchListener?: (event: FetchEvent) => void | Promise<void>;
+  #listeningPromise?: Promise<any>;
 
   constructor(options: ServerOptions) {
     this.options = options;
@@ -42,8 +48,29 @@ class ServiceWorkerServer implements Server<ServiceWorkerHandler> {
   }
 
   serve() {
+    if (isMainThread()) {
+      const swURL = this.options.serviceWorker?.url;
+      if (!swURL) {
+        throw new Error(
+          "Service worker URL is not provided. Please set the `serviceWorker.url` serve option or manually register.",
+        );
+      }
+      // Not a service worker, so self-register the service worker
+      this.#listeningPromise = navigator.serviceWorker
+        .register(swURL, {
+          type: "module",
+          scope: this.options.serviceWorker?.scope,
+        })
+        .then((registration) => {
+          registration.addEventListener("updatefound", () => {
+            location.replace(location.href);
+          });
+        });
+      return;
+    }
+
     // Listen for the 'fetch' event to handle requests
-    addEventListener("fetch", async (event) => {
+    this.#fetchListener = async (event) => {
       // skip if event url ends with file with extension
       if (/\/[^/]*\.[a-zA-Z0-9]+$/.test(new URL(event.request.url).pathname)) {
         return;
@@ -52,24 +79,41 @@ class ServiceWorkerServer implements Server<ServiceWorkerHandler> {
       if (response.status !== 404) {
         event.respondWith(response);
       }
-    });
+    };
+    addEventListener("fetch", this.#fetchListener);
 
     // Listen for the 'install' event to update the service worker
     globalThis.addEventListener("install", () => {
-      (globalThis as any).skipWaiting(); // Force the waiting service worker to become active
+      // Force the waiting service worker to become active
+      (globalThis as any).skipWaiting();
     });
 
     // Listen for the 'activate' event to claim clients
     globalThis.addEventListener("activate", (event) => {
-      (event as FetchEvent).waitUntil((globalThis as any).clients?.claim?.()); // Take control of uncontrolled clients
+      // Take control of uncontrolled clients
+      (event as FetchEvent).waitUntil((globalThis as any).clients?.claim?.());
     });
   }
 
   ready(): Promise<Server<ServiceWorkerHandler>> {
-    return Promise.resolve().then(() => this);
+    return Promise.resolve(this.#listeningPromise).then(() => this);
   }
 
-  close() {
-    return Promise.resolve();
+  async close() {
+    if (this.#fetchListener) {
+      removeEventListener("fetch", this.#fetchListener!);
+    }
+
+    // unregister the service worker
+    if (isMainThread()) {
+      const registrations = await navigator.serviceWorker.getRegistrations();
+      for (const registration of registrations) {
+        if (registration.active) {
+          await registration.unregister();
+        }
+      }
+    } else {
+      await (globalThis as any).registration.unregister();
+    }
   }
 }

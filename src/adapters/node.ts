@@ -11,9 +11,10 @@ import { sendNodeResponse } from "../_node-compat/send.ts";
 import { NodeRequest } from "../_node-compat/request.ts";
 import {
   fmtURL,
-  resolvePort,
   resolveTLSOptions,
   wrapFetchOnError,
+  printListening,
+  resolvePortAndHost,
 } from "../_utils.ts";
 import { wrapFetch } from "../_plugin.ts";
 
@@ -77,9 +78,10 @@ class NodeServer implements Server {
     };
 
     const tls = resolveTLSOptions(this.options);
+    const { port, hostname: host } = resolvePortAndHost(this.options);
     this.serveOptions = {
-      port: resolvePort(this.options.port, globalThis.process?.env.PORT),
-      host: this.options.hostname,
+      port,
+      host,
       exclusive: !this.options.reusePort,
       ...(tls
         ? { cert: tls.cert, key: tls.key, passphrase: tls.passphrase }
@@ -107,7 +109,10 @@ class NodeServer implements Server {
       return Promise.resolve(this.#listeningPromise).then(() => this);
     }
     this.#listeningPromise = new Promise<void>((resolve) => {
-      this.node!.server!.listen(this.serveOptions, () => resolve());
+      this.node!.server!.listen(this.serveOptions, () => {
+        printListening(this.options, this.url);
+        resolve();
+      });
     });
   }
 

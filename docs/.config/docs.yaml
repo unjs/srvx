@@ -17,12 +17,9 @@ landing:
     content: |
       import { serve } from "srvx";
 
-      const server = serve({
+      serve({
         port: 3000,
         fetch(request) {
           return new Response("👋 Hello there!");
         },
       });
-
-      await server.ready();
-      console.log(`🚀 Server ready at ${server.url}`);

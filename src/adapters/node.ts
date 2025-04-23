@@ -9,7 +9,12 @@ import NodeHttp from "node:http";
 import NodeHttps from "node:https";
 import { sendNodeResponse } from "../_node-compat/send.ts";
 import { NodeRequest } from "../_node-compat/request.ts";
-import { fmtURL, resolvePort, resolveTLSOptions } from "../_utils.ts";
+import {
+  fmtURL,
+  printListening,
+  resolvePort,
+  resolveTLSOptions,
+} from "../_utils.ts";
 import { wrapFetch } from "../_plugin.ts";
 
 export {
@@ -70,7 +75,7 @@ class NodeServer implements Server {
     const tls = resolveTLSOptions(this.options);
     this.serveOptions = {
       port: resolvePort(this.options.port, globalThis.process?.env.PORT),
-      host: this.options.hostname,
+      host: this.options.hostname || "0.0.0.0",
       exclusive: !this.options.reusePort,
       ...(tls
         ? { cert: tls.cert, key: tls.key, passphrase: tls.passphrase }
@@ -98,7 +103,10 @@ class NodeServer implements Server {
       return Promise.resolve(this.#listeningPromise).then(() => this);
     }
     this.#listeningPromise = new Promise<void>((resolve) => {
-      this.node!.server!.listen(this.serveOptions, () => resolve());
+      this.node!.server!.listen(this.serveOptions, () => {
+        printListening(this.options, this.url);
+        resolve();
+      });
     });
   }
 

@@ -1,6 +1,6 @@
 import type { BunFetchHandler, Server, ServerOptions } from "../types.ts";
 import type * as bun from "bun";
-import { resolvePort, resolveTLSOptions } from "../_utils.ts";
+import { printListening, resolvePort, resolveTLSOptions } from "../_utils.ts";
 import { wrapFetch } from "../_plugin.ts";
 
 export const Response: typeof globalThis.Response = globalThis.Response;
@@ -63,6 +63,7 @@ class BunServer implements Server<BunFetchHandler> {
     if (!this.bun!.server) {
       this.bun!.server = Bun.serve(this.serveOptions);
     }
+    printListening(this.options, this.url);
     return Promise.resolve(this);
   }
 

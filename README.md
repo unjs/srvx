@@ -24,10 +24,6 @@ const server = serve({
     return new Response("👋 Hello there!");
   },
 });
-
-await server.ready();
-
-console.log(`🚀 Server ready at ${server.url}`);
 ```
 
 👉 **Visit the 📖 [Documentation](https://srvx.h3.dev/) to learn more.**

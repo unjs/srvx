@@ -1,5 +1,10 @@
 import type { DenoFetchHandler, Server, ServerOptions } from "../types.ts";
-import { fmtURL, resolvePort, resolveTLSOptions } from "../_utils.ts";
+import {
+  fmtURL,
+  printListening,
+  resolvePort,
+  resolveTLSOptions,
+} from "../_utils.ts";
 import { wrapFetch } from "../_plugin.ts";
 
 export const Response: typeof globalThis.Response = globalThis.Response;
@@ -73,6 +78,7 @@ class DenoServer implements Server<DenoFetchHandler> {
           if (this.options.deno?.onListen) {
             this.options.deno.onListen(info);
           }
+          printListening(this.options, this.url);
           onListenPromise.resolve();
         },
       },

@@ -1,10 +1,8 @@
 import { serve, Response } from "srvx";
 
-const server = await serve({
+serve({
   port: 3000,
   fetch() {
     return new Response("Hello!");
   },
 });
-
-await server.ready();

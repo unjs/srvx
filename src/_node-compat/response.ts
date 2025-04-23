@@ -43,7 +43,7 @@ export const NodeResponse: {
       this.#init = init;
     }
 
-    static json(data: any, init?: ResponseInit): globalThis.Response {
+    static json(data: any, init?: ResponseInit): Response {
       if (init?.headers) {
         if (!(init.headers as Record<string, string>)[CONTENT_TYPE]) {
           const initHeaders = new Headers(init.headers);
@@ -268,7 +268,7 @@ export const NodeResponse: {
       return this.#response.blob(); // Slow path
     }
 
-    bytes(): Promise<Uint8Array> {
+    bytes(): Promise<Uint8Array<ArrayBuffer>> {
       if (this.#responseObj) {
         return this.#responseObj.bytes(); // Reuse instance
       }

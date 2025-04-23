@@ -6,7 +6,7 @@
 
 ### 💅 Refactors
 
-- ⚠️  Use `request.ip` and `request.runtime` ([#51](https://github.com/unjs/srvx/pull/51))
+- ⚠️ Use `request.ip` and `request.runtime` ([#51](https://github.com/unjs/srvx/pull/51))
 
 ### 🏡 Chore
 
@@ -14,7 +14,7 @@
 
 #### ⚠️ Breaking Changes
 
-- ⚠️  Use `request.ip` and `request.runtime` ([#51](https://github.com/unjs/srvx/pull/51))
+- ⚠️ Use `request.ip` and `request.runtime` ([#51](https://github.com/unjs/srvx/pull/51))
 
 ### ❤️ Contributors
 

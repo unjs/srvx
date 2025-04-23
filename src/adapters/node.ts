@@ -75,7 +75,7 @@ class NodeServer implements Server {
     const tls = resolveTLSOptions(this.options);
     this.serveOptions = {
       port: resolvePort(this.options.port, globalThis.process?.env.PORT),
-      host: this.options.hostname || "0.0.0.0",
+      host: this.options.hostname,
       exclusive: !this.options.reusePort,
       ...(tls
         ? { cert: tls.cert, key: tls.key, passphrase: tls.passphrase }

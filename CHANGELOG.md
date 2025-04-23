@@ -1,5 +1,23 @@
 # Changelog
 
+## v0.5.1
+
+[compare changes](https://github.com/h3js/srvx/compare/v0.5.0...v0.5.1)
+
+### 🩹 Fixes
+
+- **service-worker:** Minor fixes ([63a42b5](https://github.com/h3js/srvx/commit/63a42b5))
+
+### 🏡 Chore
+
+- Apply automated updates ([248d0b5](https://github.com/h3js/srvx/commit/248d0b5))
+- Update playground sw example to use cdn ([b333bd4](https://github.com/h3js/srvx/commit/b333bd4))
+- Fix node compat internal types ([7862ab0](https://github.com/h3js/srvx/commit/7862ab0))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](https://github.com/pi0))
+
 ## v0.5.0
 
 [compare changes](https://github.com/h3js/srvx/compare/v0.4.0...v0.5.0)

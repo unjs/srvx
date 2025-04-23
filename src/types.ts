@@ -76,6 +76,11 @@ export interface ServerOptions {
   protocol?: "http" | "https";
 
   /**
+   * If set to `true`, server will not print the listening address.
+   */
+  silent?: boolean;
+
+  /**
    * TLS server options.
    */
   tls?: {

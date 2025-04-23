@@ -1,6 +1,6 @@
 import { serve } from "../node_modules/srvx/dist/adapters/service-worker.mjs";
 
-const server = serve({
+serve({
   serviceWorker: { url: import.meta.url },
   fetch(_request) {
     return new Response(
@@ -16,5 +16,3 @@ const server = serve({
     );
   },
 });
-
-server.ready().then(() => console.log(`🚀 Server ready!`));

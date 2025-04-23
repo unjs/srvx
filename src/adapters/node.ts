@@ -9,7 +9,12 @@ import NodeHttp from "node:http";
 import NodeHttps from "node:https";
 import { sendNodeResponse } from "../_node-compat/send.ts";
 import { NodeRequest } from "../_node-compat/request.ts";
-import { fmtURL, resolvePort, resolveTLSOptions } from "../_utils.ts";
+import {
+  fmtURL,
+  printListening,
+  resolvePort,
+  resolveTLSOptions,
+} from "../_utils.ts";
 import { wrapFetch } from "../_plugin.ts";
 
 export {
@@ -98,7 +103,10 @@ class NodeServer implements Server {
       return Promise.resolve(this.#listeningPromise).then(() => this);
     }
     this.#listeningPromise = new Promise<void>((resolve) => {
-      this.node!.server!.listen(this.serveOptions, () => resolve());
+      this.node!.server!.listen(this.serveOptions, () => {
+        printListening(this.options, this.url);
+        resolve();
+      });
     });
   }
 

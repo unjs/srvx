@@ -29,6 +29,33 @@ export function fmtURL(
   return `http${secure ? "s" : ""}://${host}:${port}/`;
 }
 
+export function printListening(
+  opts: ServerOptions,
+  url: string | undefined,
+): void {
+  if (!url || (opts.silent ?? globalThis.process?.env?.TEST)) {
+    return;
+  }
+
+  const _url = new URL(url);
+  const allInterfaces = _url.hostname === "[::]" || _url.hostname === "0.0.0.0";
+  if (allInterfaces) {
+    _url.hostname = "localhost";
+    url = _url.href;
+  }
+
+  let listeningOn = `➜ Listening on:`;
+  let additionalInfo = allInterfaces ? " (all interfaces)" : "";
+
+  if (globalThis.process.stdout?.isTTY) {
+    listeningOn = `\u001B[32m${listeningOn}\u001B[0m`; // ANSI green
+    url = `\u001B[36m${url}\u001B[0m`; // ANSI cyan
+    additionalInfo = `\u001B[2m${additionalInfo}\u001B[0m`; // ANSI dim
+  }
+
+  console.log(`  ${listeningOn} ${url}${additionalInfo}`);
+}
+
 export function resolveTLSOptions(opts: ServerOptions):
   | {
       cert: string;

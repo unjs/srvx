@@ -12,11 +12,13 @@
     "./bun": "./dist/adapters/bun.mjs",
     "./node": "./dist/adapters/node.mjs",
     "./cloudflare": "./dist/adapters/cloudflare.mjs",
+    "./service-worker": "./dist/adapters/service-worker.mjs",
     ".": {
       "types": "./dist/types.d.mts",
       "deno": "./dist/adapters/deno.mjs",
       "bun": "./dist/adapters/bun.mjs",
       "workerd": "./dist/adapters/cloudflare.mjs",
+      "web": "./dist/adapters/service-worker.mjs",
       "node": "./dist/adapters/node.mjs"
     }
   },
@@ -36,6 +38,7 @@
     "play:deno": "deno run -A playground/app.mjs",
     "play:mkcert": "openssl req -x509 -newkey rsa:2048 -nodes -keyout server.key -out server.crt -days 365 -subj /CN=srvx.local",
     "play:node": "node playground/app.mjs",
+    "play:sw": "pnpm build && pnpx serve playground",
     "release": "pnpm test && changelogen --release && npm publish && git push --follow-tags",
     "test": "pnpm lint && pnpm test:types && vitest run --coverage",
     "test:types": "tsc --noEmit --skipLibCheck"

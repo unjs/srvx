@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Service Worker Example</title>
+  </head>
+  <body>
+    <p>Loading service worker...</p>
+    <script type="module">
+      if ("serviceWorker" in navigator) {
+        try {
+          // Register the new service worker
+          const newRegistration = await navigator.serviceWorker.register(
+            "./sw.mjs",
+            { type: "module" },
+          );
+          console.log(
+            "Service Worker registered with scope:",
+            newRegistration.scope,
+          );
+          // Reload the page without adding to history
+          location.replace(location.href);
+        } catch (error) {
+          console.error("Service Worker registration failed:", error);
+        }
+      } else {
+        console.log("Service Workers are not supported in this browser.");
+      }
+    </script>
+  </body>
+</html>

@@ -1,4 +1,4 @@
-import type { ErrorHandler, ServerHandler, ServerOptions } from "./types.ts";
+import type { ServerOptions } from "./types.ts";
 
 import { readFileSync } from "node:fs";
 
@@ -96,22 +96,4 @@ function resolveCertOrKey(value?: unknown): undefined | string {
     return value;
   }
   return readFileSync(value, "utf8");
-}
-
-export function wrapFetchOnError(
-  fetchHandler: ServerHandler,
-  onError?: ErrorHandler,
-): ServerHandler {
-  if (!onError) return fetchHandler;
-  return (...params) => {
-    try {
-      const result = fetchHandler(...params);
-      if (result instanceof Promise) {
-        return result.catch(onError);
-      }
-      return result;
-    } catch (error) {
-      return onError(error as Error);
-    }
-  };
 }

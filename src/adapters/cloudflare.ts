@@ -5,7 +5,7 @@ import type {
 } from "../types.ts";
 import type * as CF from "@cloudflare/workers-types";
 import { wrapFetch } from "../_plugin.ts";
-import { wrapFetchOnError } from "../_utils.ts";
+import { wrapFetchOnError } from "../_error.ts";
 
 export const Response: typeof globalThis.Response = globalThis.Response;
 

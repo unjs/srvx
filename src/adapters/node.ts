@@ -12,11 +12,11 @@ import { NodeRequest } from "../_node-compat/request.ts";
 import {
   fmtURL,
   resolveTLSOptions,
-  wrapFetchOnError,
   printListening,
   resolvePortAndHost,
 } from "../_utils.ts";
 import { wrapFetch } from "../_plugin.ts";
+import { wrapFetchOnError } from "../_error.ts";
 
 export {
   NodeRequest as Request,

@@ -1,6 +1,6 @@
 import type { Server, ServerHandler, ServerOptions } from "../types.ts";
 import { wrapFetch } from "../_plugin.ts";
-import { wrapFetchOnError } from "../_utils.ts";
+import { wrapFetchOnError } from "../_error.ts";
 
 export const Response: typeof globalThis.Response = globalThis.Response;
 

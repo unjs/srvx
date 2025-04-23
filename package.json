@@ -59,6 +59,7 @@
     "@types/bun": "^1.2.10",
     "@types/deno": "^2.2.0",
     "@types/node": "^22.14.1",
+    "@types/serviceworker": "^0.0.132",
     "@vitest/coverage-v8": "^3.1.2",
     "automd": "^0.4.0",
     "changelogen": "^0.6.1",

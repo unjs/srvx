@@ -33,6 +33,9 @@ importers:
       '@types/node':
         specifier: ^22.14.1
         version: 22.14.1
+      '@types/serviceworker':
+        specifier: ^0.0.132
+        version: 0.0.132
       '@vitest/coverage-v8':
         specifier: ^3.1.2
         version: 3.1.2(vitest@3.1.2(@types/node@22.14.1)(jiti@2.4.2))
@@ -643,6 +646,9 @@ packages:
 
   '@types/resolve@1.20.2':
     resolution: {integrity: sha512-60BCwRFOZCQhDncwQdxxeOEEkbc5dIMccYLwbxsS4TUNeVECQ/pBJ0j09mrHOl/JJvpRPGwO9SvE4nR2Nb/a4Q==}
+
+  '@types/serviceworker@0.0.132':
+    resolution: {integrity: sha512-t/3jf1pA2EyxfltOT0yjTM4Ys6G8QXYoSoMLMumJ+wFBtVVdY3VkIsijwufswCeuM5Pp7USq2MJrRcFlkAXrRw==}
 
   '@types/unist@2.0.11':
     resolution: {integrity: sha512-CmBKiL6NNo/OqgmMn95Fk9Whlp2mtvIv+KNpQKN2F4SjvrEesubTRWGYSg+BnWZOnlCaSTU1sMpsBOzgbYhnsA==}
@@ -2661,6 +2667,8 @@ snapshots:
   '@types/normalize-package-data@2.4.4': {}
 
   '@types/resolve@1.20.2': {}
+
+  '@types/serviceworker@0.0.132': {}
 
   '@types/unist@2.0.11': {}
 

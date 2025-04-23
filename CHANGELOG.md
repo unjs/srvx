@@ -9,7 +9,7 @@
 - Experimental service-worker adapter ([#53](https://github.com/h3js/srvx/pull/53))
 - **service-worker:** Self-register support ([#55](https://github.com/h3js/srvx/pull/55))
 - Generic adapter ([#56](https://github.com/h3js/srvx/pull/56))
-- ⚠️  Print listening url by default ([#57](https://github.com/h3js/srvx/pull/57))
+- ⚠️ Print listening url by default ([#57](https://github.com/h3js/srvx/pull/57))
 - Support `HOST` env for node, deno and bun ([2d94e28](https://github.com/h3js/srvx/commit/2d94e28))
 - Add runtime agnostic error handler ([#48](https://github.com/h3js/srvx/pull/48))
 
@@ -28,7 +28,7 @@
 
 #### ⚠️ Breaking Changes
 
-- ⚠️  Print listening url by default ([#57](https://github.com/h3js/srvx/pull/57))
+- ⚠️ Print listening url by default ([#57](https://github.com/h3js/srvx/pull/57))
 
 ### ❤️ Contributors
 

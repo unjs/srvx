@@ -6,7 +6,7 @@ import type {
 import type * as CF from "@cloudflare/workers-types";
 import { wrapFetch } from "../_plugin.ts";
 
-export const Response = globalThis.Response;
+export const Response: typeof globalThis.Response = globalThis.Response;
 
 export function serve(
   options: ServerOptions,

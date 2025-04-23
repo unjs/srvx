@@ -5,7 +5,10 @@ import type {
   ServerHandler,
 } from "./types.ts";
 
-export function wrapFetch(server: Server, fetchHandler: ServerHandler) {
+export function wrapFetch(
+  server: Server,
+  fetchHandler: ServerHandler,
+): ServerHandler {
   const plugins = server.options.plugins;
 
   if (!plugins?.length) {

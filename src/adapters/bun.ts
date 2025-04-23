@@ -3,7 +3,7 @@ import type * as bun from "bun";
 import { resolvePort, resolveTLSOptions } from "../_utils.ts";
 import { wrapFetch } from "../_plugin.ts";
 
-export const Response = globalThis.Response;
+export const Response: typeof globalThis.Response = globalThis.Response;
 
 export function serve(options: ServerOptions): BunServer {
   return new BunServer(options);
@@ -59,22 +59,22 @@ class BunServer implements Server<BunFetchHandler> {
     }
   }
 
-  serve() {
+  serve(): Promise<this> {
     if (!this.bun!.server) {
       this.bun!.server = Bun.serve(this.serveOptions);
     }
     return Promise.resolve(this);
   }
 
-  get url() {
+  get url(): string | undefined {
     return this.bun?.server?.url.href;
   }
 
-  ready() {
+  ready(): Promise<this> {
     return Promise.resolve(this);
   }
 
-  close(closeAll?: boolean) {
+  close(closeAll?: boolean): Promise<void> {
     return Promise.resolve(this.bun?.server?.stop(closeAll));
   }
 }

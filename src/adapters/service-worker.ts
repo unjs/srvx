@@ -1,7 +1,7 @@
 import type { Server, ServerOptions, ServerRequest } from "../types.ts";
 import { wrapFetch } from "../_plugin.ts";
 
-export const Response = globalThis.Response;
+export const Response: typeof globalThis.Response = globalThis.Response;
 
 export type ServiceWorkerHandler = (
   request: ServerRequest,

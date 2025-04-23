@@ -10,3 +10,4 @@ dist
 *.crt
 *.key
 *.pem
+tsconfig.tsbuildinfo

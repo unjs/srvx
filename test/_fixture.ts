@@ -1,4 +1,4 @@
-import type { ServerPlugin } from "../src/types.ts";
+import type { Server, ServerPlugin } from "../src/types.ts";
 
 // prettier-ignore
 const runtime = (globalThis as any).Deno ? "deno" : (globalThis.Bun ? "bun" : "node");
@@ -6,7 +6,7 @@ const { serve } = (await import(
   `../src/adapters/${runtime}.ts`
 )) as typeof import("../src/types.ts");
 
-export const server = serve({
+export const server: Server = serve({
   hostname: "localhost",
   plugins: [false, true].map(
     (withBody) =>

@@ -114,6 +114,22 @@ export interface ServerOptions {
    * @docs https://docs.deno.com/api/deno/~/Deno.serve
    */
   deno?: Deno.ServeOptions;
+
+  /**
+   * Service worker options
+   */
+  serviceWorker?: {
+    /**
+     * The path to the service worker file to be registered.
+     */
+    url?: string;
+
+    /**
+     * The scope of the service worker.
+     *
+     */
+    scope?: string;
+  };
 }
 
 export interface Server<Handler = ServerHandler> {

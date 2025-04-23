@@ -136,7 +136,13 @@ export interface Server<Handler = ServerHandler> {
   /**
    * Current runtime name
    */
-  readonly runtime: "node" | "deno" | "bun" | "cloudflare" | "service-worker";
+  readonly runtime:
+    | "node"
+    | "deno"
+    | "bun"
+    | "cloudflare"
+    | "service-worker"
+    | "generic";
 
   /**
    * Server options

@@ -1,41 +1,21 @@
-import { describe, beforeAll } from "vitest";
+import { describe, beforeAll, afterAll } from "vitest";
 import { addTests } from "./_tests.ts";
 import { serve } from "../src/adapters/node.ts";
 
 describe("node", () => {
-  describe("async", () => {
-    let server: ReturnType<typeof serve> | undefined;
+  let server: ReturnType<typeof serve> | undefined;
 
-    beforeAll(async () => {
-      process.env.PORT = "0";
-      server = await import("./_fixture.ts").then((m) => m.server);
-      await server!.ready();
-
-      return async () => {
-        await server?.close();
-      };
-    });
-
-    addTests((path) => server!.url! + path.slice(1), {
-      runtime: "node",
-    });
+  beforeAll(async () => {
+    process.env.PORT = "0";
+    server = await import("./_fixture.ts").then((m) => m.server);
+    await server!.ready();
   });
 
-  describe("sync", () => {
-    let server: ReturnType<typeof serve> | undefined;
+  afterAll(async () => {
+    await server?.close();
+  });
 
-    beforeAll(async () => {
-      process.env.PORT = "0";
-      server = await import("./_fixture-sync.ts").then((m) => m.server);
-      await server!.ready();
-
-      return async () => {
-        await server?.close();
-      };
-    });
-
-    addTests((path) => server!.url! + path.slice(1), {
-      runtime: "node",
-    });
+  addTests((path) => server!.url! + path.slice(1), {
+    runtime: "node",
   });
 });

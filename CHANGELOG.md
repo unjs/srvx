@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.5.2
+
+[compare changes](https://github.com/h3js/srvx/compare/v0.5.1...v0.5.2)
+
+### 🚀 Enhancements
+
+- Fast `URL` for node, deno and bun ([b5f5239](https://github.com/h3js/srvx/commit/b5f5239))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](https://github.com/pi0))
+
 ## v0.5.1
 
 [compare changes](https://github.com/h3js/srvx/compare/v0.5.0...v0.5.1)

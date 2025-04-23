@@ -1,9 +1,7 @@
 import { serve } from "srvx";
 
 serve({
-  // protocol: "https",
-  tls: { cert: "server.crt", key: "server.key" },
-  port: 3000,
+  // tls: { cert: "server.crt", key: "server.key" },
   fetch(_request) {
     return new Response(
       `

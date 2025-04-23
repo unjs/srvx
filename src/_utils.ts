@@ -2,17 +2,14 @@ import type { ServerOptions } from "./types.ts";
 
 import { readFileSync } from "node:fs";
 
-export function resolvePort(
-  portOptions: string | number | undefined,
-  portEnv: string | undefined,
-): number {
-  const portInput = portOptions ?? portEnv;
-  if (portInput === undefined) {
-    return 3000;
-  }
-  return typeof portInput === "number"
-    ? portInput
-    : Number.parseInt(portInput, 10);
+export function resolvePortAndHost(opts: ServerOptions): {
+  port: number;
+  hostname: string | undefined;
+} {
+  const _port = opts.port ?? globalThis.process?.env.PORT ?? 3000;
+  const port = typeof _port === "number" ? _port : Number.parseInt(_port, 10);
+  const hostname = opts.hostname ?? globalThis.process?.env.HOST;
+  return { port, hostname };
 }
 
 export function fmtURL(

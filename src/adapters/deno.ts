@@ -2,7 +2,7 @@ import type { DenoFetchHandler, Server, ServerOptions } from "../types.ts";
 import {
   fmtURL,
   printListening,
-  resolvePort,
+  resolvePortAndHost,
   resolveTLSOptions,
 } from "../_utils.ts";
 import { wrapFetch } from "../_plugin.ts";
@@ -50,8 +50,7 @@ class DenoServer implements Server<DenoFetchHandler> {
 
     const tls = resolveTLSOptions(this.options);
     this.serveOptions = {
-      port: resolvePort(this.options.port, globalThis.Deno?.env.get("PORT")),
-      hostname: this.options.hostname,
+      ...resolvePortAndHost(this.options),
       reusePort: this.options.reusePort,
       ...(tls
         ? { key: tls.key, cert: tls.cert, passphrase: tls.passphrase }

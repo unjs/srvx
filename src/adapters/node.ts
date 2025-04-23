@@ -12,7 +12,7 @@ import { NodeRequest } from "../_node-compat/request.ts";
 import {
   fmtURL,
   printListening,
-  resolvePort,
+  resolvePortAndHost,
   resolveTLSOptions,
 } from "../_utils.ts";
 import { wrapFetch } from "../_plugin.ts";
@@ -73,9 +73,10 @@ class NodeServer implements Server {
     };
 
     const tls = resolveTLSOptions(this.options);
+    const { port, hostname: host } = resolvePortAndHost(this.options);
     this.serveOptions = {
-      port: resolvePort(this.options.port, globalThis.process?.env.PORT),
-      host: this.options.hostname,
+      port,
+      host,
       exclusive: !this.options.reusePort,
       ...(tls
         ? { cert: tls.cert, key: tls.key, passphrase: tls.passphrase }

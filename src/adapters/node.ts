@@ -14,7 +14,7 @@ import {
   resolveTLSOptions,
   printListening,
   resolvePortAndHost,
-} from "../_utils.ts";
+} from "../_utils.node.ts";
 import { wrapFetch } from "../_plugin.ts";
 import { wrapFetchOnError } from "../_error.ts";
 

@@ -1,6 +1,8 @@
-import type { ServerOptions } from "./types.ts";
+// *** This file should be only imported in the runtime adapters with Node.js compatibility. ***
 
 import { readFileSync } from "node:fs";
+
+import type { ServerOptions } from "./types.ts";
 
 export function resolvePortAndHost(opts: ServerOptions): {
   port: number;

@@ -5,7 +5,7 @@ import {
   printListening,
   resolvePortAndHost,
   resolveTLSOptions,
-} from "../_utils.ts";
+} from "../_utils.node.ts";
 import { wrapFetch } from "../_plugin.ts";
 
 export const Response: typeof globalThis.Response = globalThis.Response;

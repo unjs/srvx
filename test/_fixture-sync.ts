@@ -1,4 +1,4 @@
-import type { ServerPlugin } from "../src/types.ts";
+import type { Server, ServerPlugin } from "../src/types.ts";
 
 // prettier-ignore
 const runtime = (globalThis as any).Deno ? "deno" : (globalThis.Bun ? "bun" : "node");
@@ -6,7 +6,7 @@ const { serve } = (await import(
   `../src/adapters/${runtime}.ts`
 )) as typeof import("../src/types.ts");
 
-export const server = serve({
+export const server: Server = serve({
   hostname: "localhost",
   plugins: [false, true].map(
     (withBody) =>
@@ -43,7 +43,7 @@ export const server = serve({
       }
       case "/headers": {
         // Trigger Node.js writeHead slowpath to reproduce https://github.com/unjs/srvx/pull/40
-        req.x?.node?.res?.setHeader("x-set-with-node", "");
+        req.runtime?.node?.res?.setHeader("x-set-with-node", "");
         const resHeaders = new Headers();
         for (const [key, value] of req.headers) {
           resHeaders.append(`x-req-${key}`, value);
@@ -65,7 +65,7 @@ export const server = serve({
         return req.text().then((text) => new Response(text));
       }
       case "/ip": {
-        return new Response(`ip: ${req.x?.ip}`);
+        return new Response(`ip: ${req.ip}`);
       }
       case "/req-instanceof": {
         return new Response(req instanceof Request ? "yes" : "no");

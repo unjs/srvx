@@ -2,7 +2,7 @@ import type { DenoFetchHandler, Server, ServerOptions } from "../types.ts";
 import { fmtURL, resolvePort, resolveTLSOptions } from "../_utils.ts";
 import { wrapFetch } from "../_plugin.ts";
 
-export const Response = globalThis.Response;
+export const Response: typeof globalThis.Response = globalThis.Response;
 
 export function serve(options: ServerOptions): DenoServer {
   return new DenoServer(options);
@@ -28,12 +28,14 @@ class DenoServer implements Server<DenoFetchHandler> {
     const fetchHandler = wrapFetch(this, this.options.fetch);
 
     this.fetch = (request, info) => {
-      Object.defineProperty(request, "x", {
-        enumerable: true,
-        value: {
-          runtime: "deno",
-          deno: { info, server: this.deno?.server },
-          get ip() {
+      Object.defineProperties(request, {
+        runtime: {
+          enumerable: true,
+          value: { runtime: "deno", deno: { info, server: this.deno?.server } },
+        },
+        ip: {
+          enumerable: true,
+          get() {
             return (info?.remoteAddr as Deno.NetAddr)?.hostname;
           },
         },
@@ -61,7 +63,7 @@ class DenoServer implements Server<DenoFetchHandler> {
     }
   }
 
-  serve() {
+  serve(): Promise<this> {
     if (this.deno?.server) {
       return Promise.resolve(this.#listeningPromise).then(() => this);
     }
@@ -83,7 +85,7 @@ class DenoServer implements Server<DenoFetchHandler> {
     return Promise.resolve(this.#listeningPromise).then(() => this);
   }
 
-  get url() {
+  get url(): string | undefined {
     return this.#listeningInfo
       ? fmtURL(
           this.#listeningInfo.hostname,
@@ -97,7 +99,7 @@ class DenoServer implements Server<DenoFetchHandler> {
     return Promise.resolve(this.#listeningPromise).then(() => this);
   }
 
-  close() {
+  close(): Promise<void | undefined> {
     // TODO: closeAll is not supported
     return Promise.resolve(this.deno?.server?.shutdown());
   }

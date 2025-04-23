@@ -1,5 +1,5 @@
 import type NodeHttp from "node:http";
-import type { NodeResponse } from "./response";
+import type { NodeResponse } from "./response.ts";
 import type { Readable as NodeReadable } from "node:stream";
 import { splitSetCookieString } from "cookie-es";
 

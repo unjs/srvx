@@ -1,5 +1,5 @@
 import { describe, beforeAll } from "vitest";
-import { addTests } from "./_tests";
+import { addTests } from "./_tests.ts";
 import { serve } from "../src/adapters/node.ts";
 
 describe("node", () => {

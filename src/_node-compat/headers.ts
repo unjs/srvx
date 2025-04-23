@@ -2,7 +2,12 @@ import type NodeHttp from "node:http";
 import { splitSetCookieString } from "cookie-es";
 import { kNodeInspect } from "./_common.ts";
 
-export const NodeRequestHeaders = /* @__PURE__ */ (() => {
+export const NodeRequestHeaders: {
+  new (nodeCtx: {
+    req: NodeHttp.IncomingMessage;
+    res?: NodeHttp.ServerResponse;
+  }): globalThis.Headers;
+} = /* @__PURE__ */ (() => {
   const _Headers = class Headers implements globalThis.Headers {
     _node: { req: NodeHttp.IncomingMessage; res?: NodeHttp.ServerResponse };
 
@@ -137,7 +142,12 @@ export const NodeRequestHeaders = /* @__PURE__ */ (() => {
   return _Headers;
 })();
 
-export const NodeResponseHeaders = /* @__PURE__ */ (() => {
+export const NodeResponseHeaders: {
+  new (nodeCtx: {
+    req?: NodeHttp.IncomingMessage;
+    res: NodeHttp.ServerResponse;
+  }): globalThis.Headers;
+} = /* @__PURE__ */ (() => {
   const _Headers = class Headers implements globalThis.Headers {
     _node: { req?: NodeHttp.IncomingMessage; res: NodeHttp.ServerResponse };
 

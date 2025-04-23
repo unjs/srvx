@@ -7,7 +7,7 @@ import type * as CF from "@cloudflare/workers-types";
 import { wrapFetch } from "../_plugin.ts";
 import { wrapFetchOnError } from "../_utils.ts";
 
-export const Response = globalThis.Response;
+export const Response: typeof globalThis.Response = globalThis.Response;
 
 export function serve(
   options: ServerOptions,
@@ -29,12 +29,18 @@ class CloudflareServer implements Server<CloudflareFetchHandler> {
     fetchHandler = wrapFetch(this as unknown as Server, fetchHandler);
 
     this.fetch = (request, env, context) => {
-      Object.defineProperty(request, "x", {
-        enumerable: true,
-        value: {
-          runtime: "cloudflare",
-          cloudflare: { env, context },
+      Object.defineProperties(request, {
+        runtime: {
+          enumerable: true,
+          value: { runtime: "cloudflare", cloudflare: { env, context } },
         },
+        // TODO
+        // ip: {
+        //   enumerable: true,
+        //   get() {
+        //     return;
+        //   },
+        // },
       });
       return fetchHandler(request as unknown as Request) as unknown as
         | CF.Response

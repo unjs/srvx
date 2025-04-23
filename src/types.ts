@@ -127,7 +127,7 @@ export interface Server<Handler = ServerHandler> {
   /**
    * Current runtime name
    */
-  readonly runtime: "node" | "deno" | "bun" | "cloudflare";
+  readonly runtime: "node" | "deno" | "bun" | "cloudflare" | "service-worker";
 
   /**
    * Server options
@@ -214,12 +214,7 @@ export interface ServerPluginInstance {
 // ----------------------------------------------------------------------------
 
 export interface ServerRuntimeContext {
-  runtime: "node" | "deno" | "bun" | "cloudflare" | (string & {});
-
-  /**
-   * IP address of the client.
-   */
-  ip?: string | undefined;
+  name: "node" | "deno" | "bun" | "cloudflare" | (string & {});
 
   /**
    * Underlying Node.js server request info.
@@ -256,7 +251,12 @@ export interface ServerRequest extends Request {
   /**
    * Runtime specific request context.
    */
-  x?: ServerRuntimeContext;
+  runtime?: ServerRuntimeContext;
+
+  /**
+   * IP address of the client.
+   */
+  ip?: string | undefined;
 }
 
 // ----------------------------------------------------------------------------

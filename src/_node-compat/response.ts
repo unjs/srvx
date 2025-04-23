@@ -9,7 +9,27 @@ export type NodeResponse = InstanceType<typeof NodeResponse>;
  *
  * It is faster because in most cases it doesn't create a full Response instance.
  */
-export const NodeResponse = /* @__PURE__ */ (() => {
+export const NodeResponse: {
+  new (
+    body?: BodyInit | null,
+    init?: ResponseInit,
+  ): globalThis.Response & {
+    readonly nodeResponse: () => {
+      status: number;
+      statusText: string;
+      headers: NodeHttp.OutgoingHttpHeader[];
+      body:
+        | string
+        | Buffer
+        | Uint8Array
+        | DataView
+        | ReadableStream<Uint8Array>
+        | NodeReadable
+        | undefined
+        | null;
+    };
+  };
+} = /* @__PURE__ */ (() => {
   const CONTENT_TYPE = "content-type";
   const JSON_TYPE = "application/json";
   const JSON_HEADER = [[CONTENT_TYPE, JSON_TYPE]] as HeadersInit;

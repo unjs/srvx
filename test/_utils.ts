@@ -1,15 +1,15 @@
 import { afterAll, beforeAll } from "vitest";
-import { execa, ResultPromise as ExecaRes } from "execa";
+import { execa, type ResultPromise as ExecaRes } from "execa";
 import { fileURLToPath } from "node:url";
 import { getRandomPort, waitForPort } from "get-port-please";
-import { addTests } from "./_tests";
+import { addTests } from "./_tests.ts";
 
 const testDir = fileURLToPath(new URL(".", import.meta.url));
 
 export function testsExec(
   cmd: string,
   opts: { runtime?: string; silent?: boolean },
-) {
+): void {
   let childProc: ExecaRes;
   let baseURL: string;
 

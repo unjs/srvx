@@ -3,14 +3,14 @@
 name: srvx
 shortDescription: Universal Server API
 description: Based on web platform standards and works seamlessly with Deno, Bun and Node.js.
-github: unjs/srvx
+github: h3js/srvx
 themeColor: red
 landing:
   heroLinks:
     playOnline:
       label: Play Online
       icon: i-heroicons-play
-      to: https://stackblitz.com/github/unjs/srvx/tree/main/playground?file=app.mjs
+      to: https://stackblitz.com/github/h3js/srvx/tree/main/playground?file=app.mjs
   heroCode:
     lang: js
     title: "server.mjs"

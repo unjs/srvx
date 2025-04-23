@@ -1,4 +1,4 @@
-import type { ErrorHandler, ServerHandler, ServerOptions } from "./types";
+import type { ErrorHandler, ServerHandler, ServerOptions } from "./types.ts";
 
 import { readFileSync } from "node:fs";
 
@@ -19,7 +19,7 @@ export function fmtURL(
   host: string | undefined,
   port: number | undefined,
   secure: boolean,
-) {
+): string | undefined {
   if (!host || !port) {
     return undefined;
   }
@@ -29,7 +29,13 @@ export function fmtURL(
   return `http${secure ? "s" : ""}://${host}:${port}/`;
 }
 
-export function resolveTLSOptions(opts: ServerOptions) {
+export function resolveTLSOptions(opts: ServerOptions):
+  | {
+      cert: string;
+      key: string;
+      passphrase: any;
+    }
+  | undefined {
   if (!opts.tls || opts.protocol === "http") {
     return;
   }

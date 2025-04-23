@@ -1,13 +1,10 @@
-import { serve } from "srvx";
+import { serve } from "../node_modules/srvx/dist/adapters/service-worker.mjs";
 
 const server = serve({
-  // protocol: "https",
-  tls: { cert: "server.crt", key: "server.key" },
-  port: 3000,
   fetch(_request) {
     return new Response(
       `
-        <h1>👋 Hello there</h1>
+        <h1>👋 Hello there!</h1>
         Learn more: <a href="https://srvx.h3.dev/" target="_blank">srvx.h3.dev</a>
       `,
       {
@@ -19,4 +16,4 @@ const server = serve({
   },
 });
 
-server.ready().then(() => console.log(`🚀 Server ready at ${server.url}`));
+server.ready().then(() => console.log(`🚀 Server ready!`));

@@ -1,5 +1,5 @@
 import { describe } from "vitest";
-import { testsExec } from "./_utils";
+import { testsExec } from "./_utils.ts";
 
 describe("bun", () => {
   describe("async", () => {

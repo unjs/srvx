@@ -8,7 +8,7 @@ const server = serve({
     return new Response(
       `
         <h1>👋 Hello there</h1>
-        Learn more: <a href="https://srvx.unjs.io/" target="_blank">srvx.unjs.io</a>
+        Learn more: <a href="https://srvx.h3.dev/" target="_blank">srvx.h3.dev</a>
       `,
       {
         headers: {

@@ -9,9 +9,9 @@
 
 Universal Server API based on web platform standards. Works with [Deno](https://deno.com/), [Bun](https://bun.sh/) and [Node.js](https://nodejs.org/en).
 
-- ✅ Seamless runtime integration with identical usage ([handler](https://srvx.unjs.io/guide/handler) and [instance](https://srvx.unjs.io/guide/server))
+- ✅ Seamless runtime integration with identical usage ([handler](https://srvx.h3.dev/guide/handler) and [instance](https://srvx.h3.dev/guide/server))
 - ✅ Zero overhead [Deno](https://deno.com/) and [Bun](https://bun.sh/) support
-- ✅ [Node.js compatibility](https://srvx.unjs.io/guide/node) with ~native perf and [fast response](https://srvx.unjs.io/guide/node#fast-response) support
+- ✅ [Node.js compatibility](https://srvx.h3.dev/guide/node) with ~native perf and [fast response](https://srvx.h3.dev/guide/node#fast-response) support
 
 ## Quick start
 
@@ -30,7 +30,7 @@ await server.ready();
 console.log(`🚀 Server ready at ${server.url}`);
 ```
 
-👉 **Visit the 📖 [Documentation](https://srvx.unjs.io/) to learn more.**
+👉 **Visit the 📖 [Documentation](https://srvx.h3.dev/) to learn more.**
 
 ## Development
 
@@ -50,11 +50,11 @@ console.log(`🚀 Server ready at ${server.url}`);
 
 <!-- automd:contributors author=pi0 license=MIT -->
 
-Published under the [MIT](https://github.com/unjs/srvx/blob/main/LICENSE) license.
-Made by [@pi0](https://github.com/pi0) and [community](https://github.com/unjs/srvx/graphs/contributors) 💛
+Published under the [MIT](https://github.com/h3dev/srvx/blob/main/LICENSE) license.
+Made by [@pi0](https://github.com/pi0) and [community](https://github.com/h3dev/srvx/graphs/contributors) 💛
 <br><br>
-<a href="https://github.com/unjs/srvx/graphs/contributors">
-<img src="https://contrib.rocks/image?repo=unjs/srvx" />
+<a href="https://github.com/h3dev/srvx/graphs/contributors">
+<img src="https://contrib.rocks/image?repo=h3dev/srvx" />
 </a>
 
 <!-- /automd -->

@@ -39,7 +39,7 @@ export const server: Server = serve({
         return new Response("ok");
       }
       case "/headers": {
-        // Trigger Node.js writeHead slowpath to reproduce https://github.com/unjs/srvx/pull/40
+        // Trigger Node.js writeHead slowpath to reproduce https://github.com/h3js/srvx/pull/40
         req.runtime?.node?.res?.setHeader("x-set-with-node", "");
         const resHeaders = new Headers();
         for (const [key, value] of req.headers) {

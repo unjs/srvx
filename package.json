@@ -13,6 +13,7 @@
     "./bun": "./dist/adapters/bun.mjs",
     "./node": "./dist/adapters/node.mjs",
     "./cloudflare": "./dist/adapters/cloudflare.mjs",
+    "./generic": "./dist/adapters/generic.mjs",
     "./service-worker": "./dist/adapters/service-worker.mjs",
     ".": {
       "types": "./dist/types.d.mts",
@@ -20,7 +21,8 @@
       "bun": "./dist/adapters/bun.mjs",
       "workerd": "./dist/adapters/cloudflare.mjs",
       "browser": "./dist/adapters/service-worker.mjs",
-      "node": "./dist/adapters/node.mjs"
+      "node": "./dist/adapters/node.mjs",
+      "default": "./dist/adapters/generic.mjs"
     }
   },
   "types": "./dist/types.d.mts",

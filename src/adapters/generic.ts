@@ -23,10 +23,6 @@ class GenericServer implements Server {
     this.fetch = (request: Request) => {
       return Promise.resolve(fetchHandler(request));
     };
-
-    if (!options.manual) {
-      this.serve();
-    }
   }
 
   serve(): void {}

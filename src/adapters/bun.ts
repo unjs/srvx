@@ -8,6 +8,8 @@ import {
 } from "../_utils.node.ts";
 import { wrapFetch } from "../_plugin.ts";
 
+export { FastURL as URL } from "../_url.ts";
+
 export const Response: typeof globalThis.Response = globalThis.Response;
 
 export function serve(options: ServerOptions): BunServer {

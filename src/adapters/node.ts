@@ -18,6 +18,8 @@ import {
 import { wrapFetch } from "../_plugin.ts";
 import { wrapFetchOnError } from "../_error.ts";
 
+export { FastURL as URL } from "../_url.ts";
+
 export {
   NodeRequest as Request,
   NodeResponse as Response,

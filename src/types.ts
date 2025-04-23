@@ -12,6 +12,8 @@ type MaybePromise<T> = T | Promise<T>;
 
 export declare const Response: typeof globalThis.Response;
 
+export declare const URL: typeof globalThis.URL;
+
 /**
  * Create a new server instance.
  */

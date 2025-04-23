@@ -2,6 +2,8 @@ import type { Server, ServerHandler, ServerOptions } from "../types.ts";
 import { wrapFetch } from "../_plugin.ts";
 import { wrapFetchOnError } from "../_error.ts";
 
+export const URL: typeof globalThis.URL = globalThis.URL;
+
 export const Response: typeof globalThis.Response = globalThis.Response;
 
 export function serve(options: ServerOptions): Server {

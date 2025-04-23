@@ -7,6 +7,8 @@ import type * as CF from "@cloudflare/workers-types";
 import { wrapFetch } from "../_plugin.ts";
 import { wrapFetchOnError } from "../_error.ts";
 
+export const URL: typeof globalThis.URL = globalThis.URL;
+
 export const Response: typeof globalThis.Response = globalThis.Response;
 
 export function serve(

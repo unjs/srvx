@@ -1,7 +1,7 @@
 import type { ServerPlugin } from "./types.ts";
 
 export const errorPlugin: ServerPlugin = (server) => {
-  const errorHandler = server.options.onError;
+  const errorHandler = server.options.error;
   if (!errorHandler) {
     return {};
   }

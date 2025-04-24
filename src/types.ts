@@ -34,9 +34,16 @@ export interface ServerOptions {
   fetch: ServerHandler;
 
   /**
-   * Handle websocket upgrades
+   * Handle websocket upgrades.
    */
   upgrade?: ServerHandler;
+
+  /**
+   * Handle lifecycle errors.
+   *
+   * @note This handler will set built-in Bun and Deno error handler.
+   */
+  error?: ErrorHandler;
 
   /**
    * Server plugins.
@@ -106,13 +113,6 @@ export interface ServerOptions {
      */
     passphrase?: string;
   };
-
-  /**
-   * Runtime agnostic error handler (optional).
-   *
-   * @note This handler will take precedence over runtime specific error handlers.
-   */
-  onError?: ErrorHandler;
 
   /**
    * Node.js server options.

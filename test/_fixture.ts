@@ -29,8 +29,8 @@ export const server: Server = serve({
     },
   ],
 
-  async onError(err) {
-    return new Response(`onError: ${(err as Error).message}`, { status: 500 });
+  async error(err) {
+    return new Response(`error: ${(err as Error).message}`, { status: 500 });
   },
   async fetch(req) {
     const Response =

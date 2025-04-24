@@ -15,7 +15,7 @@ serve({
       },
     );
   },
-  onError(error) {
+  error(error) {
     return new Response(
       /*html */ `<body style="background-color:blue;color:white;padding:2em;"><pre>${error.stack || error}</pre></body>`,
       {

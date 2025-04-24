@@ -7,7 +7,10 @@ import type {
 } from "../types.ts";
 import NodeHttp from "node:http";
 import NodeHttps from "node:https";
-import { sendNodeResponse } from "../_node-compat/send.ts";
+import {
+  sendNodeResponse,
+  sendNodeUpgradeResponse,
+} from "../_node-compat/send.ts";
 import { NodeRequest } from "../_node-compat/request.ts";
 import {
   fmtURL,
@@ -17,6 +20,7 @@ import {
 } from "../_utils.node.ts";
 import { wrapFetch } from "../_plugin.ts";
 import { errorPlugin } from "../_error.ts";
+import { wsUpgradePlugin } from "../_ws.ts";
 
 export { FastURL as URL } from "../_url.ts";
 
@@ -61,7 +65,10 @@ class NodeServer implements Server {
   constructor(options: ServerOptions) {
     this.options = options;
 
-    const fetchHandler = (this.fetch = wrapFetch(this, [errorPlugin]));
+    const fetchHandler = (this.fetch = wrapFetch(this, [
+      errorPlugin,
+      wsUpgradePlugin,
+    ]));
 
     const handler = (
       nodeReq: NodeHttp.IncomingMessage,
@@ -93,6 +100,22 @@ class NodeServer implements Server {
           handler,
         )
       : NodeHttp.createServer(this.serveOptions, handler);
+
+    // Listen to upgrade events if there is a hook
+    if (this.options.upgrade) {
+      server.on("upgrade", (nodeReq, socket, header) => {
+        const request = new NodeRequest({
+          req: nodeReq,
+          upgrade: { socket, header },
+        });
+        const res = fetchHandler(request);
+        return res instanceof Promise
+          ? res.then((resolvedRes) =>
+              sendNodeUpgradeResponse(socket, resolvedRes),
+            )
+          : sendNodeUpgradeResponse(socket, res);
+      });
+    }
 
     this.node = { server, handler };
 

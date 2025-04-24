@@ -34,6 +34,11 @@ export interface ServerOptions {
   fetch: ServerHandler;
 
   /**
+   * Handle websocket upgrades
+   */
+  upgrade?: ServerHandler;
+
+  /**
    * Server plugins.
    */
   plugins?: (ServerPlugin | ServerPluginInstance)[];

@@ -78,10 +78,23 @@ export const NodeResponse: {
 
       const headersInit = this.#init?.headers;
       if (headersInit) {
-        const headerEntries = headersInit.entries
-          ? (headersInit as Headers).entries()
-          : Object.entries(headersInit);
+        const headerEntries = Array.isArray(headersInit)
+          ? headersInit
+          : headersInit.entries
+            ? (headersInit as Headers).entries()
+            : Object.entries(headersInit);
         for (const [key, value] of headerEntries) {
+          if (key === "set-cookie") {
+            for (const setCookie of splitSetCookieString(value)) {
+              headers.push(["set-cookie", setCookie]);
+            }
+          } else {
+            headers.push([key, value]);
+          }
+        }
+      }
+      if (this.#headersObj) {
+        for (const [key, value] of this.#headersObj) {
           if (key === "set-cookie") {
             for (const setCookie of splitSetCookieString(value)) {
               headers.push(["set-cookie", setCookie]);

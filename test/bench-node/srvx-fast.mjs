@@ -1,8 +1,9 @@
-import { serve, Response } from "srvx";
+import { serve, FastResponse } from "srvx";
 
 serve({
   port: 3000,
+  silent: true,
   fetch() {
-    return new Response("Hello!");
+    return new FastResponse("Hello!");
   },
 });

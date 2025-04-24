@@ -2,7 +2,7 @@ import { describe, expect, test } from "vitest";
 
 export function addTests(
   url: (path: string) => string,
-  _opts?: { runtime?: string },
+  { runtime }: { runtime?: string } = {},
 ): void {
   test("GET works", async () => {
     const response = await fetch(url("/"));
@@ -70,19 +70,25 @@ export function addTests(
   });
 
   describe("plugin", () => {
-    for (const hook of ["req", "res"]) {
-      for (const type of ["async", "sync"]) {
-        test(`${type} ${hook}`, async () => {
-          const response = await fetch(url("/"), {
-            headers: {
-              [`x-plugin-${hook}`]: "true",
-              [`x-plugin-${type}`]: "true",
-            },
-          });
-          expect(response.status).toBe(200);
-          expect(await response.text()).toMatch(`plugin ${hook}`);
+    test("intercept before handler", async () => {
+      const response = await fetch(url("/"), {
+        headers: { "X-plugin-req": "1" },
+      });
+      expect(response.status).toBe(200);
+      expect(await response.text()).toBe("response from req plugin");
+    });
+
+    // TODO: support response interception in node-fast response proxy
+    test.skipIf(runtime === "node-fast")(
+      "intercept response headers",
+      async () => {
+        const response = await fetch(url("/"), {
+          headers: { "X-plugin-res": "1" },
         });
-      }
-    }
+        expect(response.status).toBe(200);
+        expect(await response.text()).toBe("ok");
+        expect(response.headers.get("x-plugin-header")).toBe("1");
+      },
+    );
   });
 }

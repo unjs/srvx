@@ -32,7 +32,7 @@ class DenoServer implements Server<DenoFetchHandler> {
   constructor(options: ServerOptions) {
     this.options = options;
 
-    const fetchHandler = wrapFetch(this, this.options.fetch);
+    const fetchHandler = wrapFetch(this);
 
     this.fetch = (request, info) => {
       Object.defineProperties(request, {

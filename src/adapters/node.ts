@@ -20,7 +20,6 @@ import {
 } from "../_utils.node.ts";
 import { wrapFetch } from "../_plugin.ts";
 import { errorPlugin } from "../_error.ts";
-import { wsUpgradePlugin } from "../_ws.ts";
 
 export { FastURL as URL } from "../_url.ts";
 
@@ -65,10 +64,7 @@ class NodeServer implements Server {
   constructor(options: ServerOptions) {
     this.options = options;
 
-    const fetchHandler = (this.fetch = wrapFetch(this, [
-      errorPlugin,
-      wsUpgradePlugin,
-    ]));
+    const fetchHandler = (this.fetch = wrapFetch(this, [errorPlugin]));
 
     const handler = (
       nodeReq: NodeHttp.IncomingMessage,

@@ -8,9 +8,8 @@ import {
 import { wrapFetch } from "../_plugin.ts";
 import { wsUpgradePlugin } from "../_ws.ts";
 
-export { FastURL as URL } from "../_url.ts";
-
-export const Response: typeof globalThis.Response = globalThis.Response;
+export { FastURL } from "../_url.ts";
+export const FastResponse: typeof globalThis.Response = Response;
 
 export function serve(options: ServerOptions): DenoServer {
   return new DenoServer(options);

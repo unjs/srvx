@@ -2,9 +2,8 @@ import type { Server, ServerHandler, ServerOptions } from "../types.ts";
 import { wrapFetch } from "../_plugin.ts";
 import { errorPlugin } from "../_error.ts";
 
-export const URL: typeof globalThis.URL = globalThis.URL;
-
-export const Response: typeof globalThis.Response = globalThis.Response;
+export const FastURL: typeof globalThis.URL = URL;
+export const FastResponse: typeof globalThis.Response = Response;
 
 export function serve(options: ServerOptions): Server {
   return new GenericServer(options);

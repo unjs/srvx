@@ -10,9 +10,15 @@ type MaybePromise<T> = T | Promise<T>;
 // srvx API
 // ----------------------------------------------------------------------------
 
-export declare const Response: typeof globalThis.Response;
+/**
+ * Faster URL constructor with lazy access to pathname and search params (For Node, Deno, and Bun).
+ */
+export declare const FastURL: typeof globalThis.URL;
 
-export declare const URL: typeof globalThis.URL;
+/**
+ * Faster Response constructor optimized for Node.js (same as Response for other runtimes).
+ */
+export declare const FastResponse: typeof globalThis.Response;
 
 /**
  * Create a new server instance.

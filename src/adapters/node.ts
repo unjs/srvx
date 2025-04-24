@@ -21,11 +21,10 @@ import {
 import { wrapFetch } from "../_plugin.ts";
 import { errorPlugin } from "../_error.ts";
 
-export { FastURL as URL } from "../_url.ts";
+export { FastURL } from "../_url.ts";
 
 export {
-  NodeRequest as Request,
-  NodeResponse as Response,
+  NodeResponse as FastResponse,
   NodeRequest,
   NodeResponse,
   NodeRequestHeaders,

@@ -78,7 +78,6 @@ export function addTests(
       expect(await response.text()).toBe("response from req plugin");
     });
 
-    // TODO: support response interception in node-fast response proxy
     test("intercept response headers", async () => {
       const response = await fetch(url("/"), {
         headers: { "X-plugin-res": "1" },

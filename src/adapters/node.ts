@@ -7,7 +7,10 @@ import type {
 } from "../types.ts";
 import NodeHttp from "node:http";
 import NodeHttps from "node:https";
-import { sendNodeResponse } from "../_node-compat/send.ts";
+import {
+  sendNodeResponse,
+  sendNodeUpgradeResponse,
+} from "../_node-compat/send.ts";
 import { NodeRequest } from "../_node-compat/request.ts";
 import {
   fmtURL,
@@ -93,6 +96,23 @@ class NodeServer implements Server {
           handler,
         )
       : NodeHttp.createServer(this.serveOptions, handler);
+
+    // Listen to upgrade events if there is a hook
+    const upgradeHandler = this.options.upgrade;
+    if (upgradeHandler) {
+      server.on("upgrade", (nodeReq, socket, header) => {
+        const request = new NodeRequest({
+          req: nodeReq,
+          upgrade: { socket, header },
+        });
+        const res = upgradeHandler(request);
+        return res instanceof Promise
+          ? res.then((resolvedRes) =>
+              sendNodeUpgradeResponse(socket, resolvedRes),
+            )
+          : sendNodeUpgradeResponse(socket, res);
+      });
+    }
 
     this.node = { server, handler };
 

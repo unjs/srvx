@@ -1,8 +1,18 @@
 import type NodeHttp from "node:http";
+import type NodeStream from "node:stream";
 import type { ServerRequest, ServerRuntimeContext } from "../types.ts";
 import { kNodeInspect } from "./_common.ts";
 import { NodeRequestHeaders } from "./headers.ts";
 import { NodeRequestURL } from "./url.ts";
+
+export type NodeRequestContext = {
+  req: NodeHttp.IncomingMessage;
+  res?: NodeHttp.ServerResponse;
+  upgrade?: {
+    socket: NodeStream.Duplex;
+    header: Buffer;
+  };
+};
 
 export const NodeRequest = /* @__PURE__ */ (() => {
   const _Request = class Request {
@@ -21,10 +31,7 @@ export const NodeRequest = /* @__PURE__ */ (() => {
     _node: { req: NodeHttp.IncomingMessage; res?: NodeHttp.ServerResponse };
     runtime: ServerRuntimeContext;
 
-    constructor(nodeCtx: {
-      req: NodeHttp.IncomingMessage;
-      res?: NodeHttp.ServerResponse;
-    }) {
+    constructor(nodeCtx: NodeRequestContext) {
       this._node = nodeCtx;
       this.runtime = {
         name: "node",
@@ -210,10 +217,7 @@ export const NodeRequest = /* @__PURE__ */ (() => {
 
   return _Request;
 })() as unknown as {
-  new (nodeCtx: {
-    req: NodeHttp.IncomingMessage;
-    res: NodeHttp.ServerResponse;
-  }): ServerRequest;
+  new (nodeCtx: NodeRequestContext): ServerRequest;
 };
 
 async function _readStream(stream: ReadableStream) {

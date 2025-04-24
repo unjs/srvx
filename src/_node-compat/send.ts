@@ -1,6 +1,6 @@
 import type NodeHttp from "node:http";
 import type { NodeResponse } from "./response.ts";
-import type { Readable as NodeReadable } from "node:stream";
+import type { Duplex, Readable as NodeReadable } from "node:stream";
 import { splitSetCookieString } from "cookie-es";
 
 export async function sendNodeResponse(
@@ -52,6 +52,28 @@ export async function sendNodeResponse(
   return webRes.body
     ? streamBody(webRes.body, nodeRes)
     : endNodeResponse(nodeRes);
+}
+
+export async function sendNodeUpgradeResponse(
+  socket: Duplex,
+  res: Response,
+): Promise<void> {
+  const head = [
+    `HTTP/1.1 ${res.status || 200} ${res.statusText || ""}`,
+    ...[...res.headers.entries()].map(
+      ([key, value]) =>
+        `${encodeURIComponent(key)}: ${encodeURIComponent(value)}`,
+    ),
+  ];
+  socket.write(head.join("\r\n") + "\r\n\r\n");
+  if (res.body) {
+    for await (const chunk of res.body) {
+      socket.write(chunk);
+    }
+  }
+  return new Promise<void>((resolve) => {
+    socket.end(resolve);
+  });
 }
 
 function endNodeResponse(nodeRes: NodeHttp.ServerResponse) {

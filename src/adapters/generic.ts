@@ -1,6 +1,6 @@
 import type { Server, ServerHandler, ServerOptions } from "../types.ts";
 import { wrapFetch } from "../_plugin.ts";
-import { wrapFetchOnError } from "../_error.ts";
+import { errorPlugin } from "../_error.ts";
 
 export const URL: typeof globalThis.URL = globalThis.URL;
 
@@ -18,10 +18,7 @@ class GenericServer implements Server {
   constructor(options: ServerOptions) {
     this.options = options;
 
-    const fetchHandler = wrapFetch(
-      this as unknown as Server,
-      wrapFetchOnError(this.options.fetch, this.options.onError),
-    );
+    const fetchHandler = wrapFetch(this as unknown as Server, [errorPlugin]);
 
     this.fetch = (request: Request) => {
       return Promise.resolve(fetchHandler(request));

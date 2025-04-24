@@ -216,26 +216,14 @@ export interface Server<Handler = ServerHandler> {
 
 export type ServerPlugin = (server: Server) => ServerPluginInstance;
 
+export type ServerMiddleware = (
+  request: ServerRequest,
+  next: () => Response | Promise<Response>,
+) => Response | Promise<Response>;
+
 export interface ServerPluginInstance {
-  /**
-   * Plugin display name
-   */
   name?: string;
-
-  /**
-   * Hook to allow running logic before user fetch handler
-   * If an response value is returned, user fetch handler and the next plugins will be skipped.
-   */
-  request?: (request: ServerRequest) => MaybePromise<Response | void>;
-
-  /**
-   * Hook to allow running logic after user fetch handler
-   * If a response value is returned, user response and the next plugins will be skipped.
-   */
-  response?: (
-    request: ServerRequest,
-    response: Response,
-  ) => MaybePromise<void | Response>;
+  fetch?: ServerMiddleware;
 }
 
 // ----------------------------------------------------------------------------

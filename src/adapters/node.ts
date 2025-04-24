@@ -16,7 +16,7 @@ import {
   resolvePortAndHost,
 } from "../_utils.node.ts";
 import { wrapFetch } from "../_plugin.ts";
-import { wrapFetchOnError } from "../_error.ts";
+import { errorPlugin } from "../_error.ts";
 
 export { FastURL as URL } from "../_url.ts";
 
@@ -61,12 +61,7 @@ class NodeServer implements Server {
   constructor(options: ServerOptions) {
     this.options = options;
 
-    const fetchHandler = wrapFetch(
-      this,
-      wrapFetchOnError(this.options.fetch, this.options.onError),
-    );
-
-    this.fetch = fetchHandler;
+    const fetchHandler = (this.fetch = wrapFetch(this, [errorPlugin]));
 
     const handler = (
       nodeReq: NodeHttp.IncomingMessage,

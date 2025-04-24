@@ -1,4 +1,4 @@
-import type { Server, ServerPlugin } from "../src/types.ts";
+import type { Server } from "../src/types.ts";
 
 // prettier-ignore
 const runtime = (globalThis as any).Deno ? "deno" : (globalThis.Bun ? "bun" : "node");
@@ -8,27 +8,27 @@ const { serve } = (await import(
 
 export const server: Server = serve({
   hostname: "localhost",
-  plugins: [false, true].map(
-    (withBody) =>
-      (() => ({
-        request: (req) => {
-          if (req.headers.has("X-plugin-req")) {
-            const res = withBody ? new Response("plugin req") : undefined;
-            return req.headers.has("x-plugin-async")
-              ? Promise.resolve(res)
-              : res;
-          }
-        },
-        response: (req) => {
-          if (req.headers.has("X-plugin-res")) {
-            const res = withBody ? new Response("plugin res") : undefined;
-            return req.headers.has("x-plugin-async")
-              ? Promise.resolve(res)
-              : res;
-          }
-        },
-      })) satisfies ServerPlugin,
-  ),
+  plugins: [
+    {
+      fetch(req, next) {
+        if (req.headers.has("X-plugin-req")) {
+          return new Response("response from req plugin");
+        }
+        return next();
+      },
+    },
+    {
+      async fetch(req, next) {
+        if (!req.headers.has("X-plugin-res")) {
+          return next();
+        }
+        const res = await next();
+        res.headers.set("x-plugin-header", "1");
+        return res;
+      },
+    },
+  ],
+
   async onError(err) {
     return new Response(`onError: ${(err as Error).message}`, { status: 500 });
   },

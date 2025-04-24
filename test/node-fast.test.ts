@@ -19,6 +19,6 @@ describe("node (fast-res)", () => {
   });
 
   addTests((path) => server!.url! + path.slice(1), {
-    runtime: "node",
+    runtime: "node-fast",
   });
 });

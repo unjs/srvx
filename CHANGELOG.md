@@ -1,5 +1,37 @@
 # Changelog
 
+## v0.6.0
+
+[compare changes](https://github.com/h3js/srvx/compare/v0.5.2...v0.6.0)
+
+### 🚀 Enhancements
+
+- ⚠️  Fetch middleware via plugins ([#62](https://github.com/h3js/srvx/pull/62))
+- Support `upgrade` hook (experimental) ([#63](https://github.com/h3js/srvx/pull/63))
+
+### 🩹 Fixes
+
+- **node:** Handle additional response headers ([#64](https://github.com/h3js/srvx/pull/64))
+
+### 💅 Refactors
+
+- ⚠️  Rename `onError` hook to `error` for consistency ([471fe57](https://github.com/h3js/srvx/commit/471fe57))
+- ⚠️  Rename to `FastURL` and `FastResponse` exports ([0fe9ed4](https://github.com/h3js/srvx/commit/0fe9ed4))
+
+### 🏡 Chore
+
+- Update bench script ([c0826c1](https://github.com/h3js/srvx/commit/c0826c1))
+
+#### ⚠️ Breaking Changes
+
+- ⚠️  Fetch middleware via plugins ([#62](https://github.com/h3js/srvx/pull/62))
+- ⚠️  Rename `onError` hook to `error` for consistency ([471fe57](https://github.com/h3js/srvx/commit/471fe57))
+- ⚠️  Rename to `FastURL` and `FastResponse` exports ([0fe9ed4](https://github.com/h3js/srvx/commit/0fe9ed4))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](https://github.com/pi0))
+
 ## v0.5.2
 
 [compare changes](https://github.com/h3js/srvx/compare/v0.5.1...v0.5.2)

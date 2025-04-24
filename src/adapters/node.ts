@@ -98,13 +98,14 @@ class NodeServer implements Server {
       : NodeHttp.createServer(this.serveOptions, handler);
 
     // Listen to upgrade events if there is a hook
-    if (this.options.upgrade) {
+    const upgradeHandler = this.options.upgrade;
+    if (upgradeHandler) {
       server.on("upgrade", (nodeReq, socket, header) => {
         const request = new NodeRequest({
           req: nodeReq,
           upgrade: { socket, header },
         });
-        const res = fetchHandler(request);
+        const res = upgradeHandler(request);
         return res instanceof Promise
           ? res.then((resolvedRes) =>
               sendNodeUpgradeResponse(socket, resolvedRes),

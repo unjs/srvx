@@ -10,16 +10,6 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
 const tls = await getTLSCert();
 
-// https://undici.nodejs.org/#/docs/api/Client.md?id=parameter-clientoptions
-// https://github.com/nodejs/undici/issues/2750#issuecomment-1941009554
-const h2Agent = new Agent({ allowH2: true, connect: { ...tls } });
-
-const fetchWithHttp2 = ((input: any, init?: any) =>
-  fetch(input, {
-    ...init,
-    dispatcher: h2Agent,
-  })) as unknown as typeof globalThis.fetch;
-
 const testConfigs = [
   {
     name: "http1",
@@ -30,21 +20,41 @@ const testConfigs = [
     Response: FastResponse,
   },
   {
+    name: "http2 - allowHTTP1",
+    Response: globalThis.Response,
+    useHttp2Agent: true,
+    serveOptions: { tls, node: { http2: true, allowHTTP1: true } },
+  },
+  {
+    name: "http2, FastResponse - allowHTTP1",
+    Response: FastResponse,
+    useHttp2Agent: true,
+    serveOptions: { tls, node: { http2: true, allowHTTP1: true } },
+  },
+  {
     name: "http2",
     Response: globalThis.Response,
-    fetch: fetchWithHttp2,
+    useHttp2Agent: true,
     serveOptions: { tls, node: { http2: true, allowHTTP1: false } },
   },
   {
     name: "http2, FastResponse",
     Response: FastResponse,
-    fetch: fetchWithHttp2,
+    useHttp2Agent: true,
     serveOptions: { tls, node: { http2: true, allowHTTP1: false } },
   },
 ];
 
 for (const config of testConfigs) {
   describe.sequential(`node (${config.name})`, () => {
+    // https://undici.nodejs.org/#/docs/api/Client.md?id=parameter-clientoptions
+    // https://github.com/nodejs/undici/issues/2750#issuecomment-1941009554
+    const h2Agent = new Agent({ allowH2: true, connect: { ...tls } });
+    const fetchWithHttp2 = ((input: any, init?: any) =>
+      fetch(input, {
+        ...init,
+        dispatcher: h2Agent,
+      })) as unknown as typeof globalThis.fetch;
     let server: ReturnType<typeof serve> | undefined;
 
     beforeAll(async () => {
@@ -58,13 +68,14 @@ for (const config of testConfigs) {
     });
 
     afterAll(async () => {
-      await server?.close();
+      await h2Agent.close();
+      await server!.close();
     });
 
     addTests({
       url: (path) => server!.url! + path.slice(1),
       runtime: "node",
-      fetch: config.fetch,
+      fetch: config.useHttp2Agent ? fetchWithHttp2 : undefined,
     });
   });
 }

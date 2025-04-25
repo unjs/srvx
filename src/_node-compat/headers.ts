@@ -105,7 +105,12 @@ export const NodeRequestHeaders: {
     }
 
     *entries(): HeadersIterator<[string, string]> {
-      const _headers = this._node.req.headers;
+      const _headers = Object.fromEntries(
+        Object.entries(this._node.req.headers).filter(
+          ([key]) => !key.startsWith(":"),
+        ),
+      );
+
       for (const key in _headers) {
         yield [key, _normalizeValue(_headers[key])];
       }
@@ -275,7 +280,7 @@ function _normalizeValue(
 }
 
 function validateHeader(name: string): string {
-  if (name[0] === ":") {
+  if (name[0] === ":" || name.includes(":")) {
     throw new TypeError("Invalid name");
   }
   return name.toLowerCase();

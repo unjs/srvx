@@ -1,6 +1,7 @@
 import { fileURLToPath } from "node:url";
 import { join } from "node:path";
-import { existsSync, mkdirSync } from "node:fs";
+import { existsSync } from "node:fs";
+import { readFile, mkdir } from "node:fs/promises";
 import { afterAll, beforeAll } from "vitest";
 import { execa, type ResultPromise as ExecaRes } from "execa";
 import { getRandomPort, waitForPort } from "get-port-please";
@@ -10,7 +11,7 @@ const testDir = fileURLToPath(new URL(".", import.meta.url));
 
 export function testsExec(
   cmd: string,
-  opts: { runtime?: string; silent?: boolean },
+  opts: { runtime: string; silent?: boolean },
 ): void {
   let childProc: ExecaRes;
   let baseURL: string;
@@ -45,18 +46,44 @@ export function testsExec(
     await childProc.kill();
   });
 
-  addTests((path) => baseURL + path.slice(1));
+  addTests({
+    url: (path) => baseURL + path.slice(1),
+    ...opts,
+  });
 }
 
-export async function getTLSCert(): Promise<{ cert: string; key: string }> {
+export async function getTLSCert(): Promise<{
+  ca: string;
+  cert: string;
+  key: string;
+}> {
   const certDir = join(testDir, ".tmp/tls");
-  const cert = join(certDir, "server.crt");
-  const key = join(certDir, "server.key");
-  if (!existsSync(cert) || !existsSync(key)) {
-    mkdirSync(certDir, { recursive: true });
+
+  const caFile = join(certDir, "ca.crt");
+  const certFile = join(certDir, "server.crt");
+  const keyFile = join(certDir, "server.key");
+
+  if (!existsSync(caFile) || !existsSync(certFile) || !existsSync(keyFile)) {
+    await mkdir(certDir, { recursive: true });
+
+    // Generate CA key and certificate
     await execa({
       cwd: certDir,
-    })`openssl req -x509 -newkey rsa:2048 -nodes -keyout server.key -out server.crt -days 365 -subj /CN=srvx.local`;
+    })`openssl req -x509 -newkey rsa:2048 -nodes -keyout ca.key -out ca.crt -days 365 -subj /CN=::1,127.0.0.1,localhost`;
+
+    // Generate server key and CSR
+    await execa({
+      cwd: certDir,
+    })`openssl req -newkey rsa:2048 -nodes -keyout server.key -out server.csr -subj /CN=::1,127.0.0.1,localhost`;
+
+    // Sign server certificate with CA
+    await execa({
+      cwd: certDir,
+    })`openssl x509 -req -in server.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out server.crt -days 365`;
   }
-  return { cert, key };
+  return {
+    ca: await readFile(caFile, "utf8"),
+    cert: await readFile(certFile, "utf8"),
+    key: await readFile(keyFile, "utf8"),
+  };
 }

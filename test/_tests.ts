@@ -1,10 +1,12 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { describe, expect, test } from "vitest";
 
-export function addTests(
-  url: (path: string) => string,
-  { runtime }: { runtime?: string } = {},
-): void {
+export function addTests(opts: {
+  url: (path: string) => string;
+  runtime: string;
+  fetch?: typeof globalThis.fetch;
+}): void {
+  const { url, fetch = globalThis.fetch } = opts;
+
   test("GET works", async () => {
     const response = await fetch(url("/"));
     expect(response.status).toBe(200);

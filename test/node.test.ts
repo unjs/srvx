@@ -1,24 +1,70 @@
 import { describe, beforeAll, afterAll } from "vitest";
+import { fetch, Agent } from "undici";
 import { addTests } from "./_tests.ts";
-import { serve } from "../src/adapters/node.ts";
+import { serve, FastResponse } from "../src/adapters/node.ts";
+import { getTLSCert } from "./_utils.ts";
+import { fixture } from "./_fixture.ts";
 
-describe("node", () => {
-  let server: ReturnType<typeof serve> | undefined;
+// TODO: fix CA!
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
-  beforeAll(async () => {
-    process.env.PORT = "0";
-    const createServer = await import("./_fixture.ts").then(
-      (m) => m.createServer,
-    );
-    server = createServer();
-    await server!.ready();
+const tls = await getTLSCert();
+
+// https://undici.nodejs.org/#/docs/api/Client.md?id=parameter-clientoptions
+// https://github.com/nodejs/undici/issues/2750#issuecomment-1941009554
+const h2Agent = new Agent({ allowH2: true, connect: { ...tls } });
+
+const fetchWithHttp2 = ((input: any, init?: any) =>
+  fetch(input, {
+    ...init,
+    dispatcher: h2Agent,
+  })) as unknown as typeof globalThis.fetch;
+
+const testConfigs = [
+  {
+    name: "http1",
+    Response: globalThis.Response,
+  },
+  {
+    name: "http1, FastResponse",
+    Response: FastResponse,
+  },
+  {
+    name: "http2",
+    Response: globalThis.Response,
+    fetch: fetchWithHttp2,
+    serveOptions: { tls, node: { http2: true, allowHTTP1: false } },
+  },
+  {
+    name: "http2, FastResponse",
+    Response: FastResponse,
+    fetch: fetchWithHttp2,
+    serveOptions: { tls, node: { http2: true, allowHTTP1: false } },
+  },
+];
+
+for (const config of testConfigs) {
+  describe.sequential(`node (${config.name})`, () => {
+    let server: ReturnType<typeof serve> | undefined;
+
+    beforeAll(async () => {
+      server = serve(
+        fixture({
+          port: 0,
+          ...config.serveOptions,
+        }),
+      );
+      await server!.ready();
+    });
+
+    afterAll(async () => {
+      await server?.close();
+    });
+
+    addTests({
+      url: (path) => server!.url! + path.slice(1),
+      runtime: "node",
+      fetch: config.fetch,
+    });
   });
-
-  afterAll(async () => {
-    await server?.close();
-  });
-
-  addTests((path) => server!.url! + path.slice(1), {
-    runtime: "node",
-  });
-});
+}

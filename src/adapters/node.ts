@@ -7,6 +7,7 @@ import type {
 } from "../types.ts";
 import NodeHttp from "node:http";
 import NodeHttps from "node:https";
+import NodeHttp2 from "node:http2";
 import {
   sendNodeResponse,
   sendNodeUpgradeResponse,
@@ -50,7 +51,7 @@ export function toNodeHandler(fetchHandler: FetchHandler): NodeHttpHandler {
 
 // https://nodejs.org/api/http.html
 // https://nodejs.org/api/https.html
-
+// https://nodejs.org/api/http2.html
 class NodeServer implements Server {
   readonly runtime = "node";
   readonly options: ServerOptions;
@@ -66,8 +67,8 @@ class NodeServer implements Server {
     const fetchHandler = (this.fetch = wrapFetch(this, [errorPlugin]));
 
     const handler = (
-      nodeReq: NodeHttp.IncomingMessage,
-      nodeRes: NodeHttp.ServerResponse,
+      nodeReq: NodeHttp.IncomingMessage | NodeHttp2.Http2ServerRequest,
+      nodeRes: NodeHttp.ServerResponse | NodeHttp2.Http2ServerResponse,
     ) => {
       const request = new NodeRequest({ req: nodeReq, res: nodeRes });
       const res = fetchHandler(request);
@@ -88,18 +89,29 @@ class NodeServer implements Server {
       ...this.options.node,
     };
 
-    // Create HTTPS server if HTTPS options are provided, otherwise create HTTP server
-    const server = (this.serveOptions as { cert: string }).cert
-      ? NodeHttps.createServer(
-          this.serveOptions as NodeHttps.ServerOptions,
-          handler,
-        )
-      : NodeHttp.createServer(this.serveOptions, handler);
+    const hasCert = (this.serveOptions as { cert?: string }).cert;
+
+    if (this.options.protocol === "http2" && hasCert) {
+      this.node = {
+        server: NodeHttp2.createSecureServer(this.serveOptions as NodeHttp2.SecureServerOptions, handler),
+        handler,
+      };
+    } else if (this.options.protocol === "https" && hasCert) {
+      this.node = {
+        server: NodeHttps.createServer(this.serveOptions as NodeHttps.ServerOptions, handler),
+        handler,
+      };
+    } else {
+      this.node = {
+        server: NodeHttp.createServer(this.serveOptions as NodeHttp.ServerOptions, handler),
+        handler,
+      };
+    }
 
     // Listen to upgrade events if there is a hook
     const upgradeHandler = this.options.upgrade;
     if (upgradeHandler) {
-      server.on("upgrade", (nodeReq, socket, header) => {
+      this.node.server!.on("upgrade", (nodeReq, socket, header) => {
         const request = new NodeRequest({
           req: nodeReq,
           upgrade: { socket, header },
@@ -112,8 +124,6 @@ class NodeServer implements Server {
           : sendNodeUpgradeResponse(socket, res);
       });
     }
-
-    this.node = { server, handler };
 
     if (!options.manual) {
       this.serve();
@@ -154,7 +164,7 @@ class NodeServer implements Server {
   close(closeAll?: boolean): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       if (closeAll) {
-        this.node?.server?.closeAllConnections?.();
+        (this.node?.server as NodeHttp.Server)?.closeAllConnections?.();
       }
       this.node?.server?.close((error?: Error) =>
         error ? reject(error) : resolve(),

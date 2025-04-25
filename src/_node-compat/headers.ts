@@ -1,24 +1,31 @@
 import type NodeHttp from "node:http";
+import type NodeHttp2 from "node:http2";
 import { splitSetCookieString } from "cookie-es";
 import { kNodeInspect } from "./_common.ts";
 
 export const NodeRequestHeaders: {
   new (nodeCtx: {
-    req: NodeHttp.IncomingMessage;
-    res?: NodeHttp.ServerResponse;
+    req: NodeHttp.IncomingMessage | NodeHttp2.Http2ServerRequest;
+    res?: NodeHttp.ServerResponse | NodeHttp2.Http2ServerResponse;
   }): globalThis.Headers;
 } = /* @__PURE__ */ (() => {
   const _Headers = class Headers implements globalThis.Headers {
-    _node: { req: NodeHttp.IncomingMessage; res?: NodeHttp.ServerResponse };
+    _node: {
+      req: NodeHttp.IncomingMessage | NodeHttp2.Http2ServerRequest;
+      res?: NodeHttp.ServerResponse | NodeHttp2.Http2ServerResponse;
+    };
 
     constructor(nodeCtx: {
-      req: NodeHttp.IncomingMessage;
-      res?: NodeHttp.ServerResponse;
+      req: NodeHttp.IncomingMessage | NodeHttp2.Http2ServerRequest;
+      res?: NodeHttp.ServerResponse | NodeHttp2.Http2ServerResponse;
     }) {
       this._node = nodeCtx;
     }
 
     append(name: string, value: string): void {
+      if (_isHeaderBanned(name)) {
+        return;
+      }
       name = name.toLowerCase();
       const _headers = this._node.req.headers;
       const _current = _headers[name];
@@ -61,6 +68,9 @@ export const NodeRequestHeaders: {
     }
 
     set(name: string, value: string): void {
+      if (_isHeaderBanned(name)) {
+        return;
+      }
       name = name.toLowerCase();
       this._node.req.headers[name] = value;
     }
@@ -159,6 +169,9 @@ export const NodeResponseHeaders: {
     }
 
     append(name: string, value: string): void {
+      if (_isHeaderBanned(name)) {
+        return;
+      }
       this._node.res.appendHeader(name, value);
     }
 
@@ -187,6 +200,9 @@ export const NodeResponseHeaders: {
     }
 
     set(name: string, value: string): void {
+      if (_isHeaderBanned(name)) {
+        return;
+      }
       this._node.res.setHeader(name, value);
     }
 
@@ -274,4 +290,8 @@ function _normalizeValue(
     return value.join(", ");
   }
   return typeof value === "string" ? value : String(value ?? "");
+}
+
+function _isHeaderBanned(name: string): boolean {
+  return name[0] === ":";
 }

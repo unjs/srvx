@@ -1,10 +1,11 @@
 import type NodeHttp from "node:http";
+import NodeHttp2 from "node:http2";
 import type { NodeResponse } from "./response.ts";
 import type { Duplex, Readable as NodeReadable } from "node:stream";
 import { splitSetCookieString } from "cookie-es";
 
 export async function sendNodeResponse(
-  nodeRes: NodeHttp.ServerResponse,
+  nodeRes: NodeHttp.ServerResponse | NodeHttp2.Http2ServerResponse,
   webRes: Response | NodeResponse,
 ): Promise<void> {
   if (!webRes) {
@@ -16,7 +17,7 @@ export async function sendNodeResponse(
   if ((webRes as NodeResponse).nodeResponse) {
     const res = (webRes as NodeResponse).nodeResponse();
     if (!nodeRes.headersSent) {
-      nodeRes.writeHead(res.status, res.statusText, res.headers.flat());
+      nodeRes.writeHead(res.status, res.statusText, res.headers.flat() as any);
     }
     if (res.body) {
       if (res.body instanceof ReadableStream) {
@@ -25,7 +26,7 @@ export async function sendNodeResponse(
         (res.body as NodeReadable).pipe(nodeRes);
         return new Promise((resolve) => nodeRes.on("close", resolve));
       }
-      nodeRes.write(res.body);
+      (nodeRes as NodeHttp.ServerResponse).write(res.body);
     }
     return endNodeResponse(nodeRes);
   }
@@ -42,11 +43,15 @@ export async function sendNodeResponse(
   }
 
   if (!nodeRes.headersSent) {
-    nodeRes.writeHead(
-      webRes.status || 200,
-      webRes.statusText,
-      headerEntries.flat(),
-    );
+    if (nodeRes instanceof NodeHttp2.Http2ServerResponse) {
+      nodeRes.writeHead(webRes.status || 200, headerEntries.flat() as any);
+    } else {
+      nodeRes.writeHead(
+        webRes.status || 200,
+        webRes.statusText,
+        headerEntries.flat() as any,
+      );
+    }
   }
 
   return webRes.body
@@ -76,13 +81,13 @@ export async function sendNodeUpgradeResponse(
   });
 }
 
-function endNodeResponse(nodeRes: NodeHttp.ServerResponse) {
+function endNodeResponse(nodeRes: NodeHttp.ServerResponse | NodeHttp2.Http2ServerResponse) {
   return new Promise<void>((resolve) => nodeRes.end(resolve));
 }
 
 export function streamBody(
   stream: ReadableStream,
-  nodeRes: NodeHttp.ServerResponse,
+  nodeRes: NodeHttp.ServerResponse | NodeHttp2.Http2ServerResponse,
 ): Promise<void> | void {
   // stream is already destroyed
   if (nodeRes.destroyed) {
@@ -108,7 +113,7 @@ export function streamBody(
       if (done) {
         // End the response
         nodeRes.end();
-      } else if (nodeRes.write(value)) {
+      } else if ((nodeRes as NodeHttp.ServerResponse).write(value)) {
         // Continue reading recursively
         reader.read().then(streamHandle, streamCancel);
       } else {

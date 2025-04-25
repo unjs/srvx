@@ -1,7 +1,7 @@
 import { serve } from "srvx";
 
 serve({
-  // tls: { cert: "server.crt", key: "server.key" },
+  tls: { cert: "server.crt", key: "server.key" },
   fetch(_request) {
     return new Response(
       /*html */ `

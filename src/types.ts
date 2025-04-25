@@ -1,5 +1,6 @@
 import type * as NodeHttp from "node:http";
 import type * as NodeHttps from "node:https";
+import type * as NodeHttp2 from "node:http2";
 import type * as NodeNet from "node:net";
 import type * as Bun from "bun";
 import type * as CF from "@cloudflare/workers-types";
@@ -93,7 +94,7 @@ export interface ServerOptions {
    *
    * If `protocol` is not set, Server will use `http` as the default protocol or `https` if both `tls.cert` and `tls.key` options are provided.
    */
-  protocol?: "http" | "https";
+  protocol?: "http" | "https" | "http2";
 
   /**
    * If set to `true`, server will not print the listening address.
@@ -183,10 +184,10 @@ export interface Server<Handler = ServerHandler> {
    * Node.js context.
    */
   readonly node?: {
-    server?: NodeHttp.Server;
+    server?: NodeHttp.Server | NodeHttp2.Http2Server;
     handler: (
-      nodeReq: NodeHttp.IncomingMessage,
-      nodeRes: NodeHttp.ServerResponse,
+      nodeReq: NodeHttp.IncomingMessage | NodeHttp2.Http2ServerRequest,
+      nodeRes: NodeHttp.ServerResponse | NodeHttp2.Http2ServerResponse,
     ) => void | Promise<void>;
   };
 
@@ -248,8 +249,8 @@ export interface ServerRuntimeContext {
    * Underlying Node.js server request info.
    */
   node?: {
-    req: NodeHttp.IncomingMessage;
-    res?: NodeHttp.ServerResponse;
+    req: NodeHttp.IncomingMessage | NodeHttp2.Http2ServerRequest;
+    res?: NodeHttp.ServerResponse | NodeHttp2.Http2ServerResponse;
   };
 
   /**

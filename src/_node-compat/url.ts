@@ -1,14 +1,18 @@
 import type NodeHttp from "node:http";
+import type NodeHttp2 from "node:http2";
 import { kNodeInspect } from "./_common.ts";
 
 export const NodeRequestURL: {
   new (nodeCtx: {
-    req: NodeHttp.IncomingMessage;
-    res?: NodeHttp.ServerResponse;
+    req: NodeHttp.IncomingMessage | NodeHttp2.Http2ServerRequest;
+    res?: NodeHttp.ServerResponse | NodeHttp2.Http2ServerResponse;
   }): URL;
 } = /* @__PURE__ */ (() => {
   const _URL = class URL implements Partial<globalThis.URL> {
-    _node: { req: NodeHttp.IncomingMessage; res?: NodeHttp.ServerResponse };
+    _node: {
+      req: NodeHttp.IncomingMessage | NodeHttp2.Http2ServerRequest;
+      res?: NodeHttp.ServerResponse | NodeHttp2.Http2ServerResponse;
+    };
 
     _hash = "";
     _username = "";
@@ -22,8 +26,8 @@ export const NodeRequestURL: {
     _searchParams?: URLSearchParams;
 
     constructor(nodeCtx: {
-      req: NodeHttp.IncomingMessage;
-      res?: NodeHttp.ServerResponse;
+      req: NodeHttp.IncomingMessage | NodeHttp2.Http2ServerRequest;
+      res?: NodeHttp.ServerResponse | NodeHttp2.Http2ServerResponse;
     }) {
       this._node = nodeCtx;
     }
@@ -54,7 +58,9 @@ export const NodeRequestURL: {
 
     // host
     get host() {
-      return this._node.req.headers.host || "";
+      return this._node.req.headers.host
+      || (this._node.req.headers[":authority"] as string)
+      || "";
     }
     set host(value: string) {
       this._hostname = undefined;

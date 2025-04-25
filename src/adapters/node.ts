@@ -90,26 +90,27 @@ class NodeServer implements Server {
       ...this.options.node,
     };
 
-    const hasCert = (this.serveOptions as { cert?: string }).cert;
+    this.#isSecure =
+      !!(this.serveOptions as { cert?: string }).cert &&
+      this.options.protocol !== "http";
 
-    if (this.options.protocol === "http2" && hasCert) {
-      this.node = {
-        server: NodeHttp2.createSecureServer(
-          { ...this.serveOptions, allowHTTP1: true },
-          handler,
-        ),
+    this.node = { handler };
+
+    if (this.options.node?.http2) {
+      if (!this.#isSecure) {
+        // unencrypted HTTP2 is not supported in browsers
+        // https://http2.github.io/faq/#does-http2-require-encryption
+        throw new Error("node.http2 option requires tls certificate!");
+      }
+      this.node.server = NodeHttp2.createSecureServer(
+        { allowHTTP1: true, ...this.serveOptions },
         handler,
-      };
-      this.#isSecure = true;
-    } else if (this.options.protocol === "https" && hasCert) {
-      this.node = {
-        server: NodeHttps.createServer(
-          this.serveOptions as NodeHttps.ServerOptions,
-          handler,
-        ),
+      );
+    } else if (this.#isSecure) {
+      this.node.server = NodeHttps.createServer(
+        this.serveOptions as NodeHttps.ServerOptions,
         handler,
-      };
-      this.#isSecure = true;
+      );
     } else {
       this.node = {
         server: NodeHttp.createServer(
@@ -118,7 +119,6 @@ class NodeServer implements Server {
         ),
         handler,
       };
-      this.#isSecure = false;
     }
 
     // Listen to upgrade events if there is a hook

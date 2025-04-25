@@ -129,7 +129,7 @@ export interface ServerOptions {
     | NodeHttps.ServerOptions
     | NodeHttp2.ServerOptions
   ) &
-    NodeNet.ListenOptions;
+    NodeNet.ListenOptions & { http2?: boolean };
 
   /**
    * Bun server options

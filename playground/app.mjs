@@ -1,7 +1,7 @@
 import { serve } from "srvx";
 
 serve({
-  protocol: "http2",
+  node: { http2: true },
   tls: { cert: "server.crt", key: "server.key" },
   fetch(_request) {
     return new Response(

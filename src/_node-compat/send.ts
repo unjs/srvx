@@ -81,7 +81,9 @@ export async function sendNodeUpgradeResponse(
   });
 }
 
-function endNodeResponse(nodeRes: NodeHttp.ServerResponse | NodeHttp2.Http2ServerResponse) {
+function endNodeResponse(
+  nodeRes: NodeHttp.ServerResponse | NodeHttp2.Http2ServerResponse,
+) {
   return new Promise<void>((resolve) => nodeRes.end(resolve));
 }
 

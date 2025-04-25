@@ -58,9 +58,11 @@ export const NodeRequestURL: {
 
     // host
     get host() {
-      return this._node.req.headers.host
-      || (this._node.req.headers[":authority"] as string)
-      || "";
+      return (
+        this._node.req.headers.host ||
+        (this._node.req.headers[":authority"] as string) ||
+        ""
+      );
     }
     set host(value: string) {
       this._hostname = undefined;

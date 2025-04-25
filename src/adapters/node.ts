@@ -93,17 +93,26 @@ class NodeServer implements Server {
 
     if (this.options.protocol === "http2" && hasCert) {
       this.node = {
-        server: NodeHttp2.createSecureServer(this.serveOptions as NodeHttp2.SecureServerOptions, handler),
+        server: NodeHttp2.createSecureServer(
+          this.serveOptions as NodeHttp2.SecureServerOptions,
+          handler,
+        ),
         handler,
       };
     } else if (this.options.protocol === "https" && hasCert) {
       this.node = {
-        server: NodeHttps.createServer(this.serveOptions as NodeHttps.ServerOptions, handler),
+        server: NodeHttps.createServer(
+          this.serveOptions as NodeHttps.ServerOptions,
+          handler,
+        ),
         handler,
       };
     } else {
       this.node = {
-        server: NodeHttp.createServer(this.serveOptions as NodeHttp.ServerOptions, handler),
+        server: NodeHttp.createServer(
+          this.serveOptions as NodeHttp.ServerOptions,
+          handler,
+        ),
         handler,
       };
     }

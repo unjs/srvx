@@ -253,8 +253,8 @@ export interface ServerRuntimeContext {
    * Underlying Node.js server request info.
    */
   node?: {
-    req: NodeHttp.IncomingMessage | NodeHttp2.Http2ServerRequest;
-    res?: NodeHttp.ServerResponse | NodeHttp2.Http2ServerResponse;
+    req: NodeServerRequest;
+    res?: NodeServerResponse;
   };
 
   /**

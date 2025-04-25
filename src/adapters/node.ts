@@ -1,10 +1,3 @@
-import type {
-  FetchHandler,
-  NodeHttpHandler,
-  Server,
-  ServerHandler,
-  ServerOptions,
-} from "../types.ts";
 import NodeHttp from "node:http";
 import NodeHttps from "node:https";
 import NodeHttp2 from "node:http2";
@@ -21,6 +14,16 @@ import {
 } from "../_utils.node.ts";
 import { wrapFetch } from "../_plugin.ts";
 import { errorPlugin } from "../_error.ts";
+
+import type {
+  FetchHandler,
+  NodeHttpHandler,
+  NodeServerRequest,
+  NodeServerResponse,
+  Server,
+  ServerHandler,
+  ServerOptions,
+} from "../types.ts";
 
 export { FastURL } from "../_url.ts";
 
@@ -68,8 +71,8 @@ class NodeServer implements Server {
     const fetchHandler = (this.fetch = wrapFetch(this, [errorPlugin]));
 
     const handler = (
-      nodeReq: NodeHttp.IncomingMessage | NodeHttp2.Http2ServerRequest,
-      nodeRes: NodeHttp.ServerResponse | NodeHttp2.Http2ServerResponse,
+      nodeReq: NodeServerRequest,
+      nodeRes: NodeServerResponse,
     ) => {
       const request = new NodeRequest({ req: nodeReq, res: nodeRes });
       const res = fetchHandler(request);

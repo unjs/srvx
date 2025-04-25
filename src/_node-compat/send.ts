@@ -28,6 +28,7 @@ export async function sendNodeResponse(
         (res.body as NodeReadable).pipe(nodeRes);
         return new Promise((resolve) => nodeRes.on("close", resolve));
       }
+      // TODO: FastResponse write with http2?
       (nodeRes as NodeHttp.ServerResponse).write(res.body);
     }
     return endNodeResponse(nodeRes);
@@ -90,7 +91,7 @@ function endNodeResponse(nodeRes: NodeServerResponse) {
 
 export function streamBody(
   stream: ReadableStream,
-  nodeRes: NodeHttp.ServerResponse | NodeHttp2.Http2ServerResponse,
+  nodeRes: NodeServerResponse,
 ): Promise<void> | void {
   // stream is already destroyed
   if (nodeRes.destroyed) {

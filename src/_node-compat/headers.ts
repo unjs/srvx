@@ -145,17 +145,14 @@ export const NodeRequestHeaders: {
 
 export const NodeResponseHeaders: {
   new (nodeCtx: {
-    req?: NodeHttp.IncomingMessage;
-    res: NodeHttp.ServerResponse;
+    req?: NodeServerRequest;
+    res: NodeServerResponse;
   }): globalThis.Headers;
 } = /* @__PURE__ */ (() => {
   const _Headers = class Headers implements globalThis.Headers {
-    _node: { req?: NodeHttp.IncomingMessage; res: NodeHttp.ServerResponse };
+    _node: { req?: NodeServerRequest; res: NodeServerResponse };
 
-    constructor(nodeCtx: {
-      req?: NodeHttp.IncomingMessage;
-      res: NodeHttp.ServerResponse;
-    }) {
+    constructor(nodeCtx: { req?: NodeServerRequest; res: NodeServerResponse }) {
       this._node = nodeCtx;
     }
 

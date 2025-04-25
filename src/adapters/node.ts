@@ -40,10 +40,7 @@ export function serve(options: ServerOptions): Server {
 }
 
 export function toNodeHandler(fetchHandler: FetchHandler): NodeHttpHandler {
-  return (
-    nodeReq: NodeHttp.IncomingMessage,
-    nodeRes: NodeHttp.ServerResponse,
-  ) => {
+  return (nodeReq, nodeRes) => {
     const request = new NodeRequest({ req: nodeReq, res: nodeRes });
     const res = fetchHandler(request);
     return res instanceof Promise

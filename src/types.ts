@@ -190,8 +190,8 @@ export interface Server<Handler = ServerHandler> {
   readonly node?: {
     server?: NodeHttp.Server | NodeHttp2.Http2Server;
     handler: (
-      nodeReq: NodeHttp.IncomingMessage | NodeHttp2.Http2ServerRequest,
-      nodeRes: NodeHttp.ServerResponse | NodeHttp2.Http2ServerResponse,
+      req: NodeServerRequest,
+      res: NodeServerResponse,
     ) => void | Promise<void>;
   };
 
@@ -310,9 +310,17 @@ export type DenoFetchHandler = (
   info?: Deno.ServeHandlerInfo<Deno.NetAddr>,
 ) => Response | Promise<Response>;
 
+export type NodeServerRequest =
+  | NodeHttp.IncomingMessage
+  | NodeHttp2.Http2ServerRequest;
+
+export type NodeServerResponse =
+  | NodeHttp.ServerResponse
+  | NodeHttp2.Http2ServerResponse;
+
 export type NodeHttpHandler = (
-  nodeReq: NodeHttp.IncomingMessage,
-  nodeRes: NodeHttp.ServerResponse,
+  req: NodeServerRequest,
+  res: NodeServerResponse,
 ) => void | Promise<void>;
 
 export type CloudflareFetchHandler = CF.ExportedHandlerFetchHandler;

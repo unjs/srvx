@@ -1,11 +1,13 @@
-import type NodeHttp from "node:http";
-import NodeHttp2 from "node:http2";
-import type { NodeResponse } from "./response.ts";
-import type { Duplex, Readable as NodeReadable } from "node:stream";
 import { splitSetCookieString } from "cookie-es";
 
+import type { Duplex, Readable as NodeReadable } from "node:stream";
+import type NodeHttp from "node:http";
+import NodeHttp2 from "node:http2";
+import type { NodeServerResponse } from "../types.ts";
+import type { NodeResponse } from "./response.ts";
+
 export async function sendNodeResponse(
-  nodeRes: NodeHttp.ServerResponse | NodeHttp2.Http2ServerResponse,
+  nodeRes: NodeServerResponse,
   webRes: Response | NodeResponse,
 ): Promise<void> {
   if (!webRes) {
@@ -43,6 +45,7 @@ export async function sendNodeResponse(
   }
 
   if (!nodeRes.headersSent) {
+    // TODO: use faster method to check http2
     if (nodeRes instanceof NodeHttp2.Http2ServerResponse) {
       nodeRes.writeHead(webRes.status || 200, headerEntries.flat() as any);
     } else {
@@ -81,9 +84,7 @@ export async function sendNodeUpgradeResponse(
   });
 }
 
-function endNodeResponse(
-  nodeRes: NodeHttp.ServerResponse | NodeHttp2.Http2ServerResponse,
-) {
+function endNodeResponse(nodeRes: NodeServerResponse) {
   return new Promise<void>((resolve) => nodeRes.end(resolve));
 }
 

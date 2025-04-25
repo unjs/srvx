@@ -1,24 +1,21 @@
-import type NodeHttp from "node:http";
-import type NodeHttp2 from "node:http2";
 import { splitSetCookieString } from "cookie-es";
 import { kNodeInspect } from "./_common.ts";
 
+import type { NodeServerRequest, NodeServerResponse } from "../types.ts";
+
 export const NodeRequestHeaders: {
   new (nodeCtx: {
-    req: NodeHttp.IncomingMessage | NodeHttp2.Http2ServerRequest;
-    res?: NodeHttp.ServerResponse | NodeHttp2.Http2ServerResponse;
+    req: NodeServerRequest;
+    res?: NodeServerResponse;
   }): globalThis.Headers;
 } = /* @__PURE__ */ (() => {
   const _Headers = class Headers implements globalThis.Headers {
     _node: {
-      req: NodeHttp.IncomingMessage | NodeHttp2.Http2ServerRequest;
-      res?: NodeHttp.ServerResponse | NodeHttp2.Http2ServerResponse;
+      req: NodeServerRequest;
+      res?: NodeServerResponse;
     };
 
-    constructor(nodeCtx: {
-      req: NodeHttp.IncomingMessage | NodeHttp2.Http2ServerRequest;
-      res?: NodeHttp.ServerResponse | NodeHttp2.Http2ServerResponse;
-    }) {
+    constructor(nodeCtx: { req: NodeServerRequest; res?: NodeServerResponse }) {
       this._node = nodeCtx;
     }
 

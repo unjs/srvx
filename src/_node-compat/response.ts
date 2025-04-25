@@ -1,7 +1,7 @@
-import type NodeHttp from "node:http";
-import type NodeHttp2 from "node:http2";
-import type { Readable as NodeReadable } from "node:stream";
 import { splitSetCookieString } from "cookie-es";
+
+import type NodeHttp from "node:http";
+import type { Readable as NodeReadable } from "node:stream";
 
 export type NodeResponse = InstanceType<typeof NodeResponse>;
 
@@ -18,7 +18,7 @@ export const NodeResponse: {
     readonly nodeResponse: () => {
       status: number;
       statusText: string;
-      headers: NodeHttp.OutgoingHttpHeader[] | NodeHttp2.OutgoingHttpHeaders[];
+      headers: NodeHttp.OutgoingHttpHeader[];
       body:
         | string
         | Buffer

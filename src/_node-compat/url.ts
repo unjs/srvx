@@ -1,17 +1,14 @@
-import type NodeHttp from "node:http";
-import type NodeHttp2 from "node:http2";
 import { kNodeInspect } from "./_common.ts";
 
+import type { NodeServerRequest, NodeServerResponse } from "../types.ts";
+
 export const NodeRequestURL: {
-  new (nodeCtx: {
-    req: NodeHttp.IncomingMessage | NodeHttp2.Http2ServerRequest;
-    res?: NodeHttp.ServerResponse | NodeHttp2.Http2ServerResponse;
-  }): URL;
+  new (nodeCtx: { req: NodeServerRequest; res?: NodeServerResponse }): URL;
 } = /* @__PURE__ */ (() => {
   const _URL = class URL implements Partial<globalThis.URL> {
     _node: {
-      req: NodeHttp.IncomingMessage | NodeHttp2.Http2ServerRequest;
-      res?: NodeHttp.ServerResponse | NodeHttp2.Http2ServerResponse;
+      req: NodeServerRequest;
+      res?: NodeServerResponse;
     };
 
     _hash = "";
@@ -25,10 +22,7 @@ export const NodeRequestURL: {
     _search?: string;
     _searchParams?: URLSearchParams;
 
-    constructor(nodeCtx: {
-      req: NodeHttp.IncomingMessage | NodeHttp2.Http2ServerRequest;
-      res?: NodeHttp.ServerResponse | NodeHttp2.Http2ServerResponse;
-    }) {
+    constructor(nodeCtx: { req: NodeServerRequest; res?: NodeServerResponse }) {
       this._node = nodeCtx;
     }
 

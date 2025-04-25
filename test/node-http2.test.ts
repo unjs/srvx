@@ -1,5 +1,6 @@
 import { describe, beforeAll, afterAll } from "vitest";
 import { addTests } from "./_tests.ts";
+import { getTLSCert } from "./_utils.ts";
 import { serve } from "../src/adapters/node.ts";
 
 describe("node-http2", () => {
@@ -14,10 +15,7 @@ describe("node-http2", () => {
 
     server = createServer({
       protocol: "http2",
-      tls: {
-        cert: "./server.crt",
-        key: "./server.key",
-      },
+      tls: await getTLSCert(),
     });
 
     await server!.ready();

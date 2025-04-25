@@ -1,27 +1,33 @@
 import { describe, beforeAll, afterAll } from "vitest";
 import { addTests } from "./_tests.ts";
 import { serve } from "../src/adapters/node.ts";
-import { NodeResponse } from "../src/_node-compat/response.ts";
 
-describe("node (fast-res)", () => {
+describe("node-http2", () => {
   let server: ReturnType<typeof serve> | undefined;
 
   beforeAll(async () => {
     process.env.PORT = "0";
-    (globalThis as any).TEST_RESPONSE_CTOR = NodeResponse;
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
     const createServer = await import("./_fixture.ts").then(
       (m) => m.createServer,
     );
-    server = createServer();
+
+    server = createServer({
+      protocol: "http2",
+      tls: {
+        cert: "./server.crt",
+        key: "./server.key",
+      },
+    });
+
     await server!.ready();
   });
 
   afterAll(async () => {
-    delete (globalThis as any).TEST_RESPONSE_CTOR;
     await server?.close();
   });
 
   addTests((path) => server!.url! + path.slice(1), {
-    runtime: "node-fast",
+    runtime: "node",
   });
 });

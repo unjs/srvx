@@ -58,6 +58,7 @@ class NodeServer implements Server {
   readonly node: Server["node"];
   readonly serveOptions: ServerOptions["node"];
   readonly fetch: ServerHandler;
+  readonly #isSecure: boolean;
 
   #listeningPromise?: Promise<void>;
 
@@ -94,11 +95,12 @@ class NodeServer implements Server {
     if (this.options.protocol === "http2" && hasCert) {
       this.node = {
         server: NodeHttp2.createSecureServer(
-          this.serveOptions as NodeHttp2.SecureServerOptions,
+          { ...this.serveOptions, allowHTTP1: true },
           handler,
         ),
         handler,
       };
+      this.#isSecure = true;
     } else if (this.options.protocol === "https" && hasCert) {
       this.node = {
         server: NodeHttps.createServer(
@@ -107,6 +109,7 @@ class NodeServer implements Server {
         ),
         handler,
       };
+      this.#isSecure = true;
     } else {
       this.node = {
         server: NodeHttp.createServer(
@@ -115,6 +118,7 @@ class NodeServer implements Server {
         ),
         handler,
       };
+      this.#isSecure = false;
     }
 
     // Listen to upgrade events if there is a hook
@@ -159,11 +163,7 @@ class NodeServer implements Server {
 
     return typeof addr === "string"
       ? addr /* socket */
-      : fmtURL(
-          addr.address,
-          addr.port,
-          this.node!.server! instanceof NodeHttps.Server,
-        );
+      : fmtURL(addr.address, addr.port, this.#isSecure);
   }
 
   ready(): Promise<Server> {

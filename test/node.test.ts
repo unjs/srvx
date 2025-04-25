@@ -7,7 +7,10 @@ describe("node", () => {
 
   beforeAll(async () => {
     process.env.PORT = "0";
-    server = await import("./_fixture.ts").then((m) => m.server);
+    const createServer = await import("./_fixture.ts").then(
+      (m) => m.createServer,
+    );
+    server = createServer();
     await server!.ready();
   });
 

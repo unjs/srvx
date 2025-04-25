@@ -47,7 +47,7 @@
     "play:node": "node playground/app.mjs",
     "play:sw": "pnpm build && pnpx serve playground",
     "release": "pnpm test && changelogen --release && npm publish && git push --follow-tags",
-    "test": "pnpm lint && pnpm test:types && vitest run --coverage",
+    "test": "pnpm lint && pnpm test:types && pnpm play:mkcert && vitest run --coverage",
     "test:types": "tsc --noEmit --skipLibCheck"
   },
   "resolutions": {

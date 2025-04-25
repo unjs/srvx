@@ -124,7 +124,11 @@ export interface ServerOptions {
   /**
    * Node.js server options.
    */
-  node?: (NodeHttp.ServerOptions | NodeHttps.ServerOptions) &
+  node?: (
+    | NodeHttp.ServerOptions
+    | NodeHttps.ServerOptions
+    | NodeHttp2.ServerOptions
+  ) &
     NodeNet.ListenOptions;
 
   /**

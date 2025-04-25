@@ -107,7 +107,7 @@ export const NodeRequestHeaders: {
     *entries(): HeadersIterator<[string, string]> {
       const headers = this._node.req.headers;
       const isHttp2 = this._node.req.httpVersion === "2.0";
-    
+
       for (const key in headers) {
         if (!isHttp2 || !key.startsWith(":")) {
           yield [key, _normalizeValue(headers[key])];

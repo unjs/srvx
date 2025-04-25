@@ -20,18 +20,6 @@ const testConfigs = [
     Response: FastResponse,
   },
   {
-    name: "http2 - allowHTTP1",
-    Response: globalThis.Response,
-    useHttp2Agent: true,
-    serveOptions: { tls, node: { http2: true, allowHTTP1: true } },
-  },
-  {
-    name: "http2, FastResponse - allowHTTP1",
-    Response: FastResponse,
-    useHttp2Agent: true,
-    serveOptions: { tls, node: { http2: true, allowHTTP1: true } },
-  },
-  {
     name: "http2",
     Response: globalThis.Response,
     useHttp2Agent: true,

@@ -23,10 +23,7 @@ export const NodeRequestHeaders: {
     }
 
     append(name: string, value: string): void {
-      if (_isHeaderBanned(name)) {
-        return;
-      }
-      name = name.toLowerCase();
+      name = validateHeader(name);
       const _headers = this._node.req.headers;
       const _current = _headers[name];
       if (_current) {
@@ -41,12 +38,12 @@ export const NodeRequestHeaders: {
     }
 
     delete(name: string): void {
-      name = name.toLowerCase();
+      name = validateHeader(name);
       this._node.req.headers[name] = undefined;
     }
 
     get(name: string): string | null {
-      name = name.toLowerCase();
+      name = validateHeader(name);
       const rawValue = this._node.req.headers[name];
       if (rawValue === undefined) {
         return null;
@@ -63,15 +60,12 @@ export const NodeRequestHeaders: {
     }
 
     has(name: string): boolean {
-      name = name.toLowerCase();
+      name = validateHeader(name);
       return !!this._node.req.headers[name];
     }
 
     set(name: string, value: string): void {
-      if (_isHeaderBanned(name)) {
-        return;
-      }
-      name = name.toLowerCase();
+      name = validateHeader(name);
       this._node.req.headers[name] = value;
     }
 
@@ -169,9 +163,6 @@ export const NodeResponseHeaders: {
     }
 
     append(name: string, value: string): void {
-      if (_isHeaderBanned(name)) {
-        return;
-      }
       this._node.res.appendHeader(name, value);
     }
 
@@ -200,9 +191,6 @@ export const NodeResponseHeaders: {
     }
 
     set(name: string, value: string): void {
-      if (_isHeaderBanned(name)) {
-        return;
-      }
       this._node.res.setHeader(name, value);
     }
 
@@ -292,6 +280,9 @@ function _normalizeValue(
   return typeof value === "string" ? value : String(value ?? "");
 }
 
-function _isHeaderBanned(name: string): boolean {
-  return name[0] === ":";
+function validateHeader(name: string): string {
+  if (name[0] === ":") {
+    throw new TypeError("Invalid name");
+  }
+  return name.toLowerCase();
 }

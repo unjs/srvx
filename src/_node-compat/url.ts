@@ -214,11 +214,14 @@ export const NodeRequestURL: {
 
 function parsePath(input: string): [pathname: string, search: string] {
   const url = (input || "/").replace(/\\/g, "/");
-  const qIndex = url.indexOf("?");
+
+  const path = url.replace(/^.*?:\/\//, "");
+
+  const qIndex = path.indexOf("?");
   if (qIndex === -1) {
-    return [url, ""];
+    return [path, ""];
   }
-  return [url.slice(0, qIndex), url.slice(qIndex)];
+  return [path.slice(0, qIndex), path.slice(qIndex)];
 }
 
 function parseHost(host: string | undefined): [hostname: string, port: string] {

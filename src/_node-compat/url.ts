@@ -211,17 +211,23 @@ export const NodeRequestURL: {
 
   return _URL;
 })();
-
 function parsePath(input: string): [pathname: string, search: string] {
-  const url = (input || "/").replace(/\\/g, "/");
+  const normalized = (input || "/").replace(/\\/g, "/");
 
-  const path = url.replace(/^.*?:\/\//, "");
+  // Remove protocol (e.g., http://)
+  const withoutProtocol = normalized.replace(/^([a-z]+:)?\/\//i, "");
 
-  const qIndex = path.indexOf("?");
+  // Remove domain if present
+  const firstSlash = withoutProtocol.indexOf("/");
+  const pathWithQuery =
+    firstSlash === -1 ? "/" : withoutProtocol.slice(firstSlash);
+
+  const qIndex = pathWithQuery.indexOf("?");
   if (qIndex === -1) {
-    return [path, ""];
+    return [pathWithQuery, ""];
   }
-  return [path.slice(0, qIndex), path.slice(qIndex)];
+
+  return [pathWithQuery.slice(0, qIndex), pathWithQuery.slice(qIndex)];
 }
 
 function parseHost(host: string | undefined): [hostname: string, port: string] {

@@ -95,7 +95,7 @@ export const NodeRequestURL: {
     // pathname
     get pathname() {
       if (this._pathname === undefined) {
-        const [pathname, search] = parsePath(this._node.req.url || "/");
+        const [pathname, search] = parsePathWithoutURL(this._node.req.url || "/");
         this._pathname = pathname;
         if (this._search === undefined) {
           this._search = search;
@@ -117,7 +117,7 @@ export const NodeRequestURL: {
     // search
     get search() {
       if (this._search === undefined) {
-        const [pathname, search] = parsePath(this._node.req.url || "/");
+        const [pathname, search] = parsePathWithoutURL(this._node.req.url || "/");
         this._search = search;
         if (this._pathname === undefined) {
           this._pathname = pathname;
@@ -211,7 +211,7 @@ export const NodeRequestURL: {
 
   return _URL;
 })();
-function parsePath(input: string): [pathname: string, search: string] {
+function parsePathWithoutURL(input: string): [pathname: string, search: string] {
   const normalized = (input || "/").replace(/\\/g, "/");
 
   // Remove protocol (e.g., http://)

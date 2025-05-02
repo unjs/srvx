@@ -89,6 +89,25 @@ export function addTests(opts: {
       expect(await response.text()).toBe("ok");
       expect(response.headers.get("x-plugin-header")).toBe("1");
     });
+
+    test("should stream pipe response from Node.js Readable", async () => {
+      const res = await fetch(url("/stream-pipe"));
+      expect(res.status).toBe(200);
+
+      const reader = res.body!.getReader();
+      const decoder = new TextDecoder();
+      let result = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        result += decoder.decode(value, { stream: true });
+      }
+
+      expect(result).toContain("pipe-chunk1");
+      expect(result).toContain("pipe-chunk2");
+      expect(result).toContain("pipe-chunk3");
+    });
   });
 }
 

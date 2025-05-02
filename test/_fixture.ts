@@ -81,6 +81,18 @@ export const fixture: (
       case "/stream": {
         return new _Response("chunk1\nchunk2\nchunk3");
       }
+      case "/stream-pipe": {
+        const { Readable } = await import("node:stream");
+        const stream = new Readable({
+          read() {
+            this.push("pipe-chunk1\n");
+            this.push("pipe-chunk2\n");
+            this.push("pipe-chunk3");
+            this.push(null); // End the stream
+          },
+        });
+        return new _Response(stream as any);
+      }
     }
     return new _Response("404", { status: 404 });
   },

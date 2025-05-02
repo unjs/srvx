@@ -1,9 +1,11 @@
 import { describe, beforeAll, afterAll } from "vitest";
+import * as http2 from 'node:http2';
 import { fetch, Agent } from "undici";
 import { addTests } from "./_tests.ts";
 import { serve, FastResponse } from "../src/adapters/node.ts";
 import { getTLSCert } from "./_utils.ts";
 import { fixture } from "./_fixture.ts";
+import { addStreamingTests } from "./_stream-tests.ts";
 
 const tls = await getTLSCert();
 
@@ -65,3 +67,35 @@ for (const config of testConfigs) {
     });
   });
 }
+
+describe.sequential('node (http2, stream)', () => {
+  let server: ReturnType<typeof serve> | undefined;
+  let clientSession: http2.ClientHttp2Session | undefined;
+
+  beforeAll(async () => {
+    server = serve(
+      fixture({
+        port: 0,
+        hostname: 'localhost',
+        node: { http2: true },
+        tls,
+      }),
+    );
+
+    await server!.ready();
+    // replace [::1] with localhost because h/2 cannot accept [::1]
+    clientSession = http2.connect(server!.url!.replace('[::1]', 'localhost'), {
+      rejectUnauthorized: false,
+    });
+  });
+
+  afterAll(async () => {
+    clientSession!.close(async () => {
+      await server!.close();
+    });
+  });
+
+  addStreamingTests({
+    clientSession: () => clientSession!,
+  });
+});

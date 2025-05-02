@@ -78,6 +78,10 @@ export const fixture: (
       case "/error": {
         throw new Error("test error");
       }
+      case "/stream": {
+        return new _Response("chunk1\nchunk2\nchunk3");
+      }
+      
     }
     return new _Response("404", { status: 404 });
   },

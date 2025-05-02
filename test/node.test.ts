@@ -1,5 +1,4 @@
 import { describe, beforeAll, afterAll } from "vitest";
-import * as http2 from "node:http2";
 import { fetch, Agent } from "undici";
 import { addTests, addStreamingTests } from "./_tests.ts";
 import { serve, FastResponse } from "../src/adapters/node.ts";
@@ -7,6 +6,18 @@ import { getTLSCert } from "./_utils.ts";
 import { fixture } from "./_fixture.ts";
 
 const tls = await getTLSCert();
+const getHttp2Client = () => {
+  // https://undici.nodejs.org/#/docs/api/Client.md?id=parameter-clientoptions
+  // https://github.com/nodejs/undici/issues/2750#issuecomment-1941009554
+  const h2Agent = new Agent({ allowH2: true, connect: { ...tls } });
+  const fetchWithHttp2 = ((input: any, init?: any) =>
+    fetch(input, {
+      ...init,
+      dispatcher: h2Agent,
+    })) as unknown as typeof globalThis.fetch;
+
+  return { fetchWithHttp2, h2Agent };
+};
 
 const testConfigs = [
   {
@@ -33,15 +44,7 @@ const testConfigs = [
 
 for (const config of testConfigs) {
   describe.sequential(`node (${config.name})`, () => {
-    // https://undici.nodejs.org/#/docs/api/Client.md?id=parameter-clientoptions
-    // https://github.com/nodejs/undici/issues/2750#issuecomment-1941009554
-    const h2Agent = new Agent({ allowH2: true, connect: { ...tls } });
-    const fetchWithHttp2 = ((input: any, init?: any) =>
-      fetch(input, {
-        ...init,
-        dispatcher: h2Agent,
-      })) as unknown as typeof globalThis.fetch;
-
+    const { fetchWithHttp2, h2Agent } = getHttp2Client();
     let server: ReturnType<typeof serve> | undefined;
 
     beforeAll(async () => {
@@ -69,7 +72,7 @@ for (const config of testConfigs) {
 
 describe.sequential("node (http2, stream)", () => {
   let server: ReturnType<typeof serve> | undefined;
-  let clientSession: http2.ClientHttp2Session | undefined;
+  const { fetchWithHttp2, h2Agent } = getHttp2Client();
 
   beforeAll(async () => {
     server = serve(
@@ -82,20 +85,15 @@ describe.sequential("node (http2, stream)", () => {
     );
 
     await server!.ready();
-    // replace [::1] with localhost because h/2 cannot accept [::1]
-    clientSession = http2.connect(server!.url!.replace("[::1]", "localhost"), {
-      rejectUnauthorized: false,
-    });
   });
 
   afterAll(async () => {
-    clientSession!.close(async () => {
-      await server!.close();
-    });
+    await h2Agent.close();
+    await server!.close();
   });
 
   addStreamingTests({
-    clientSession: () => clientSession!,
-    runtime: "node",
+    url: (path) => server!.url! + path.slice(1),
+    fetch: fetchWithHttp2,
   });
 });

@@ -1,5 +1,4 @@
 import { describe, expect, test } from "vitest";
-import * as http2 from "node:http2";
 
 export function addTests(opts: {
   url: (path: string) => string;
@@ -94,71 +93,72 @@ export function addTests(opts: {
 }
 
 export function addStreamingTests(opts: {
-  clientSession: () => http2.ClientHttp2Session;
-  runtime: string;
+  url: (path: string) => string;
+  fetch?: typeof globalThis.fetch;
 }): void {
-  const { clientSession, runtime } = opts;
+  const { url, fetch = globalThis.fetch } = opts;
 
-  describe(`${runtime} - http2 - stream`, () => {
-    test("streaming response", async () => {
-      const streamReq = clientSession().request({
-        ":method": "GET",
-        ":path": "/stream",
-      });
+  test("streaming response", async () => {
+    const response = await fetch(url("/stream"));
+    const chunks: string[] = [];
 
-      const chunks: Buffer[] = [];
+    const reader = response.body!.getReader();
+    const decoder = new TextDecoder(`utf-8`);
 
-      streamReq.on("data", (chunk) => {
-        chunks.push(chunk);
-      });
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) {
+        break;
+      }
 
-      return new Promise<void>((resolve, reject) => {
-        streamReq.on("end", () => {
-          try {
-            const data = Buffer.concat(chunks).toString();
-            expect(data).toContain("chunk1");
-            expect(data).toContain("chunk2");
-            expect(data).toContain("chunk3");
-            resolve();
-          } catch (error) {
-            reject(error);
-          }
-        });
+      chunks.push(decoder.decode(value, { stream: true }));
+    }
 
-        streamReq.on("error", reject);
-      });
+    expect(chunks.join("")).toContain("chunk1");
+    expect(chunks.join("")).toContain("chunk2");
+    expect(chunks.join("")).toContain("chunk3");
+  });
+
+  test("abort stream", async () => {
+    const controller = new AbortController();
+    const signal = controller.signal;
+
+    // Create a stream using fetch API
+    const response = await fetch(url("/long-stream"), {
+      signal,
     });
 
-    test("abort stream", async () => {
-      const controller = new AbortController();
+    // Get the response as a readable stream
+    const reader = response.body!.getReader();
 
-      // Create a stream that we'll abort
-      const streamReq = clientSession().request({
-        ":method": "GET",
-        ":path": "/long-stream",
-      });
+    const chunks: Uint8Array[] = [];
 
-      const chunks: Buffer[] = [];
-
-      streamReq.on("data", (chunk) => {
-        chunks.push(chunk);
+    // Read the first chunk and then abort
+    try {
+      const { value, done } = await reader.read();
+      if (!done) {
+        chunks.push(value);
         // Abort after receiving first chunk
         controller.abort();
-      });
+      }
 
-      // Connect abort signal
-      controller.signal.addEventListener("abort", () => {
-        streamReq.close(http2.constants.NGHTTP2_CANCEL);
-      });
+      // Try to read more chunks (this should throw when aborted)
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        chunks.push(value);
+      }
+    } catch (error) {
+      // We expect the AbortError to be thrown
+      expect((error as any).name).toBe("AbortError");
+    } finally {
+      // Make sure to release the reader
+      reader.releaseLock();
+    }
 
-      return new Promise<void>((resolve) => {
-        streamReq.on("close", () => {
-          // We expect the stream to be closed after first chunk
-          expect(chunks.length).toBeGreaterThan(0);
-          expect(chunks.length).toBeLessThan(10); // Assuming long stream has many chunks
-          resolve();
-        });
-      });
-    });
+    // We expect at least one chunk to be received before aborting
+    expect(chunks.length).toBeGreaterThan(0);
+    // And we expect the abort to prevent receiving too many chunks
+    expect(chunks.length).toBeLessThan(10); // Assuming long stream has many chunks
   });
 }

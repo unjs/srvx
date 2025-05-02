@@ -81,7 +81,6 @@ export const fixture: (
       case "/stream": {
         return new _Response("chunk1\nchunk2\nchunk3");
       }
-      
     }
     return new _Response("404", { status: 404 });
   },

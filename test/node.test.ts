@@ -1,5 +1,5 @@
 import { describe, beforeAll, afterAll } from "vitest";
-import * as http2 from 'node:http2';
+import * as http2 from "node:http2";
 import { fetch, Agent } from "undici";
 import { addTests } from "./_tests.ts";
 import { serve, FastResponse } from "../src/adapters/node.ts";
@@ -68,7 +68,7 @@ for (const config of testConfigs) {
   });
 }
 
-describe.sequential('node (http2, stream)', () => {
+describe.sequential("node (http2, stream)", () => {
   let server: ReturnType<typeof serve> | undefined;
   let clientSession: http2.ClientHttp2Session | undefined;
 
@@ -76,7 +76,7 @@ describe.sequential('node (http2, stream)', () => {
     server = serve(
       fixture({
         port: 0,
-        hostname: 'localhost',
+        hostname: "localhost",
         node: { http2: true },
         tls,
       }),
@@ -84,7 +84,7 @@ describe.sequential('node (http2, stream)', () => {
 
     await server!.ready();
     // replace [::1] with localhost because h/2 cannot accept [::1]
-    clientSession = http2.connect(server!.url!.replace('[::1]', 'localhost'), {
+    clientSession = http2.connect(server!.url!.replace("[::1]", "localhost"), {
       rejectUnauthorized: false,
     });
   });

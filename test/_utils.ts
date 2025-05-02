@@ -1,7 +1,7 @@
 import { fileURLToPath } from "node:url";
 import { join } from "node:path";
 import { existsSync } from "node:fs";
-import { readFile, mkdir } from "node:fs/promises";
+import { readFile, mkdir, writeFile } from "node:fs/promises";
 import { afterAll, beforeAll } from "vitest";
 import { execa, type ResultPromise as ExecaRes } from "execa";
 import { getRandomPort, waitForPort } from "get-port-please";
@@ -58,23 +58,72 @@ export async function getTLSCert(): Promise<{
   key: string;
 }> {
   const certDir = join(testDir, ".tmp/tls");
-
   const caFile = join(certDir, "ca.crt");
   const certFile = join(certDir, "server.crt");
   const keyFile = join(certDir, "server.key");
 
-  if (!existsSync(caFile) || !existsSync(certFile) || !existsSync(keyFile)) {
-    await mkdir(certDir, { recursive: true });
-
-    // Generate CA key and certificate
-    const x = execa({ cwd: certDir });
-    await x`openssl req -x509 -newkey rsa:2048 -nodes -keyout ca.key -out ca.crt -days 365 -subj /CN=test -addext subjectAltName=DNS:localhost,IP:127.0.0.1,IP:::1`;
-    await x`openssl req -newkey rsa:2048 -nodes -keyout server.key -out server.csr -subj /CN=localhost -addext subjectAltName=DNS:localhost,IP:127.0.0.1,IP:::1`;
-    await x`openssl x509 -req -in server.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out server.crt -days 365  -copy_extensions copy`;
+  if (existsSync(caFile) && existsSync(certFile) && existsSync(keyFile)) {
+    return {
+      ca: await readFile(caFile, "utf8"),
+      cert: await readFile(certFile, "utf8"),
+      key: await readFile(keyFile, "utf8"),
+    };
   }
-  return {
-    ca: await readFile(caFile, "utf8"),
-    cert: await readFile(certFile, "utf8"),
-    key: await readFile(keyFile, "utf8"),
-  };
+
+  const { pki, md } = await import("node-forge");
+
+  // Generate keys
+  const caKeys = pki.rsa.generateKeyPair(2048);
+  const serverKeys = pki.rsa.generateKeyPair(2048);
+
+  // Create CA cert
+  const caCert = pki.createCertificate();
+  caCert.publicKey = caKeys.publicKey;
+  caCert.serialNumber = "01";
+  caCert.validity.notBefore = new Date();
+  caCert.validity.notAfter = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
+  caCert.setSubject([{ name: "commonName", value: "Test CA" }]);
+  caCert.setIssuer(caCert.subject.attributes);
+  caCert.setExtensions([
+    { name: "basicConstraints", cA: true },
+    { name: "keyUsage", keyCertSign: true, digitalSignature: true },
+    { name: "subjectKeyIdentifier" },
+  ]);
+  caCert.sign(caKeys.privateKey, md.sha256.create());
+
+  // Create server cert
+  const serverCert = pki.createCertificate();
+  serverCert.publicKey = serverKeys.publicKey;
+  serverCert.serialNumber = "02";
+  serverCert.validity.notBefore = new Date();
+  serverCert.validity.notAfter = new Date(
+    Date.now() + 365 * 24 * 60 * 60 * 1000,
+  );
+  serverCert.setSubject([{ name: "commonName", value: "localhost" }]);
+  serverCert.setIssuer(caCert.subject.attributes);
+  serverCert.setExtensions([
+    { name: "basicConstraints", cA: false },
+    { name: "keyUsage", digitalSignature: true, keyEncipherment: true },
+    { name: "extKeyUsage", serverAuth: true },
+    {
+      name: "subjectAltName",
+      altNames: [
+        { type: 2, value: "localhost" },
+        { type: 7, ip: "127.0.0.1" },
+        { type: 7, ip: "::1" },
+      ],
+    },
+  ]);
+  serverCert.sign(caKeys.privateKey, md.sha256.create());
+
+  const ca = pki.certificateToPem(caCert);
+  const key = pki.privateKeyToPem(serverKeys.privateKey);
+  const cert = pki.certificateToPem(serverCert);
+
+  await mkdir(certDir, { recursive: true });
+  await writeFile(caFile, ca);
+  await writeFile(certFile, cert);
+  await writeFile(keyFile, key);
+
+  return { ca, cert, key };
 }

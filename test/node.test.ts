@@ -1,11 +1,10 @@
 import { describe, beforeAll, afterAll } from "vitest";
 import * as http2 from "node:http2";
 import { fetch, Agent } from "undici";
-import { addTests } from "./_tests.ts";
+import { addTests, addStreamingTests } from "./_tests.ts";
 import { serve, FastResponse } from "../src/adapters/node.ts";
 import { getTLSCert } from "./_utils.ts";
 import { fixture } from "./_fixture.ts";
-import { addStreamingTests } from "./_stream-tests.ts";
 
 const tls = await getTLSCert();
 
@@ -97,5 +96,6 @@ describe.sequential("node (http2, stream)", () => {
 
   addStreamingTests({
     clientSession: () => clientSession!,
+    runtime: "node",
   });
 });

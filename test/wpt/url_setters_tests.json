@@ -1,7 +1,6 @@
 {
   "comment": [
     "## Tests for setters of https://url.spec.whatwg.org/#urlutils-members",
-    "source: https://github.com/web-platform-tests/wpt/blob/master/url/resources/setters_tests.json",
     "",
     "This file contains a JSON object.",
     "Other than 'comment', each key is an attribute of the `URL` interface",
@@ -2029,7 +2028,6 @@
       "comment": "UTF-8 percent encoding with the default encode set. Tabs and newlines are removed.",
       "href": "a:/",
       "new_value": "\u0000\u0001\t\n\r\u001f !\"#$%&'()*+,-./09:;<=>?@AZ[\\]^_`az{|}~\u007f\u0080\u0081Éé",
-      "skip": true,
       "expected": {
         "href": "a:/%00%01%1F%20!%22%23$%&'()*+,-./09:;%3C=%3E%3F@AZ[\\]%5E_%60az%7B|%7D~%7F%C2%80%C2%81%C3%89%C3%A9",
         "pathname": "/%00%01%1F%20!%22%23$%&'()*+,-./09:;%3C=%3E%3F@AZ[\\]%5E_%60az%7B|%7D~%7F%C2%80%C2%81%C3%89%C3%A9"
@@ -2281,7 +2279,6 @@
     {
       "comment": "Trailing spaces and opaque paths",
       "href": "data:space ?query",
-      "skip": true,
       "new_value": "",
       "expected": {
         "href": "data:space%20",
@@ -2291,7 +2288,6 @@
     },
     {
       "href": "sc:space ?query",
-      "skip": true,
       "new_value": "",
       "expected": {
         "href": "sc:space%20",
@@ -2302,7 +2298,6 @@
     {
       "comment": "Trailing spaces and opaque paths",
       "href": "data:space  ?query#fragment",
-      "skip": true,
       "new_value": "",
       "expected": {
         "href": "data:space %20#fragment",
@@ -2312,7 +2307,6 @@
     {
       "href": "sc:space  ?query#fragment",
       "new_value": "",
-      "skip": true,
       "expected": {
         "href": "sc:space %20#fragment",
         "search": ""
@@ -2472,7 +2466,6 @@
     },
     {
       "comment": "Trailing spaces and opaque paths",
-      "skip": true,
       "href": "data:space                                                                                                                                  #fragment",
       "new_value": "",
       "expected": {
@@ -2483,7 +2476,6 @@
     },
     {
       "href": "sc:space    #fragment",
-      "skip": true,
       "new_value": "",
       "expected": {
         "href": "sc:space   %20",
@@ -2493,7 +2485,6 @@
     },
     {
       "comment": "Trailing spaces and opaque paths",
-      "skip": true,
       "href": "data:space  ?query#fragment",
       "new_value": "",
       "expected": {
@@ -2504,7 +2495,6 @@
     {
       "href": "sc:space  ?query#fragment",
       "new_value": "",
-      "skip": true,
       "expected": {
         "href": "sc:space %20?query",
         "hash": ""

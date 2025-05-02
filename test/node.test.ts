@@ -49,10 +49,13 @@ for (const config of testConfigs) {
 
     beforeAll(async () => {
       server = serve(
-        fixture({
-          port: 0,
-          ...config.serveOptions,
-        }),
+        fixture(
+          {
+            port: 0,
+            ...config.serveOptions,
+          },
+          config.Response as unknown as typeof Response, // TODO: fix type incompatibility
+        ),
       );
       await server!.ready();
     });
@@ -70,18 +73,21 @@ for (const config of testConfigs) {
   });
 }
 
-describe.sequential("node (http2, stream)", () => {
+describe.sequential("node (http2, stream, fastResponse)", () => {
   let server: ReturnType<typeof serve> | undefined;
   const { fetchWithHttp2, h2Agent } = getHttp2Client();
 
   beforeAll(async () => {
     server = serve(
-      fixture({
-        port: 0,
-        hostname: "localhost",
-        node: { http2: true },
-        tls,
-      }),
+      fixture(
+        {
+          port: 0,
+          hostname: "localhost",
+          node: { http2: true },
+          tls,
+        },
+        FastResponse as unknown as typeof Response, // TODO: fix type incompatibility
+      ),
     );
 
     await server!.ready();

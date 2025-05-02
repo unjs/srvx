@@ -11,7 +11,7 @@ export default defineConfig({
         "src/adapters/deno.ts",
         "src/types.ts",
       ],
-      reporter: ["text", "clover", "json"],
+      reporter: ["text", "clover", "json", "html"],
     },
   },
 });

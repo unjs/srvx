@@ -1,3 +1,10 @@
+/**
+ * Wrapper for URL with fast path access to `.pathname` and `.search` props.
+ *
+ * **NOTE:** It is assumed that the input URL is already ecoded and formatted from an HTTP request and contains no hash.
+ *
+ * **NOTE:** Triggering the setters or getters on other props will deoptimize to full URL parsing.
+ */
 export const FastURL: { new (url: string): URL } = /* @__PURE__ */ (() => {
   const FastURL = class URL implements globalThis.URL {
     #originalURL: string;
@@ -67,13 +74,13 @@ export const FastURL: { new (url: string): URL } = /* @__PURE__ */ (() => {
       }
       if (!this._search) {
         const qIndex = this._urlqindex;
-        if (qIndex === -1) {
+        if (qIndex === -1 || qIndex === this.#originalURL.length - 1) {
           this._search = "";
         } else {
           this._search =
             qIndex === undefined
               ? this._url.search // deoptimize (mostly unlikely unless pathname is not accessed)
-              : this.#originalURL.slice(this._urlqindex);
+              : this.#originalURL.slice(qIndex);
         }
       }
       return this._search;

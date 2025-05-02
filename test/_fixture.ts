@@ -84,7 +84,6 @@ export const fixture: (
 });
 
 if (import.meta.main) {
-  console.log("main", import.meta.main);
   const server = serve(fixture({}));
   await server.ready();
 }

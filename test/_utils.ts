@@ -67,19 +67,10 @@ export async function getTLSCert(): Promise<{
     await mkdir(certDir, { recursive: true });
 
     // Generate CA key and certificate
-    await execa({
-      cwd: certDir,
-    })`openssl req -x509 -newkey rsa:2048 -nodes -keyout ca.key -out ca.crt -days 365 -subj /CN=::1,127.0.0.1,localhost`;
-
-    // Generate server key and CSR
-    await execa({
-      cwd: certDir,
-    })`openssl req -newkey rsa:2048 -nodes -keyout server.key -out server.csr -subj /CN=::1,127.0.0.1,localhost`;
-
-    // Sign server certificate with CA
-    await execa({
-      cwd: certDir,
-    })`openssl x509 -req -in server.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out server.crt -days 365`;
+    const x = execa({ cwd: certDir });
+    await x`openssl req -x509 -newkey rsa:2048 -nodes -keyout ca.key -out ca.crt -days 365 -subj /CN=test -addext subjectAltName=DNS:localhost,IP:127.0.0.1,IP:::1`;
+    await x`openssl req -newkey rsa:2048 -nodes -keyout server.key -out server.csr -subj /CN=localhost -addext subjectAltName=DNS:localhost,IP:127.0.0.1,IP:::1`;
+    await x`openssl x509 -req -in server.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out server.crt -days 365  -copy_extensions copy`;
   }
   return {
     ca: await readFile(caFile, "utf8"),

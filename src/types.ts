@@ -94,7 +94,7 @@ export interface ServerOptions {
    *
    * If `protocol` is not set, Server will use `http` as the default protocol or `https` if both `tls.cert` and `tls.key` options are provided.
    */
-  protocol?: "http" | "https" | "http2";
+  protocol?: "http" | "https";
 
   /**
    * If set to `true`, server will not print the listening address.

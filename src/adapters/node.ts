@@ -172,12 +172,14 @@ class NodeServer implements Server {
 
   close(closeAll?: boolean): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      if (closeAll) {
-        (this.node?.server as NodeHttp.Server)?.closeAllConnections?.();
+      const server = this.node?.server;
+      if (!server) {
+        return resolve();
       }
-      this.node?.server?.close((error?: Error) =>
-        error ? reject(error) : resolve(),
-      );
+      if (closeAll && "closeAllConnections" in server) {
+        server.closeAllConnections();
+      }
+      server.close((error?: Error) => (error ? reject(error) : resolve()));
     });
   }
 }

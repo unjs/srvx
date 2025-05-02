@@ -5,9 +5,6 @@ import { serve, FastResponse } from "../src/adapters/node.ts";
 import { getTLSCert } from "./_utils.ts";
 import { fixture } from "./_fixture.ts";
 
-// TODO: fix CA!
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-
 const tls = await getTLSCert();
 
 const testConfigs = [
@@ -43,6 +40,7 @@ for (const config of testConfigs) {
         ...init,
         dispatcher: h2Agent,
       })) as unknown as typeof globalThis.fetch;
+
     let server: ReturnType<typeof serve> | undefined;
 
     beforeAll(async () => {

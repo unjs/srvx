@@ -109,7 +109,7 @@ export const NodeRequestHeaders: {
       const isHttp2 = this._node.req.httpVersion === "2.0";
 
       for (const key in headers) {
-        if (!isHttp2 || !key.startsWith(":")) {
+        if (!isHttp2 || key[0] !== ":") {
           yield [key, _normalizeValue(headers[key])];
         }
       }
@@ -279,8 +279,8 @@ function _normalizeValue(
 }
 
 function validateHeader(name: string): string {
-  if (name[0] === ":" || name.includes(":")) {
-    throw new TypeError("Invalid name");
+  if (name[0] === ":") {
+    throw new TypeError("Invalid header name");
   }
   return name.toLowerCase();
 }

@@ -1,10 +1,12 @@
-import type NodeHttp from "node:http";
-import type { NodeResponse } from "./response.ts";
-import type { Duplex, Readable as NodeReadable } from "node:stream";
 import { splitSetCookieString } from "cookie-es";
 
+import type { Duplex, Readable as NodeReadable } from "node:stream";
+import type NodeHttp from "node:http";
+import type { NodeServerResponse } from "../types.ts";
+import type { NodeResponse } from "./response.ts";
+
 export async function sendNodeResponse(
-  nodeRes: NodeHttp.ServerResponse,
+  nodeRes: NodeServerResponse,
   webRes: Response | NodeResponse,
 ): Promise<void> {
   if (!webRes) {
@@ -15,9 +17,7 @@ export async function sendNodeResponse(
   // Fast path for NodeResponse
   if ((webRes as NodeResponse).nodeResponse) {
     const res = (webRes as NodeResponse).nodeResponse();
-    if (!nodeRes.headersSent) {
-      nodeRes.writeHead(res.status, res.statusText, res.headers.flat());
-    }
+    writeHead(nodeRes, res.status, res.statusText, res.headers.flat());
     if (res.body) {
       if (res.body instanceof ReadableStream) {
         return streamBody(res.body, nodeRes);
@@ -25,7 +25,9 @@ export async function sendNodeResponse(
         (res.body as NodeReadable).pipe(nodeRes);
         return new Promise((resolve) => nodeRes.on("close", resolve));
       }
-      nodeRes.write(res.body);
+      // Note: NodeHttp2ServerResponse.write() body type declared as string | Uint8Array
+      // We explicitly test other types in runtime.
+      (nodeRes as NodeHttp.ServerResponse).write(res.body);
     }
     return endNodeResponse(nodeRes);
   }
@@ -41,17 +43,26 @@ export async function sendNodeResponse(
     }
   }
 
-  if (!nodeRes.headersSent) {
-    nodeRes.writeHead(
-      webRes.status || 200,
-      webRes.statusText,
-      headerEntries.flat(),
-    );
-  }
+  writeHead(nodeRes, webRes.status, webRes.statusText, headerEntries.flat());
 
   return webRes.body
     ? streamBody(webRes.body, nodeRes)
     : endNodeResponse(nodeRes);
+}
+
+function writeHead(
+  nodeRes: NodeServerResponse,
+  status: number,
+  statusText: string,
+  headers: NodeHttp.OutgoingHttpHeader[],
+): void {
+  if (!nodeRes.headersSent) {
+    if (nodeRes.req?.httpVersion === "2.0") {
+      nodeRes.writeHead(status, headers.flat() as any);
+    } else {
+      nodeRes.writeHead(status, statusText, headers.flat() as any);
+    }
+  }
 }
 
 export async function sendNodeUpgradeResponse(
@@ -76,13 +87,13 @@ export async function sendNodeUpgradeResponse(
   });
 }
 
-function endNodeResponse(nodeRes: NodeHttp.ServerResponse) {
+function endNodeResponse(nodeRes: NodeServerResponse) {
   return new Promise<void>((resolve) => nodeRes.end(resolve));
 }
 
 export function streamBody(
   stream: ReadableStream,
-  nodeRes: NodeHttp.ServerResponse,
+  nodeRes: NodeServerResponse,
 ): Promise<void> | void {
   // stream is already destroyed
   if (nodeRes.destroyed) {
@@ -108,7 +119,7 @@ export function streamBody(
       if (done) {
         // End the response
         nodeRes.end();
-      } else if (nodeRes.write(value)) {
+      } else if ((nodeRes as NodeHttp.ServerResponse).write(value)) {
         // Continue reading recursively
         reader.read().then(streamHandle, streamCancel);
       } else {

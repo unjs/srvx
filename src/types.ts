@@ -1,5 +1,6 @@
 import type * as NodeHttp from "node:http";
 import type * as NodeHttps from "node:https";
+import type * as NodeHttp2 from "node:http2";
 import type * as NodeNet from "node:net";
 import type * as Bun from "bun";
 import type * as CF from "@cloudflare/workers-types";
@@ -123,8 +124,12 @@ export interface ServerOptions {
   /**
    * Node.js server options.
    */
-  node?: (NodeHttp.ServerOptions | NodeHttps.ServerOptions) &
-    NodeNet.ListenOptions;
+  node?: (
+    | NodeHttp.ServerOptions
+    | NodeHttps.ServerOptions
+    | NodeHttp2.ServerOptions
+  ) &
+    NodeNet.ListenOptions & { http2?: boolean };
 
   /**
    * Bun server options
@@ -183,10 +188,10 @@ export interface Server<Handler = ServerHandler> {
    * Node.js context.
    */
   readonly node?: {
-    server?: NodeHttp.Server;
+    server?: NodeHttp.Server | NodeHttp2.Http2Server;
     handler: (
-      nodeReq: NodeHttp.IncomingMessage,
-      nodeRes: NodeHttp.ServerResponse,
+      req: NodeServerRequest,
+      res: NodeServerResponse,
     ) => void | Promise<void>;
   };
 
@@ -248,8 +253,8 @@ export interface ServerRuntimeContext {
    * Underlying Node.js server request info.
    */
   node?: {
-    req: NodeHttp.IncomingMessage;
-    res?: NodeHttp.ServerResponse;
+    req: NodeServerRequest;
+    res?: NodeServerResponse;
   };
 
   /**
@@ -305,9 +310,17 @@ export type DenoFetchHandler = (
   info?: Deno.ServeHandlerInfo<Deno.NetAddr>,
 ) => Response | Promise<Response>;
 
+export type NodeServerRequest =
+  | NodeHttp.IncomingMessage
+  | NodeHttp2.Http2ServerRequest;
+
+export type NodeServerResponse =
+  | NodeHttp.ServerResponse
+  | NodeHttp2.Http2ServerResponse;
+
 export type NodeHttpHandler = (
-  nodeReq: NodeHttp.IncomingMessage,
-  nodeRes: NodeHttp.ServerResponse,
+  req: NodeServerRequest,
+  res: NodeServerResponse,
 ) => void | Promise<void>;
 
 export type CloudflareFetchHandler = CF.ExportedHandlerFetchHandler;

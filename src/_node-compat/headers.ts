@@ -1,25 +1,26 @@
-import type NodeHttp from "node:http";
 import { splitSetCookieString } from "cookie-es";
 import { kNodeInspect } from "./_common.ts";
 
+import type { NodeServerRequest, NodeServerResponse } from "../types.ts";
+
 export const NodeRequestHeaders: {
   new (nodeCtx: {
-    req: NodeHttp.IncomingMessage;
-    res?: NodeHttp.ServerResponse;
+    req: NodeServerRequest;
+    res?: NodeServerResponse;
   }): globalThis.Headers;
 } = /* @__PURE__ */ (() => {
   const _Headers = class Headers implements globalThis.Headers {
-    _node: { req: NodeHttp.IncomingMessage; res?: NodeHttp.ServerResponse };
+    _node: {
+      req: NodeServerRequest;
+      res?: NodeServerResponse;
+    };
 
-    constructor(nodeCtx: {
-      req: NodeHttp.IncomingMessage;
-      res?: NodeHttp.ServerResponse;
-    }) {
+    constructor(nodeCtx: { req: NodeServerRequest; res?: NodeServerResponse }) {
       this._node = nodeCtx;
     }
 
     append(name: string, value: string): void {
-      name = name.toLowerCase();
+      name = validateHeader(name);
       const _headers = this._node.req.headers;
       const _current = _headers[name];
       if (_current) {
@@ -34,12 +35,12 @@ export const NodeRequestHeaders: {
     }
 
     delete(name: string): void {
-      name = name.toLowerCase();
+      name = validateHeader(name);
       this._node.req.headers[name] = undefined;
     }
 
     get(name: string): string | null {
-      name = name.toLowerCase();
+      name = validateHeader(name);
       const rawValue = this._node.req.headers[name];
       if (rawValue === undefined) {
         return null;
@@ -56,12 +57,12 @@ export const NodeRequestHeaders: {
     }
 
     has(name: string): boolean {
-      name = name.toLowerCase();
+      name = validateHeader(name);
       return !!this._node.req.headers[name];
     }
 
     set(name: string, value: string): void {
-      name = name.toLowerCase();
+      name = validateHeader(name);
       this._node.req.headers[name] = value;
     }
 
@@ -104,9 +105,13 @@ export const NodeRequestHeaders: {
     }
 
     *entries(): HeadersIterator<[string, string]> {
-      const _headers = this._node.req.headers;
-      for (const key in _headers) {
-        yield [key, _normalizeValue(_headers[key])];
+      const headers = this._node.req.headers;
+      const isHttp2 = this._node.req.httpVersion === "2.0";
+
+      for (const key in headers) {
+        if (!isHttp2 || key[0] !== ":") {
+          yield [key, _normalizeValue(headers[key])];
+        }
       }
     }
 
@@ -144,17 +149,14 @@ export const NodeRequestHeaders: {
 
 export const NodeResponseHeaders: {
   new (nodeCtx: {
-    req?: NodeHttp.IncomingMessage;
-    res: NodeHttp.ServerResponse;
+    req?: NodeServerRequest;
+    res: NodeServerResponse;
   }): globalThis.Headers;
 } = /* @__PURE__ */ (() => {
   const _Headers = class Headers implements globalThis.Headers {
-    _node: { req?: NodeHttp.IncomingMessage; res: NodeHttp.ServerResponse };
+    _node: { req?: NodeServerRequest; res: NodeServerResponse };
 
-    constructor(nodeCtx: {
-      req?: NodeHttp.IncomingMessage;
-      res: NodeHttp.ServerResponse;
-    }) {
+    constructor(nodeCtx: { req?: NodeServerRequest; res: NodeServerResponse }) {
       this._node = nodeCtx;
     }
 
@@ -274,4 +276,11 @@ function _normalizeValue(
     return value.join(", ");
   }
   return typeof value === "string" ? value : String(value ?? "");
+}
+
+function validateHeader(name: string): string {
+  if (name[0] === ":") {
+    throw new TypeError("Invalid header name");
+  }
+  return name.toLowerCase();
 }

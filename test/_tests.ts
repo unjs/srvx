@@ -1,10 +1,12 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { describe, expect, test } from "vitest";
 
-export function addTests(
-  url: (path: string) => string,
-  { runtime }: { runtime?: string } = {},
-): void {
+export function addTests(opts: {
+  url: (path: string) => string;
+  runtime: string;
+  fetch?: typeof globalThis.fetch;
+}): void {
+  const { url, fetch = globalThis.fetch } = opts;
+
   test("GET works", async () => {
     const response = await fetch(url("/"));
     expect(response.status).toBe(200);
@@ -86,6 +88,32 @@ export function addTests(
       expect(response.status).toBe(200);
       expect(await response.text()).toBe("ok");
       expect(response.headers.get("x-plugin-header")).toBe("1");
+    });
+  });
+
+  describe("response types", () => {
+    test("ReadableStream", async () => {
+      const res = await fetch(url("/response/ReadableStream"));
+      expect(res.status).toBe(200);
+      expect(await res.text()).toBe("chunk0\nchunk1\nchunk2\n");
+    });
+
+    test("NodeReadable", async () => {
+      const res = await fetch(url("/response/NodeReadable"));
+      expect(res.status).toBe(200);
+      expect(await res.text()).toBe("chunk0\nchunk1\nchunk2\n");
+    });
+
+    test("ArrayBuffer", async () => {
+      const res = await fetch(url("/response/ArrayBuffer"));
+      expect(res.status).toBe(200);
+      expect(await res.text()).toEqual("hello!");
+    });
+
+    test("Uint8Array", async () => {
+      const res = await fetch(url("/response/Uint8Array"));
+      expect(res.status).toBe(200);
+      expect(await res.text()).toEqual("hello!");
     });
   });
 }

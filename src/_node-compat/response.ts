@@ -1,6 +1,7 @@
+import { splitSetCookieString } from "cookie-es";
+
 import type NodeHttp from "node:http";
 import type { Readable as NodeReadable } from "node:stream";
-import { splitSetCookieString } from "cookie-es";
 
 export type NodeResponse = InstanceType<typeof NodeResponse>;
 

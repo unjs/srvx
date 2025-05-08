@@ -1,13 +1,18 @@
-import type NodeHttp from "node:http";
-import type NodeStream from "node:stream";
-import type { ServerRequest, ServerRuntimeContext } from "../types.ts";
 import { kNodeInspect } from "./_common.ts";
 import { NodeRequestHeaders } from "./headers.ts";
 import { NodeRequestURL } from "./url.ts";
 
+import type NodeStream from "node:stream";
+import type {
+  NodeServerRequest,
+  NodeServerResponse,
+  ServerRequest,
+  ServerRuntimeContext,
+} from "../types.ts";
+
 export type NodeRequestContext = {
-  req: NodeHttp.IncomingMessage;
-  res?: NodeHttp.ServerResponse;
+  req: NodeServerRequest;
+  res?: NodeServerResponse;
   upgrade?: {
     socket: NodeStream.Duplex;
     header: Buffer;
@@ -28,7 +33,7 @@ export const NodeRequest = /* @__PURE__ */ (() => {
     #textBody?: Promise<string>;
     #bodyStream?: undefined | ReadableStream<Uint8Array>;
 
-    _node: { req: NodeHttp.IncomingMessage; res?: NodeHttp.ServerResponse };
+    _node: { req: NodeServerRequest; res?: NodeServerResponse };
     runtime: ServerRuntimeContext;
 
     constructor(nodeCtx: NodeRequestContext) {

@@ -1,4 +1,4 @@
-import type { Server } from "../src/types.ts";
+import type { ServerOptions } from "../src/types.ts";
 
 // prettier-ignore
 const runtime = (globalThis as any).Deno ? "deno" : (globalThis.Bun ? "bun" : "node");
@@ -6,13 +6,17 @@ const { serve } = (await import(
   `../src/adapters/${runtime}.ts`
 )) as typeof import("../src/types.ts");
 
-export const server: Server = serve({
+export const fixture: (
+  opts?: Partial<ServerOptions>,
+  _Response?: typeof globalThis.Response,
+) => ServerOptions = (opts, _Response = globalThis.Response) => ({
+  ...opts,
   hostname: "localhost",
   plugins: [
     {
       fetch(req, next) {
         if (req.headers.has("X-plugin-req")) {
-          return new Response("response from req plugin");
+          return new _Response("response from req plugin");
         }
         return next();
       },
@@ -30,16 +34,14 @@ export const server: Server = serve({
   ],
 
   async error(err) {
-    return new Response(`error: ${(err as Error).message}`, { status: 500 });
+    return new _Response(`error: ${(err as Error).message}`, { status: 500 });
   },
-  async fetch(req) {
-    const Response =
-      (globalThis as any).TEST_RESPONSE_CTOR || globalThis.Response;
 
+  async fetch(req) {
     const url = new URL(req.url);
     switch (url.pathname) {
       case "/": {
-        return new Response("ok");
+        return new _Response("ok");
       }
       case "/headers": {
         // Trigger Node.js writeHead slowpath to reproduce https://github.com/h3js/srvx/pull/40
@@ -59,28 +61,68 @@ export const server: Server = serve({
         );
       }
       case "/body/binary": {
-        return new Response(req.body);
+        return new _Response(req.body);
       }
       case "/body/text": {
-        return new Response(await req.text());
+        return new _Response(await req.text());
       }
       case "/ip": {
-        return new Response(`ip: ${req.ip}`);
+        return new _Response(`ip: ${req.ip}`);
       }
       case "/req-instanceof": {
-        return new Response(req instanceof Request ? "yes" : "no");
+        return new _Response(req instanceof Request ? "yes" : "no");
       }
       case "/req-headers-instanceof": {
-        return new Response(req.headers instanceof Headers ? "yes" : "no");
+        return new _Response(req.headers instanceof Headers ? "yes" : "no");
       }
       case "/error": {
         throw new Error("test error");
       }
+      case "/response/ArrayBuffer": {
+        const data = new TextEncoder().encode("hello!");
+        return new _Response(data.buffer);
+      }
+      case "/response/Uint8Array": {
+        const data = new TextEncoder().encode("hello!");
+        return new _Response(data);
+      }
+      case "/response/ReadableStream": {
+        return new _Response(
+          new ReadableStream({
+            start(controller) {
+              const count = +url.searchParams.get("count")! || 3;
+              for (let i = 0; i < count; i++) {
+                controller.enqueue(new TextEncoder().encode(`chunk${i}\n`));
+              }
+              controller.close();
+            },
+          }),
+          {
+            headers: {
+              "content-type": "text/plain",
+            },
+          },
+        );
+      }
+      case "/response/NodeReadable": {
+        const { Readable } = process.getBuiltinModule("node:stream");
+        return new _Response(
+          new Readable({
+            read() {
+              for (let i = 0; i < 3; i++) {
+                this.push(`chunk${i}\n`);
+              }
+              this.push(null /* end stream */);
+            },
+          }) as any,
+        );
+      }
     }
-    return new Response("404", { status: 404 });
+    return new _Response("404", { status: 404 });
   },
 });
 
-await server.ready();
-
-// console.log(`Listening on ${server.url}`);
+if (import.meta.main) {
+  const server = serve(fixture({}));
+  await server.ready();
+}

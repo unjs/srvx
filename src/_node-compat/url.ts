@@ -1,14 +1,15 @@
-import type NodeHttp from "node:http";
 import { kNodeInspect } from "./_common.ts";
 
+import type { NodeServerRequest, NodeServerResponse } from "../types.ts";
+
 export const NodeRequestURL: {
-  new (nodeCtx: {
-    req: NodeHttp.IncomingMessage;
-    res?: NodeHttp.ServerResponse;
-  }): URL;
+  new (nodeCtx: { req: NodeServerRequest; res?: NodeServerResponse }): URL;
 } = /* @__PURE__ */ (() => {
   const _URL = class URL implements Partial<globalThis.URL> {
-    _node: { req: NodeHttp.IncomingMessage; res?: NodeHttp.ServerResponse };
+    _node: {
+      req: NodeServerRequest;
+      res?: NodeServerResponse;
+    };
 
     _hash = "";
     _username = "";
@@ -21,10 +22,7 @@ export const NodeRequestURL: {
     _search?: string;
     _searchParams?: URLSearchParams;
 
-    constructor(nodeCtx: {
-      req: NodeHttp.IncomingMessage;
-      res?: NodeHttp.ServerResponse;
-    }) {
+    constructor(nodeCtx: { req: NodeServerRequest; res?: NodeServerResponse }) {
       this._node = nodeCtx;
     }
 
@@ -54,7 +52,11 @@ export const NodeRequestURL: {
 
     // host
     get host() {
-      return this._node.req.headers.host || "";
+      return (
+        this._node.req.headers.host ||
+        (this._node.req.headers[":authority"] as string) ||
+        ""
+      );
     }
     set host(value: string) {
       this._hostname = undefined;

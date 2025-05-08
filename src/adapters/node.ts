@@ -1,12 +1,6 @@
-import type {
-  FetchHandler,
-  NodeHttpHandler,
-  Server,
-  ServerHandler,
-  ServerOptions,
-} from "../types.ts";
 import NodeHttp from "node:http";
 import NodeHttps from "node:https";
+import NodeHttp2 from "node:http2";
 import {
   sendNodeResponse,
   sendNodeUpgradeResponse,
@@ -20,6 +14,16 @@ import {
 } from "../_utils.node.ts";
 import { wrapFetch } from "../_plugin.ts";
 import { errorPlugin } from "../_error.ts";
+
+import type {
+  FetchHandler,
+  NodeHttpHandler,
+  NodeServerRequest,
+  NodeServerResponse,
+  Server,
+  ServerHandler,
+  ServerOptions,
+} from "../types.ts";
 
 export { FastURL } from "../_url.ts";
 
@@ -36,10 +40,7 @@ export function serve(options: ServerOptions): Server {
 }
 
 export function toNodeHandler(fetchHandler: FetchHandler): NodeHttpHandler {
-  return (
-    nodeReq: NodeHttp.IncomingMessage,
-    nodeRes: NodeHttp.ServerResponse,
-  ) => {
+  return (nodeReq, nodeRes) => {
     const request = new NodeRequest({ req: nodeReq, res: nodeRes });
     const res = fetchHandler(request);
     return res instanceof Promise
@@ -50,13 +51,14 @@ export function toNodeHandler(fetchHandler: FetchHandler): NodeHttpHandler {
 
 // https://nodejs.org/api/http.html
 // https://nodejs.org/api/https.html
-
+// https://nodejs.org/api/http2.html
 class NodeServer implements Server {
   readonly runtime = "node";
   readonly options: ServerOptions;
   readonly node: Server["node"];
   readonly serveOptions: ServerOptions["node"];
   readonly fetch: ServerHandler;
+  readonly #isSecure: boolean;
 
   #listeningPromise?: Promise<void>;
 
@@ -66,8 +68,8 @@ class NodeServer implements Server {
     const fetchHandler = (this.fetch = wrapFetch(this, [errorPlugin]));
 
     const handler = (
-      nodeReq: NodeHttp.IncomingMessage,
-      nodeRes: NodeHttp.ServerResponse,
+      nodeReq: NodeServerRequest,
+      nodeRes: NodeServerResponse,
     ) => {
       const request = new NodeRequest({ req: nodeReq, res: nodeRes });
       const res = fetchHandler(request);
@@ -88,13 +90,33 @@ class NodeServer implements Server {
       ...this.options.node,
     };
 
-    // Create HTTPS server if HTTPS options are provided, otherwise create HTTP server
-    const server = (this.serveOptions as { cert: string }).cert
-      ? NodeHttps.createServer(
-          this.serveOptions as NodeHttps.ServerOptions,
+    // prettier-ignore
+    let server: NodeHttp.Server | NodeHttps.Server | NodeHttp2.Http2SecureServer;
+
+    // prettier-ignore
+    this.#isSecure = !!(this.serveOptions as { cert?: string }).cert && this.options.protocol !== "http";
+    const isHttp2 = this.options.node?.http2 ?? this.#isSecure;
+
+    if (isHttp2) {
+      if (this.#isSecure) {
+        server = NodeHttp2.createSecureServer(
+          { allowHTTP1: true, ...this.serveOptions },
           handler,
-        )
-      : NodeHttp.createServer(this.serveOptions, handler);
+        );
+      } else {
+        throw new Error("node.http2 option requires tls certificate!");
+      }
+    } else if (this.#isSecure) {
+      server = NodeHttps.createServer(
+        this.serveOptions as NodeHttps.ServerOptions,
+        handler,
+      );
+    } else {
+      server = NodeHttp.createServer(
+        this.serveOptions as NodeHttp.ServerOptions,
+        handler,
+      );
+    }
 
     // Listen to upgrade events if there is a hook
     const upgradeHandler = this.options.upgrade;
@@ -140,11 +162,7 @@ class NodeServer implements Server {
 
     return typeof addr === "string"
       ? addr /* socket */
-      : fmtURL(
-          addr.address,
-          addr.port,
-          this.node!.server! instanceof NodeHttps.Server,
-        );
+      : fmtURL(addr.address, addr.port, this.#isSecure);
   }
 
   ready(): Promise<Server> {
@@ -153,12 +171,14 @@ class NodeServer implements Server {
 
   close(closeAll?: boolean): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      if (closeAll) {
-        this.node?.server?.closeAllConnections?.();
+      const server = this.node?.server;
+      if (!server) {
+        return resolve();
       }
-      this.node?.server?.close((error?: Error) =>
-        error ? reject(error) : resolve(),
-      );
+      if (closeAll && "closeAllConnections" in server) {
+        server.closeAllConnections();
+      }
+      server.close((error?: Error) => (error ? reject(error) : resolve()));
     });
   }
 }

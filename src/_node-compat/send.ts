@@ -28,7 +28,8 @@ export async function sendNodeResponse(
         (res.body as NodeReadable).pipe(nodeRes);
         return new Promise((resolve) => nodeRes.on("close", resolve));
       }
-      // TODO: FastResponse write with http2?
+      // Note: NodeHttp2ServerResponse.write() body type declared as string | Uint8Array
+      // We explicitly test other types in runtime.
       (nodeRes as NodeHttp.ServerResponse).write(res.body);
     }
     return endNodeResponse(nodeRes);

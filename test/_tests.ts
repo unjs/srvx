@@ -91,19 +91,29 @@ export function addTests(opts: {
     });
   });
 
-  describe("streams", () => {
-    test("response streaming (ReadableStream)", async () => {
-      const res = await fetch(url("/stream/node"));
+  describe("response types", () => {
+    test("ReadableStream", async () => {
+      const res = await fetch(url("/response/ReadableStream"));
       expect(res.status).toBe(200);
       expect(await res.text()).toBe("chunk0\nchunk1\nchunk2\n");
     });
 
-    test("response streaming (Node.js Readable)", async () => {
-      const res = await fetch(url("/stream/node"));
+    test("NodeReadable", async () => {
+      const res = await fetch(url("/response/NodeReadable"));
       expect(res.status).toBe(200);
       expect(await res.text()).toBe("chunk0\nchunk1\nchunk2\n");
     });
 
-    // TODO: abortion test (we should test "fixture server" to see the abort signal)
+    test("ArrayBuffer", async () => {
+      const res = await fetch(url("/response/ArrayBuffer"));
+      expect(res.status).toBe(200);
+      expect(await res.text()).toEqual("hello!");
+    });
+
+    test("Uint8Array", async () => {
+      const res = await fetch(url("/response/Uint8Array"));
+      expect(res.status).toBe(200);
+      expect(await res.text()).toEqual("hello!");
+    });
   });
 }

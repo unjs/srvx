@@ -78,13 +78,19 @@ export const fixture: (
       case "/error": {
         throw new Error("test error");
       }
-      case "/stream": {
+      case "/response/ArrayBuffer": {
+        const data = new TextEncoder().encode("hello!");
+        return new _Response(data.buffer);
+      }
+      case "/response/Uint8Array": {
+        const data = new TextEncoder().encode("hello!");
+        return new _Response(data);
+      }
+      case "/response/ReadableStream": {
         return new _Response(
           new ReadableStream({
             start(controller) {
-              const count = Number.parseInt(
-                url.searchParams.get("count") || "3",
-              );
+              const count = +url.searchParams.get("count")! || 3;
               for (let i = 0; i < count; i++) {
                 controller.enqueue(new TextEncoder().encode(`chunk${i}\n`));
               }
@@ -98,8 +104,7 @@ export const fixture: (
           },
         );
       }
-
-      case "/stream/node": {
+      case "/response/NodeReadable": {
         const { Readable } = process.getBuiltinModule("node:stream");
         return new _Response(
           new Readable({

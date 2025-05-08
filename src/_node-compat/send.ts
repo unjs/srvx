@@ -2,7 +2,6 @@ import { splitSetCookieString } from "cookie-es";
 
 import type { Duplex, Readable as NodeReadable } from "node:stream";
 import type NodeHttp from "node:http";
-import NodeHttp2 from "node:http2";
 import type { NodeServerResponse } from "../types.ts";
 import type { NodeResponse } from "./response.ts";
 
@@ -18,9 +17,7 @@ export async function sendNodeResponse(
   // Fast path for NodeResponse
   if ((webRes as NodeResponse).nodeResponse) {
     const res = (webRes as NodeResponse).nodeResponse();
-    if (!nodeRes.headersSent) {
-      nodeRes.writeHead(res.status, res.statusText, res.headers.flat() as any);
-    }
+    writeHead(nodeRes, res.status, res.statusText, res.headers.flat());
     if (res.body) {
       if (res.body instanceof ReadableStream) {
         return streamBody(res.body, nodeRes);
@@ -46,22 +43,26 @@ export async function sendNodeResponse(
     }
   }
 
-  if (!nodeRes.headersSent) {
-    // TODO: use faster method to check http2
-    if (nodeRes instanceof NodeHttp2.Http2ServerResponse) {
-      nodeRes.writeHead(webRes.status || 200, headerEntries.flat() as any);
-    } else {
-      nodeRes.writeHead(
-        webRes.status || 200,
-        webRes.statusText,
-        headerEntries.flat() as any,
-      );
-    }
-  }
+  writeHead(nodeRes, webRes.status, webRes.statusText, headerEntries.flat());
 
   return webRes.body
     ? streamBody(webRes.body, nodeRes)
     : endNodeResponse(nodeRes);
+}
+
+function writeHead(
+  nodeRes: NodeServerResponse,
+  status: number,
+  statusText: string,
+  headers: NodeHttp.OutgoingHttpHeader[],
+): void {
+  if (!nodeRes.headersSent) {
+    if (nodeRes.req?.httpVersion === "2.0") {
+      nodeRes.writeHead(status, headers.flat() as any);
+    } else {
+      nodeRes.writeHead(status, statusText, headers.flat() as any);
+    }
+  }
 }
 
 export async function sendNodeUpgradeResponse(

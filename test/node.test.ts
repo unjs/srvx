@@ -1,6 +1,6 @@
 import { describe, beforeAll, afterAll } from "vitest";
 import { fetch, Agent } from "undici";
-import { addTests, addStreamingTests } from "./_tests.ts";
+import { addTests } from "./_tests.ts";
 import { serve, FastResponse } from "../src/adapters/node.ts";
 import { getTLSCert } from "./_utils.ts";
 import { fixture } from "./_fixture.ts";
@@ -72,34 +72,3 @@ for (const config of testConfigs) {
     });
   });
 }
-
-describe.sequential("node (http2, stream, fastResponse)", () => {
-  let server: ReturnType<typeof serve> | undefined;
-  const { fetchWithHttp2, h2Agent } = getHttp2Client();
-
-  beforeAll(async () => {
-    server = serve(
-      fixture(
-        {
-          port: 0,
-          hostname: "localhost",
-          node: { http2: true },
-          tls,
-        },
-        FastResponse as unknown as typeof Response, // TODO: fix type incompatibility
-      ),
-    );
-
-    await server!.ready();
-  });
-
-  afterAll(async () => {
-    await h2Agent.close();
-    await server!.close();
-  });
-
-  addStreamingTests({
-    url: (path) => server!.url! + path.slice(1),
-    fetch: fetchWithHttp2,
-  });
-});

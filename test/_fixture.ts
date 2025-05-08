@@ -79,19 +79,38 @@ export const fixture: (
         throw new Error("test error");
       }
       case "/stream": {
-        return new _Response("chunk1\nchunk2\nchunk3");
-      }
-      case "/stream-pipe": {
-        const { Readable } = await import("node:stream");
-        const stream = new Readable({
-          read() {
-            this.push("pipe-chunk1\n");
-            this.push("pipe-chunk2\n");
-            this.push("pipe-chunk3");
-            this.push(null); // End the stream
+        return new _Response(
+          new ReadableStream({
+            start(controller) {
+              const count = Number.parseInt(
+                url.searchParams.get("count") || "3",
+              );
+              for (let i = 0; i < count; i++) {
+                controller.enqueue(new TextEncoder().encode(`chunk${i}\n`));
+              }
+              controller.close();
+            },
+          }),
+          {
+            headers: {
+              "content-type": "text/plain",
+            },
           },
-        });
-        return new _Response(stream as any);
+        );
+      }
+
+      case "/stream/node": {
+        const { Readable } = process.getBuiltinModule("node:stream");
+        return new _Response(
+          new Readable({
+            read() {
+              for (let i = 0; i < 3; i++) {
+                this.push(`chunk${i}\n`);
+              }
+              this.push(null /* end stream */);
+            },
+          }) as any,
+        );
       }
     }
     return new _Response("404", { status: 404 });

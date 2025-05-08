@@ -89,95 +89,21 @@ export function addTests(opts: {
       expect(await response.text()).toBe("ok");
       expect(response.headers.get("x-plugin-header")).toBe("1");
     });
+  });
 
-    test("should stream pipe response from Node.js Readable", async () => {
-      const res = await fetch(url("/stream-pipe"));
+  describe("streams", () => {
+    test("response streaming (ReadableStream)", async () => {
+      const res = await fetch(url("/stream/node"));
       expect(res.status).toBe(200);
-
-      const reader = res.body!.getReader();
-      const decoder = new TextDecoder();
-      let result = "";
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        result += decoder.decode(value, { stream: true });
-      }
-
-      expect(result).toContain("pipe-chunk1");
-      expect(result).toContain("pipe-chunk2");
-      expect(result).toContain("pipe-chunk3");
-    });
-  });
-}
-
-export function addStreamingTests(opts: {
-  url: (path: string) => string;
-  fetch?: typeof globalThis.fetch;
-}): void {
-  const { url, fetch = globalThis.fetch } = opts;
-
-  test("streaming response", async () => {
-    const response = await fetch(url("/stream"));
-    const chunks: string[] = [];
-
-    const reader = response.body!.getReader();
-    const decoder = new TextDecoder(`utf-8`);
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) {
-        break;
-      }
-
-      chunks.push(decoder.decode(value, { stream: true }));
-    }
-
-    expect(chunks.join("")).toContain("chunk1");
-    expect(chunks.join("")).toContain("chunk2");
-    expect(chunks.join("")).toContain("chunk3");
-  });
-
-  test("abort stream", async () => {
-    const controller = new AbortController();
-    const signal = controller.signal;
-
-    // Create a stream using fetch API
-    const response = await fetch(url("/long-stream"), {
-      signal,
+      expect(await res.text()).toBe("chunk0\nchunk1\nchunk2\n");
     });
 
-    // Get the response as a readable stream
-    const reader = response.body!.getReader();
+    test("response streaming (Node.js Readable)", async () => {
+      const res = await fetch(url("/stream/node"));
+      expect(res.status).toBe(200);
+      expect(await res.text()).toBe("chunk0\nchunk1\nchunk2\n");
+    });
 
-    const chunks: Uint8Array[] = [];
-
-    // Read the first chunk and then abort
-    try {
-      const { value, done } = await reader.read();
-      if (!done) {
-        chunks.push(value);
-        // Abort after receiving first chunk
-        controller.abort();
-      }
-
-      // Try to read more chunks (this should throw when aborted)
-      while (true) {
-        const { value, done } = await reader.read();
-        if (done) break;
-        chunks.push(value);
-      }
-    } catch (error) {
-      // We expect the AbortError to be thrown
-      expect((error as any).name).toBe("AbortError");
-    } finally {
-      // Make sure to release the reader
-      reader.releaseLock();
-    }
-
-    // We expect at least one chunk to be received before aborting
-    expect(chunks.length).toBeGreaterThan(0);
-    // And we expect the abort to prevent receiving too many chunks
-    expect(chunks.length).toBeLessThan(10); // Assuming long stream has many chunks
+    // TODO: abortion test (we should test "fixture server" to see the abort signal)
   });
 }

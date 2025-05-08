@@ -90,14 +90,13 @@ class NodeServer implements Server {
       ...this.options.node,
     };
 
-    let server:
-      | NodeHttp.Server
-      | NodeHttps.Server
-      | NodeHttp2.Http2SecureServer;
+    // prettier-ignore
+    let server: NodeHttp.Server | NodeHttps.Server | NodeHttp2.Http2SecureServer;
 
     // prettier-ignore
     this.#isSecure = !!(this.serveOptions as { cert?: string }).cert && this.options.protocol !== "http";
     const isHttp2 = this.options.node?.http2 ?? this.#isSecure;
+
     if (isHttp2) {
       if (this.#isSecure) {
         server = NodeHttp2.createSecureServer(

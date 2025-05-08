@@ -96,16 +96,17 @@ class NodeServer implements Server {
 
     this.node = { handler };
 
-    if (this.options.node?.http2) {
-      if (!this.#isSecure) {
-        // unencrypted HTTP2 is not supported in browsers
-        // https://http2.github.io/faq/#does-http2-require-encryption
+    const isHttp2 = this.options.node?.http2 ?? this.#isSecure;
+
+    if (isHttp2) {
+      if (this.#isSecure) {
+        this.node.server = NodeHttp2.createSecureServer(
+          { allowHTTP1: true, ...this.serveOptions },
+          handler,
+        );
+      } else {
         throw new Error("node.http2 option requires tls certificate!");
       }
-      this.node.server = NodeHttp2.createSecureServer(
-        { allowHTTP1: true, ...this.serveOptions },
-        handler,
-      );
     } else if (this.#isSecure) {
       this.node.server = NodeHttps.createServer(
         this.serveOptions as NodeHttps.ServerOptions,

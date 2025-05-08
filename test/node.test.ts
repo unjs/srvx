@@ -6,18 +6,6 @@ import { getTLSCert } from "./_utils.ts";
 import { fixture } from "./_fixture.ts";
 
 const tls = await getTLSCert();
-const getHttp2Client = () => {
-  // https://undici.nodejs.org/#/docs/api/Client.md?id=parameter-clientoptions
-  // https://github.com/nodejs/undici/issues/2750#issuecomment-1941009554
-  const h2Agent = new Agent({ allowH2: true, connect: { ...tls } });
-  const fetchWithHttp2 = ((input: any, init?: any) =>
-    fetch(input, {
-      ...init,
-      dispatcher: h2Agent,
-    })) as unknown as typeof globalThis.fetch;
-
-  return { fetchWithHttp2, h2Agent };
-};
 
 const testConfigs = [
   {
@@ -31,20 +19,20 @@ const testConfigs = [
   {
     name: "http2",
     Response: globalThis.Response,
-    useHttp2Agent: true,
+    http2: true,
     serveOptions: { tls, node: { http2: true, allowHTTP1: false } },
   },
   {
     name: "http2, FastResponse",
     Response: FastResponse,
-    useHttp2Agent: true,
+    http2: true,
     serveOptions: { tls, node: { http2: true, allowHTTP1: false } },
   },
 ];
 
 for (const config of testConfigs) {
   describe.sequential(`node (${config.name})`, () => {
-    const { fetchWithHttp2, h2Agent } = getHttp2Client();
+    const client = getHttpClient(config.http2);
     let server: ReturnType<typeof serve> | undefined;
 
     beforeAll(async () => {
@@ -61,14 +49,31 @@ for (const config of testConfigs) {
     });
 
     afterAll(async () => {
-      await h2Agent.close();
+      await client.agent?.close();
       await server!.close();
     });
 
     addTests({
       url: (path) => server!.url! + path.slice(1),
       runtime: "node",
-      fetch: config.useHttp2Agent ? fetchWithHttp2 : undefined,
+      fetch: client.fetch,
     });
   });
+}
+
+function getHttpClient(h2?: boolean) {
+  if (!h2) {
+    return {
+      fetch: globalThis.fetch,
+      agent: undefined,
+    };
+  }
+  const h2Agent = new Agent({ allowH2: true, connect: { ...tls } });
+  const fetchWithHttp2 = ((input: any, init?: any) =>
+    fetch(input, {
+      ...init,
+      dispatcher: h2Agent,
+    })) as unknown as typeof globalThis.fetch;
+
+  return { fetch: fetchWithHttp2, agent: h2Agent };
 }

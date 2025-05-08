@@ -90,14 +90,17 @@ class NodeServer implements Server {
       ...this.options.node,
     };
 
-    this.node = { handler };
+    let server:
+      | NodeHttp.Server
+      | NodeHttps.Server
+      | NodeHttp2.Http2SecureServer;
 
     // prettier-ignore
     this.#isSecure = !!(this.serveOptions as { cert?: string }).cert && this.options.protocol !== "http";
     const isHttp2 = this.options.node?.http2 ?? this.#isSecure;
     if (isHttp2) {
       if (this.#isSecure) {
-        this.node.server = NodeHttp2.createSecureServer(
+        server = NodeHttp2.createSecureServer(
           { allowHTTP1: true, ...this.serveOptions },
           handler,
         );
@@ -105,24 +108,21 @@ class NodeServer implements Server {
         throw new Error("node.http2 option requires tls certificate!");
       }
     } else if (this.#isSecure) {
-      this.node.server = NodeHttps.createServer(
+      server = NodeHttps.createServer(
         this.serveOptions as NodeHttps.ServerOptions,
         handler,
       );
     } else {
-      this.node = {
-        server: NodeHttp.createServer(
-          this.serveOptions as NodeHttp.ServerOptions,
-          handler,
-        ),
+      server = NodeHttp.createServer(
+        this.serveOptions as NodeHttp.ServerOptions,
         handler,
-      };
+      );
     }
 
     // Listen to upgrade events if there is a hook
     const upgradeHandler = this.options.upgrade;
     if (upgradeHandler) {
-      this.node.server!.on("upgrade", (nodeReq, socket, header) => {
+      server.on("upgrade", (nodeReq, socket, header) => {
         const request = new NodeRequest({
           req: nodeReq,
           upgrade: { socket, header },
@@ -135,6 +135,8 @@ class NodeServer implements Server {
           : sendNodeUpgradeResponse(socket, res);
       });
     }
+
+    this.node = { server, handler };
 
     if (!options.manual) {
       this.serve();

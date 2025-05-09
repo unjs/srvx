@@ -4,9 +4,8 @@ import type {
   ServerOptions,
 } from "../types.ts";
 import type * as CF from "@cloudflare/workers-types";
-import { wrapFetch } from "../_plugin.ts";
-import { errorPlugin } from "../_error.ts";
-import { wsUpgradePlugin } from "../_ws.ts";
+import { wrapFetch } from "../_middleware.ts";
+import { errorPlugin, wsUpgradePlugin } from "../_plugins.ts";
 
 export const FastURL: typeof globalThis.URL = URL;
 export const FastResponse: typeof globalThis.Response = Response;
@@ -26,10 +25,13 @@ class CloudflareServer implements Server<CloudflareFetchHandler> {
   constructor(options: ServerOptions) {
     this.options = options;
 
-    const fetchHandler = wrapFetch(this as unknown as Server, [
-      errorPlugin,
-      wsUpgradePlugin,
-    ]);
+    if (options.plugins) {
+      for (const plugin of options.plugins) plugin(this as unknown as Server);
+    }
+    wsUpgradePlugin(this as unknown as Server);
+    errorPlugin(this as unknown as Server);
+
+    const fetchHandler = wrapFetch(this as unknown as Server);
 
     this.fetch = (request, env, context) => {
       Object.defineProperties(request, {

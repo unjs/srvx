@@ -1,7 +1,7 @@
 /* eslint-disable unicorn/prefer-global-this */
 import type { Server, ServerOptions, ServerRequest } from "../types.ts";
-import { wrapFetch } from "../_plugin.ts";
-import { errorPlugin } from "../_error.ts";
+import { wrapFetch } from "../_middleware.ts";
+import { errorPlugin } from "../_plugins.ts";
 
 export const FastURL: typeof globalThis.URL = URL;
 export const FastResponse: typeof globalThis.Response = Response;
@@ -31,7 +31,12 @@ class ServiceWorkerServer implements Server<ServiceWorkerHandler> {
   constructor(options: ServerOptions) {
     this.options = options;
 
-    const fetchHandler = wrapFetch(this as unknown as Server, [errorPlugin]);
+    if (options.plugins) {
+      for (const plugin of options.plugins) plugin(this as unknown as Server);
+    }
+    errorPlugin(this as unknown as Server);
+
+    const fetchHandler = wrapFetch(this as unknown as Server);
 
     this.fetch = (request: Request, event: FetchEvent) => {
       Object.defineProperties(request, {

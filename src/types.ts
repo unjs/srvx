@@ -31,6 +31,13 @@ export declare function serve(options: ServerOptions): Server;
  */
 export type ServerHandler = (request: ServerRequest) => MaybePromise<Response>;
 
+export type ServerMiddleware = (
+  request: ServerRequest,
+  next: () => Response | Promise<Response>,
+) => Response | Promise<Response>;
+
+export type ServerPlugin = (server: Server) => void;
+
 /**
  * Server options
  */
@@ -53,9 +60,14 @@ export interface ServerOptions {
   error?: ErrorHandler;
 
   /**
+   * Server middleware handlers to run before the main fetch handler.
+   */
+  middleware?: ServerMiddleware[];
+
+  /**
    * Server plugins.
    */
-  plugins?: (ServerPlugin | ServerPluginInstance)[];
+  plugins?: ServerPlugin[];
 
   /**
    * If set to `true`, server will not start listening automatically.
@@ -224,22 +236,6 @@ export interface Server<Handler = ServerHandler> {
    * @default false
    */
   close(closeActiveConnections?: boolean): Promise<void>;
-}
-
-// ----------------------------------------------------------------------------
-// Plugins
-// ----------------------------------------------------------------------------
-
-export type ServerPlugin = (server: Server) => ServerPluginInstance;
-
-export type ServerMiddleware = (
-  request: ServerRequest,
-  next: () => Response | Promise<Response>,
-) => Response | Promise<Response>;
-
-export interface ServerPluginInstance {
-  name?: string;
-  fetch?: ServerMiddleware;
 }
 
 // ----------------------------------------------------------------------------

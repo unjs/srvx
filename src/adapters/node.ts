@@ -12,8 +12,8 @@ import {
   printListening,
   resolvePortAndHost,
 } from "../_utils.node.ts";
-import { wrapFetch } from "../_plugin.ts";
-import { errorPlugin } from "../_error.ts";
+import { wrapFetch } from "../_middleware.ts";
+import { errorPlugin } from "../_plugins.ts";
 
 import type {
   FetchHandler,
@@ -65,7 +65,12 @@ class NodeServer implements Server {
   constructor(options: ServerOptions) {
     this.options = options;
 
-    const fetchHandler = (this.fetch = wrapFetch(this, [errorPlugin]));
+    if (options.plugins) {
+      for (const plugin of options.plugins) plugin(this);
+    }
+    errorPlugin(this);
+
+    const fetchHandler = (this.fetch = wrapFetch(this));
 
     const handler = (
       nodeReq: NodeServerRequest,

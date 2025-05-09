@@ -5,8 +5,8 @@ import {
   resolvePortAndHost,
   resolveTLSOptions,
 } from "../_utils.node.ts";
-import { wrapFetch } from "../_plugin.ts";
-import { wsUpgradePlugin } from "../_ws.ts";
+import { wrapFetch } from "../_middleware.ts";
+import { wsUpgradePlugin } from "../_plugins.ts";
 
 export { FastURL } from "../_url.ts";
 export const FastResponse: typeof globalThis.Response = Response;
@@ -32,7 +32,12 @@ class DenoServer implements Server<DenoFetchHandler> {
   constructor(options: ServerOptions) {
     this.options = options;
 
-    const fetchHandler = wrapFetch(this, [wsUpgradePlugin]);
+    if (options.plugins) {
+      for (const plugin of options.plugins) plugin(this);
+    }
+    wsUpgradePlugin(this);
+
+    const fetchHandler = wrapFetch(this);
 
     this.fetch = (request, info) => {
       Object.defineProperties(request, {

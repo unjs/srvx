@@ -12,24 +12,25 @@ export const fixture: (
 ) => ServerOptions = (opts, _Response = globalThis.Response) => ({
   ...opts,
   hostname: "localhost",
-  plugins: [
-    {
-      fetch(req, next) {
-        if (req.headers.has("X-plugin-req")) {
-          return new _Response("response from req plugin");
-        }
-        return next();
-      },
+  middleware: [
+    (req, next) => {
+      if (req.headers.has("X-plugin-req")) {
+        return new _Response("response from req plugin");
+      }
+      return next();
     },
-    {
-      async fetch(req, next) {
+  ],
+  plugins: [
+    (server) => {
+      server.options.middleware ??= [];
+      server.options.middleware.unshift(async (req, next) => {
         if (!req.headers.has("X-plugin-res")) {
           return next();
         }
         const res = await next();
         res.headers.set("x-plugin-header", "1");
         return res;
-      },
+      });
     },
   ],
 

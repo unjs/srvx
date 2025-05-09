@@ -32,9 +32,7 @@ class DenoServer implements Server<DenoFetchHandler> {
   constructor(options: ServerOptions) {
     this.options = options;
 
-    if (options.plugins) {
-      for (const plugin of options.plugins) plugin(this);
-    }
+    for (const plugin of options.plugins || []) plugin(this);
     wsUpgradePlugin(this);
 
     const fetchHandler = wrapFetch(this);

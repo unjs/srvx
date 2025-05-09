@@ -25,9 +25,7 @@ class CloudflareServer implements Server<CloudflareFetchHandler> {
   constructor(options: ServerOptions) {
     this.options = options;
 
-    if (options.plugins) {
-      for (const plugin of options.plugins) plugin(this as unknown as Server);
-    }
+    for (const plugin of options.plugins || []) plugin(this as any as Server);
     wsUpgradePlugin(this as unknown as Server);
     errorPlugin(this as unknown as Server);
 

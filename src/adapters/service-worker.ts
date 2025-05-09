@@ -31,9 +31,7 @@ class ServiceWorkerServer implements Server<ServiceWorkerHandler> {
   constructor(options: ServerOptions) {
     this.options = options;
 
-    if (options.plugins) {
-      for (const plugin of options.plugins) plugin(this as unknown as Server);
-    }
+    for (const plugin of options.plugins || []) plugin(this as any as Server);
     errorPlugin(this as unknown as Server);
 
     const fetchHandler = wrapFetch(this as unknown as Server);

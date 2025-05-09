@@ -17,9 +17,7 @@ class GenericServer implements Server {
   constructor(options: ServerOptions) {
     this.options = options;
 
-    if (options.plugins) {
-      for (const plugin of options.plugins) plugin(this);
-    }
+    for (const plugin of options.plugins || []) plugin(this);
     errorPlugin(this);
 
     const fetchHandler = wrapFetch(this as unknown as Server);

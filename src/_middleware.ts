@@ -3,24 +3,11 @@ import type {
   ServerRequest,
   ServerHandler,
   ServerMiddleware,
-  ServerPlugin,
 } from "./types.ts";
 
-export function wrapFetch(
-  server: Server,
-  basePlugins?: ServerPlugin[],
-): ServerHandler {
-  const plugins = [
-    ...(basePlugins || []),
-    ...(server.options.plugins || []),
-  ].map((plugin) => (typeof plugin === "function" ? plugin(server) : plugin));
-
-  const middleware = plugins
-    .filter((plugin) => plugin.fetch)
-    .map((plugin) => plugin.fetch!);
-
+export function wrapFetch(server: Server): ServerHandler {
   const fetchHandler = server.options.fetch;
-
+  const middleware = server.options.middleware || [];
   return middleware.length === 0
     ? fetchHandler
     : (request) => callMiddleware(request, fetchHandler, middleware, 0);
